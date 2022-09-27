@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AccessImagePathFail" xml:space="preserve">
+    <value>* Resim Yoluna Erişilemiyor!</value>
+  </data>
+  <data name="AccessImagePathFailFormatted" xml:space="preserve">
+    <value>* Resim Yoluna Erişilemiyor. Hata: {0}</value>
+  </data>
+  <data name="AccessImagePathOk" xml:space="preserve">
+    <value>* Resim Yoluna Erişim Sağlandı.</value>
+  </data>
+  <data name="DbConnectionFail" xml:space="preserve">
+    <value>* Veritabanına bağlantı sağlanamadı!</value>
+  </data>
+  <data name="DbConnectionSuccessful" xml:space="preserve">
+    <value>* Veritabanına Bağlantı Başarılı</value>
+  </data>
+  <data name="errorFormatted" xml:space="preserve">
+    <value>Hata: {0}</value>
+  </data>
+  <data name="IndexTitle" xml:space="preserve">
+    <value>Orjin Yazılım Mobil Web Servis</value>
+  </data>
+  <data name="KodluIsTalebiOlusturuldu" xml:space="preserve">
+    <value>{0} kodlu iş talebi oluşturuldu.</value>
+  </data>
+  <data name="NoluIsemrineAtandiniz" xml:space="preserve">
+    <value>{0} numaralı iş emrine atandınız.</value>
+  </data>
+  <data name="NoluIsemriOlusturuldu" xml:space="preserve">
+    <value>{0} numaralı iş emri oluşturuldu.</value>
+  </data>
+  <data name="NoluMalzemeTalebiOlusturuldu" xml:space="preserve">
+    <value>{0} numaralı malzeme talebi oluşturuldu.</value>
+  </data>
+  <data name="PersonelBilgiYokKayitEdilemedi" xml:space="preserve">
+    <value>Personel bağlantısı bulunmadığı için profil fotoğrafı kaydedilmedi!</value>
+  </data>
+  <data name="ResimKayitHata" xml:space="preserve">
+    <value>Resim bilgisi kaydedilirken hata oluştu! Hata : {0}</value>
+  </data>
+  <data name="YeniIsEmri" xml:space="preserve">
+    <value>Yeni İş Emri!</value>
+  </data>
+  <data name="YeniIsTalebi" xml:space="preserve">
+    <value>Yeni İş Talebi!</value>
+  </data>
+  <data name="YeniMalzemeTalebi" xml:space="preserve">
+    <value>Yeni Malzeme Talebi!</value>
+  </data>
+  <data name="FirmaListError" xml:space="preserve">
+    <value>Firma listesi alınırken sunucu hatası: {0}</value>
+  </data>
+  <data name="GetCalismaAyarListError" xml:space="preserve">
+    <value>Çalışma tipleri alınırken sunucu hatası: {0}</value>
+  </data>
+  <data name="GetCalismaListError" xml:space="preserve">
+    <value>Makine çalışma listesi alınırken sunucu hatası: {0}</value>
+  </data>
+  <data name="GetCalismaOperatorListError" xml:space="preserve">
+    <value>Operator listesi alınırken sunucu hatası: {0}</value>
+  </data>
+  <data name="KodOlusturError" xml:space="preserve">
+    <value>Kod oluşturulurken sunucu hatası: {0}</value>
+  </data>
+  <data name="MakineCalismaKartGuncelleErr" xml:space="preserve">
+    <value>Makine çalışma kartı güncellenirken sunucu hatası: {0}</value>
+  </data>
+  <data name="MakineCalismaKartGuncelleOk" xml:space="preserve">
+    <value>Makine çalışma kartı başarılı bir şekilde güncellendi</value>
+  </data>
+  <data name="MakineCalismaKartKayitErr" xml:space="preserve">
+    <value>Makine çalışma kartı kaydedilirken sunucu hatası: {0}</value>
+  </data>
+  <data name="MakineCalismaKartKayitOk" xml:space="preserve">
+    <value>Makine çalışma kartı başarılı bir şekilde kaydedildi.</value>
+  </data>
+  <data name="MknCalismaKartKayitDegisiklikYok" xml:space="preserve">
+    <value>Makine çalışma kartı güncellenemedi!\nKayıtta değişiklik algılanmadı!</value>
+  </data>
+  <data name="MknCalismaKartKayitKayitYok" xml:space="preserve">
+    <value>Makine çalışma kartı güncellenemedi!\nBöyle bir kayıt yok!</value>
+  </data>
+  <data name="BilgilerAlinirkenSunucuHata" xml:space="preserve">
+    <value>Bilgiler alınırken sunucu hatası: {0}</value>
+  </data>
+  <data name="MknCalismaOperatorGuncelleHata" xml:space="preserve">
+    <value>Operatör güncellenirken sunucu hatası: {0}</value>
+  </data>
+  <data name="MknCalismaOperatorGuncelleOk" xml:space="preserve">
+    <value>Operatör başarılı bir şekilde güncellendi</value>
+  </data>
+  <data name="MknCalismaOperatorKayitHata" xml:space="preserve">
+    <value>Operatör kaydedilirken sunucu hatası: {0}</value>
+  </data>
+  <data name="MknCalismaOperatorKayitOk" xml:space="preserve">
+    <value>Operatör başarılı bir şekilde kaydedildi.</value>
+  </data>
+  <data name="MknCalismaSilHata" xml:space="preserve">
+    <value>Makine çalışma kartı silinemedi!</value>
+  </data>
+  <data name="MknCalismaSilKayitYok" xml:space="preserve">
+    <value>Makine çalışma kartı silinemedi!\nBöyle bir kayıt yok!</value>
+  </data>
+  <data name="MknCalismaSilOk" xml:space="preserve">
+    <value>Makine çalışma kartı başarıyla silindi</value>
+  </data>
+  <data name="MknCalismaSilSunucuHata" xml:space="preserve">
+    <value>Makine çalışma kartı silinirken sunucu hatası: {0}</value>
+  </data>
+  <data name="MknOperatorSilHata" xml:space="preserve">
+    <value>Operatör silinemedi!</value>
+  </data>
+  <data name="MknOperatorSilKayitYok" xml:space="preserve">
+    <value>Operatör silinemedi! Böyle bir kayıt yok!</value>
+  </data>
+  <data name="MknOperatorSilOk" xml:space="preserve">
+    <value>Operatör başarılı bir şekilde silindi</value>
+  </data>
+  <data name="MknOperatorSilSunucuHata" xml:space="preserve">
+    <value>Operatör silinirken sunucu hatası: {0}</value>
+  </data>
+  <data name="MknOprGuncelleDegYokHata" xml:space="preserve">
+    <value>Operatör güncellenmedi!\nKayıtta değişiklik algılanmadı!</value>
+  </data>
+  <data name="MknOprGuncelleKayitYokHata" xml:space="preserve">
+    <value>Operatör güncellenemedi!\nBöyle bir kayıtyok!</value>
+  </data>
+  <data name="KayitBulunamadi" xml:space="preserve">
+    <value>Kayıt bulunamadı!</value>
+  </data>
+  <data name="KayitEdilemedi" xml:space="preserve">
+    <value>Kayıt işlemi başarısız oldu!</value>
+  </data>
+  <data name="IsemriMevcut" xml:space="preserve">
+    <value>İş Emri Mevcut!</value>
+  </data>
+</root>

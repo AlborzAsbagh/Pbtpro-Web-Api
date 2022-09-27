@@ -1,0 +1,708 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="11/14/2019 15:00:27" ReportInfo.Modified="11/21/2019 17:26:57" ReportInfo.CreatorVersion="2019.4.12.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+    private void BeforeHeaderPrint(object sender, EventArgs e)
+    {     
+      string df=&quot;dd.MM.yyyy&quot;;
+      DataSourceBase ADOQuery1 = Report.GetDataSource(&quot;ADOQuery1&quot;);       
+      ADOQuery1.Init();                      
+      DataSourceBase ADOQuery3 = Report.GetDataSource(&quot;ADOQuery3&quot;);       
+      ADOQuery3.Init();                   
+      DataSourceBase ADOQuery4 = Report.GetDataSource(&quot;ADOQuery4&quot;);       
+      ADOQuery4.Init();                   
+      DataSourceBase msqFirma = Report.GetDataSource(&quot;msqFirma&quot;);       
+      msqFirma.Init(); 
+      string duztarih=((DateTime)Report.GetColumnValue(&quot;ADOQuery1.ISM_DUZENLEME_TARIH&quot;)).ToString(df);    
+      string bastarih=((DateTime)Report.GetColumnValue(&quot;ADOQuery1.ISM_BASLAMA_TARIH&quot;)).ToString(df); 
+      string bittarih=((DateTime)Report.GetColumnValue(&quot;ADOQuery1.ISM_BITIS_TARIH&quot;)).ToString(df);       
+      string biltarih=((DateTime)Report.GetColumnValue(&quot;ADOQuery1.ISM_BILDIRIM_TARIH&quot;)).ToString(df);   
+      string bassaat = Convert.ToString(Report.GetColumnValue(&quot;ADOQuery1.ISM_BASLAMA_SAAT&quot;));   
+      string bitsaat = Convert.ToString(Report.GetColumnValue(&quot;ADOQuery1.ISM_BITIS_SAAT&quot;));
+      bassaat=bassaat==null||bassaat.Length&lt;5?&quot;&quot;:bassaat.Substring(0,5);            
+      bitsaat=bitsaat==null||bitsaat.Length&lt;5?&quot;&quot;:bitsaat.Substring(0,5);         
+      
+      if(duztarih==&quot;01.01.0001&quot;)  
+        Memo60.Visible = false; 
+      else
+        Memo60.Text=duztarih;
+      
+      if(biltarih==&quot;01.01.0001&quot;)  
+        Memo85.Visible = false; 
+      else
+        Memo85.Text=biltarih;
+            
+      if(bastarih==&quot;01.01.0001&quot;) 
+          Memo41.Visible = false; 
+      else 
+        Memo41.Text=String.Format(&quot;{0} / {1}&quot;,bastarih,bassaat);
+      
+      if(bittarih==&quot;01.01.0001&quot;)  
+          Memo42.Visible = false;
+      else 
+        Memo42.Text=String.Format(&quot;{0} / {1}&quot;,bittarih,bitsaat);
+      
+      
+    }
+  
+  }
+}
+/*procedure PageHeader1OnBeforePrint(Sender: TfrxComponent);
+begin
+  msqParametre.Close;
+  msqParametre.Open;
+    
+  ADOQuery1.Close;
+  ADOQuery1.ParamByName('NO').Value := msqParametre.FieldByName('DEGER').Value;
+  ADOQuery1.Open;              
+ 
+  ADOQuery2.Close;
+  ADOQuery2.ParamByName('NO').Value := msqParametre.FieldByName('DEGER').Value;
+  ADOQuery2.Open;            
+  
+  ADOQuery3.Close;
+  ADOQuery3.ParamByName('NO').Value := msqParametre.FieldByName('DEGER').Value;
+  ADOQuery3.Open;            
+  
+  ADOQuery4.Close;
+  ADOQuery4.ParamByName('NO').Value := msqParametre.FieldByName('DEGER').Value;
+  ADOQuery4.Open;
+    
+  msqFirmaId.Close;
+  msqFirmaId.Open;
+  
+  msqFirma.Close;
+  msqFirma.ParamByName('TB_FIRMA_ID').Value := msqFirmaId.FieldByName('TB_FIRMA_ID').Value;                                       
+  msqFirma.Open;
+
+    
+          
+
+  if ADOQuery1.FieldByName('ISM_BASLAMA_TARIH').Value &lt;= 0 then 
+    memo41.visible := False;  
+  if ADOQuery1.FieldByName('ISM_BITIS_TARIH').Value &lt;= 0 then 
+    memo42.visible := False;  
+ end;
+  
+begin          
+end.
+*/</ScriptText>
+  <Dictionary>
+    <MsSqlDataConnection Name="omega_1" ConnectionString="rijcmlqR+hQ2oKf4PMfQPoonpwhNNSGZEUJnJNSzwQJa39+BqILiXv9KuzgIymP2PX0QNTE+HPEZh47qiUxdqucbFSImnYSb4M44T1Zyp6XK10JhRUyriYLUQtqCTsSaEBRXvi9aHLHA1Fo3brhoE7wHuEujZuAcdk1b0v7KIjbx6q49wyI01GFaPGDAjrh2uujIYE2nmwCYX/qcCgK7sQYbf200kmtOYHs9zVqPxIKfNuXnJw=">
+      <TableDataSource Name="ADOQuery1" DataType="System.Int32" Enabled="true" SelectCommand="SELECT I.*, M.MKN_KOD, M.MKN_TANIM, M.MKN_GARANTI_BITIS, E.EKP_KOD, E.EKP_TANIM,&#13;&#10;L.LOK_TANIM, O.SOC_TANIM, TK.TKV_TANIM, TLM.TLM_TANIM, A.ATL_TANIM, IT.IMT_TANIM,      K.KOD_TANIM AS ISTIP, K1.KOD_TANIM AS ISDURUM, K2.KOD_TANIM AS MKNDURUM, K3.KOD_TANIM AS ISNEDEN,ISE.ISM_ISEMRI_NO ISM_ISEMRI_NO_1,SYC.MES_GUNCEL_DEGER,&#13;&#10;&#13;&#10;CASE WHEN I.ISM_TIP_ID = 2 THEN P.PBK_KOD&#13;&#10;ELSE IST.IST_KOD END AS ISKOD,&#13;&#10;&#13;&#10;CASE WHEN I.ISM_TIP_ID = 2 THEN P.PBK_TANIM&#13;&#10;ELSE IST.IST_TANIM END AS ISTANIM&#13;&#10;&#13;&#10;&#13;&#10;FROM orjin.TB_ISEMRI I&#13;&#10;&#13;&#10;LEFT OUTER JOIN orjin.TB_ISEMRI ISE ON (I.ISM_BAGLI_ISEMRI_ID = ISE.TB_ISEMRI_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_MAKINE M ON (I.ISM_MAKINE_ID = M.TB_MAKINE_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_SAYAC SYC ON (SYC.MES_REF_ID = M.TB_MAKINE_ID AND MES_VARSAYILAN = 1)&#13;&#10;LEFT OUTER JOIN orjin.TB_EKIPMAN E ON (I.ISM_EKIPMAN_ID = E.TB_EKIPMAN_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_ISEMRI_TIP IT ON (I.ISM_TIP_ID = IT.TB_ISEMRI_TIP_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_IS_TANIM IST ON (I.ISM_REF_ID = IST.TB_IS_TANIM_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_LOKASYON L ON (I.ISM_LOKASYON_ID = L.TB_LOKASYON_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_SERVIS_ONCELIK O ON (I.ISM_ONCELIK_ID = O.TB_SERVIS_ONCELIK_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_TAKVIM TK ON (I.ISM_TAKVIM_ID = TK.TB_TAKVIM_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_TALIMAT TLM ON (I.ISM_TALIMAT_ID = TLM.TB_TALIMAT_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_ATOLYE A ON (I.ISM_ATOLYE_ID = A.TB_ATOLYE_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_PERIYODIK_BAKIM P ON (I.ISM_REF_ID = P.TB_PERIYODIK_BAKIM_ID) &#13;&#10;&#13;&#10;LEFT OUTER JOIN orjin.TB_KOD K  ON (I.ISM_TIP_KOD_ID = K.TB_KOD_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_KOD K1 ON (I.ISM_DURUM_KOD_ID = K1.TB_KOD_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_KOD K2 ON (I.ISM_MAKINE_DURUM_KOD_ID = K2.TB_KOD_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_KOD K3 ON (I.ISM_NEDEN_KOD_ID = K3.TB_KOD_ID)&#13;&#10;&#13;&#10;WHERE I.ISM_ISEMRI_NO = @ISMNO">
+        <Column Name="TB_ISEMRI_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ISEMRI_NO" DataType="System.String"/>
+        <Column Name="ISM_MAKINE_ID" DataType="System.Int32"/>
+        <Column Name="ISM_REF_ID" DataType="System.Int32"/>
+        <Column Name="ISM_REF_GRUP" DataType="System.String"/>
+        <Column Name="ISM_ONCELIK_ID" DataType="System.Int32"/>
+        <Column Name="ISM_BILDIRIM_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BILDIRIM_SAAT" DataType="System.String"/>
+        <Column Name="ISM_DUZENLEME_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_DUZENLEME_SAAT" DataType="System.String"/>
+        <Column Name="ISM_BASLAMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BASLAMA_SAAT" DataType="System.String"/>
+        <Column Name="ISM_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BITIS_SAAT" DataType="System.String"/>
+        <Column Name="ISM_MALIYET_MLZ" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PERSONEL" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_DURUS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_DISSERVIS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_DIGER" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_TOPLAM" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_MLZ" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_PERSONEL" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_DURUS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_DISSERVIS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_DIGER" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_TOPLAM" DataType="System.Double"/>
+        <Column Name="ISM_SURE_MUDAHALE_LOJISTIK" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_MUDAHALE_SEYAHAT" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_MUDAHALE_ONAY" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_MUDAHALE_DIGER" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_BEKLEME" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_TOPLAM" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_TALEP" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_CALISMA" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_DURUS" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_BEKLEME" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_TOPLAM" DataType="System.Int32"/>
+        <Column Name="ISM_TAKVIM_ID" DataType="System.Int32"/>
+        <Column Name="ISM_KAPATILDI" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISM_TALIMAT_ID" DataType="System.Int32"/>
+        <Column Name="ISM_GUVENLIK_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ACIKLAMA" DataType="System.String"/>
+        <Column Name="ISM_BILDIREN" DataType="System.String"/>
+        <Column Name="ISM_PUAN" DataType="System.String"/>
+        <Column Name="ISM_SONUC" DataType="System.String"/>
+        <Column Name="ISM_LOKASYON_ID" DataType="System.Int32"/>
+        <Column Name="ISM_DURUM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IPTAL_NEDEN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IPTAL_ONAY_PERSONEL_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IPTAL_ACIKLAMA" DataType="System.String"/>
+        <Column Name="ISM_NEDEN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ILETISIM_SEKLI_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_DURUM_ACIKLAMA" DataType="System.String"/>
+        <Column Name="ISM_IRTIBAT_TEL" DataType="System.String"/>
+        <Column Name="ISM_EMAIL" DataType="System.String"/>
+        <Column Name="ISM_KONU" DataType="System.String"/>
+        <Column Name="ISM_NOT" DataType="System.String"/>
+        <Column Name="ISM_YAPILDI" DataType="System.String"/>
+        <Column Name="ISM_YAPILAMAMA_NEDEN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_PLAN_BASLAMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_PLAN_BASLAMA_SAAT" DataType="System.String"/>
+        <Column Name="ISM_PLAN_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_PLAN_BITIS_SAAT" DataType="System.String"/>
+        <Column Name="ISM_TIP_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ATOLYE_ID" DataType="System.Int32"/>
+        <Column Name="ISM_EKIPMAN_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_TIP" DataType="System.String"/>
+        <Column Name="ISM_OLUSTURAN_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OLUSTURMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_DEGISTIREN_ID" DataType="System.Int32"/>
+        <Column Name="ISM_DEGISTIRME_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BAGLI_ISEMRI_ID" DataType="System.Int32"/>
+        <Column Name="ISM_MAKINE_DURUM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_TIP_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_BILDIREN" DataType="System.String"/>
+        <Column Name="ISM_IS_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_IS_SAAT" DataType="System.String"/>
+        <Column Name="ISM_MASRAF_MERKEZ_ID" DataType="System.Int32"/>
+        <Column Name="ISM_PROJE_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_REFERANS_NO" DataType="System.String"/>
+        <Column Name="ISM_TAMAMLANMA_ORAN" DataType="System.Int32"/>
+        <Column Name="ISM_FIRMA_ID" DataType="System.Int32"/>
+        <Column Name="ISM_FIRMA_SOZLESME_ID" DataType="System.Int32"/>
+        <Column Name="ISM_EVRAK_NO" DataType="System.String"/>
+        <Column Name="ISM_GARANTI_KAPSAMINDA" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISM_IS_DEPARTMAN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_ILETISIM_SEKLI_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_EMAIL" DataType="System.String"/>
+        <Column Name="ISM_IS_IRTIBAT_TEL" DataType="System.String"/>
+        <Column Name="ISM_IS_SONUC" DataType="System.String"/>
+        <Column Name="ISM_SURE_ISCILIK" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_CALISMA" DataType="System.Int32"/>
+        <Column Name="ISM_SONUC_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_KAPAT_MAKINE_DURUM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_SAYAC_DEGER" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_LOJISTIK" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_SEYAHAT" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_ONAY" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_DIGER" DataType="System.Int32"/>
+        <Column Name="ISM_PLAN_BASLAMA_TARIH_ILK" DataType="System.DateTime"/>
+        <Column Name="ISM_OTOMATIK_ISEMRI" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISM_TASERON_FIRMA_ID" DataType="System.Int32"/>
+        <Column Name="ISM_HAKEDIS_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_1" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_2" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_3" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_4" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_5" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_6" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_7" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_8" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_9" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_10" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_11_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_12_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_13_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_14_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_15_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_16" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_17" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_18" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_19" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_20" DataType="System.Double"/>
+        <Column Name="ISM_EVRAK_TARIHI" DataType="System.DateTime"/>
+        <Column Name="ISM_MAKINE_GUVENLIK_NOTU" DataType="System.String"/>
+        <Column Name="ISM_PROJE_ID" DataType="System.Int32"/>
+        <Column Name="ISM_MALIYET_KDV" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_INDIRIM" DataType="System.Double"/>
+        <Column Name="ISM_KAPANMA_YDK_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_KAPANMA_YDK_SAAT" DataType="System.String"/>
+        <Column Name="ISM_IS_TALEP_NO" DataType="System.String"/>
+        <Column Name="MKN_KOD" DataType="System.String"/>
+        <Column Name="MKN_TANIM" DataType="System.String"/>
+        <Column Name="MKN_GARANTI_BITIS" DataType="System.DateTime"/>
+        <Column Name="EKP_KOD" DataType="System.String"/>
+        <Column Name="EKP_TANIM" DataType="System.String"/>
+        <Column Name="LOK_TANIM" DataType="System.String"/>
+        <Column Name="SOC_TANIM" DataType="System.String"/>
+        <Column Name="TKV_TANIM" DataType="System.String"/>
+        <Column Name="TLM_TANIM" DataType="System.String"/>
+        <Column Name="ATL_TANIM" DataType="System.String"/>
+        <Column Name="IMT_TANIM" DataType="System.String"/>
+        <Column Name="ISTIP" DataType="System.String"/>
+        <Column Name="ISDURUM" DataType="System.String"/>
+        <Column Name="MKNDURUM" DataType="System.String"/>
+        <Column Name="ISNEDEN" DataType="System.String"/>
+        <Column Name="ISM_ISEMRI_NO_1" DataType="System.String"/>
+        <Column Name="MES_GUNCEL_DEGER" DataType="System.Double"/>
+        <Column Name="ISKOD" DataType="System.String"/>
+        <Column Name="ISTANIM" DataType="System.String"/>
+        <CommandParameter Name="ISMNO" DataType="22" Expression="[ISMNO]"/>
+      </TableDataSource>
+      <TableDataSource Name="ADOQuery3" DataType="System.Int32" Enabled="true" SelectCommand="SELECT IM.*, K.KOD_TANIM AS BIRIM, S.STK_KOD, S.STK_TANIM  ,STK_TIP                 &#13;&#10;FROM orjin.VW_ISEMRI_MLZ IM&#13;&#10;LEFT OUTER JOIN orjin.TB_ISEMRI I ON (IM.IDM_ISEMRI_ID = I.TB_ISEMRI_ID)&#13;&#10;LEFT OUTER JOIN orjin.VW_STOK S ON (IM.IDM_STOK_ID = S.TB_STOK_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_KOD K ON (IM.IDM_BIRIM_KOD_ID = K.TB_KOD_ID)&#13;&#10;WHERE I.ISM_ISEMRI_NO = @ISMNO">
+        <Column Name="TB_ISEMRI_MLZ_ID" DataType="System.Int32"/>
+        <Column Name="IDM_ISEMRI_ID" DataType="System.Int32"/>
+        <Column Name="IDM_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDM_SAAT" DataType="System.String"/>
+        <Column Name="IDM_STOK_ID" DataType="System.Int32"/>
+        <Column Name="IDM_DEPO_ID" DataType="System.Int32"/>
+        <Column Name="IDM_BIRIM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="IDM_STOK_TIP_KOD_ID" DataType="System.Int32"/>
+        <Column Name="IDM_STOK_DUS" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IDM_STOK_TANIM" DataType="System.String"/>
+        <Column Name="IDM_BIRIM_FIYAT" DataType="System.Double"/>
+        <Column Name="IDM_MIKTAR" DataType="System.Double"/>
+        <Column Name="IDM_TUTAR" DataType="System.Double"/>
+        <Column Name="IDM_OLUSTURAN_ID" DataType="System.Int32"/>
+        <Column Name="IDM_OLUSTURMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDM_DEGISTIREN_ID" DataType="System.Int32"/>
+        <Column Name="IDM_DEGISTIRME_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDM_REF_ID" DataType="System.Int32"/>
+        <Column Name="IDM_STOK_KULLANIM_SEKLI" DataType="System.Int16"/>
+        <Column Name="IDM_MALZEME_STOKTAN" DataType="System.String"/>
+        <Column Name="IDM_ALTERNATIF_STOK_ID" DataType="System.Int32"/>
+        <Column Name="IDM_MARKA_KOD_ID" DataType="System.Int32"/>
+        <Column Name="IDM_ACIKLAMA" DataType="System.String"/>
+        <Column Name="IDM_MALZEMETIP" DataType="System.String"/>
+        <Column Name="IDM_DEPO" DataType="System.String"/>
+        <Column Name="IDM_BIRIM" DataType="System.String"/>
+        <Column Name="IDM_OLUSTURAN" DataType="System.String"/>
+        <Column Name="IDM_DEGISTIREN" DataType="System.String"/>
+        <Column Name="BIRIM" DataType="System.String"/>
+        <Column Name="STK_KOD" DataType="System.String"/>
+        <Column Name="STK_TANIM" DataType="System.String"/>
+        <Column Name="STK_TIP" DataType="System.String"/>
+        <CommandParameter Name="ISMNO" DataType="22" Expression="[ISMNO]"/>
+      </TableDataSource>
+      <TableDataSource Name="ADOQuery4" DataType="System.Int32" Enabled="true" SelectCommand="SELECT *&#13;&#10;FROM orjin.TB_ISEMRI_KAYNAK IK&#13;&#10;LEFT OUTER JOIN orjin.TB_ISEMRI I ON (IK.IDK_ISEMRI_ID = I.TB_ISEMRI_ID)&#13;&#10;LEFT OUTER JOIN orjin.TB_PERSONEL P ON (IK.IDK_REF_ID = P.TB_PERSONEL_ID)&#13;&#10;WHERE I.ISM_ISEMRI_NO = @ISMNO">
+        <Column Name="TB_ISEMRI_KAYNAK_ID" DataType="System.Int32"/>
+        <Column Name="IDK_ISEMRI_ID" DataType="System.Int32"/>
+        <Column Name="IDK_SOZLESME_ID" DataType="System.Int32"/>
+        <Column Name="IDK_REF_ID" DataType="System.Int32"/>
+        <Column Name="IDK_REF_GRUP" DataType="System.String"/>
+        <Column Name="IDK_BASLAMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDK_BASLAMA_SAAT" DataType="System.String"/>
+        <Column Name="IDK_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDK_BITIS_SAAT" DataType="System.String"/>
+        <Column Name="IDK_EVRAK_NO" DataType="System.String"/>
+        <Column Name="IDK_ACIKLAMA" DataType="System.String"/>
+        <Column Name="IDK_SURE" DataType="System.Int32"/>
+        <Column Name="IDK_SAAT_UCRETI" DataType="System.Double"/>
+        <Column Name="IDK_VARDIYA" DataType="System.Int32"/>
+        <Column Name="IDK_FAZLA_MESAI_VAR" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IDK_FAZLA_MESAI_SURE" DataType="System.Int32"/>
+        <Column Name="IDK_FAZLA_MESAI_SAAT_UCRETI" DataType="System.Double"/>
+        <Column Name="IDK_MALIYET" DataType="System.Double"/>
+        <Column Name="IDK_OLUSTURAN_ID" DataType="System.Int32"/>
+        <Column Name="IDK_OLUSTURMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDK_DEGISTIREN_ID" DataType="System.Int32"/>
+        <Column Name="IDK_DEGISTIRME_TARIH" DataType="System.DateTime"/>
+        <Column Name="IDK_OKUMA" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="IDK_MAIL_GONDERILDI" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="TB_ISEMRI_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ISEMRI_NO" DataType="System.String"/>
+        <Column Name="ISM_MAKINE_ID" DataType="System.Int32"/>
+        <Column Name="ISM_REF_ID" DataType="System.Int32"/>
+        <Column Name="ISM_REF_GRUP" DataType="System.String"/>
+        <Column Name="ISM_ONCELIK_ID" DataType="System.Int32"/>
+        <Column Name="ISM_BILDIRIM_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BILDIRIM_SAAT" DataType="System.String"/>
+        <Column Name="ISM_DUZENLEME_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_DUZENLEME_SAAT" DataType="System.String"/>
+        <Column Name="ISM_BASLAMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BASLAMA_SAAT" DataType="System.String"/>
+        <Column Name="ISM_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BITIS_SAAT" DataType="System.String"/>
+        <Column Name="ISM_MALIYET_MLZ" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PERSONEL" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_DURUS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_DISSERVIS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_DIGER" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_TOPLAM" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_MLZ" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_PERSONEL" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_DURUS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_DISSERVIS" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_DIGER" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_PLAN_TOPLAM" DataType="System.Double"/>
+        <Column Name="ISM_SURE_MUDAHALE_LOJISTIK" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_MUDAHALE_SEYAHAT" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_MUDAHALE_ONAY" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_MUDAHALE_DIGER" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_BEKLEME" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_TOPLAM" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_TALEP" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_CALISMA" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_DURUS" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_BEKLEME" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_TOPLAM" DataType="System.Int32"/>
+        <Column Name="ISM_TAKVIM_ID" DataType="System.Int32"/>
+        <Column Name="ISM_KAPATILDI" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISM_TALIMAT_ID" DataType="System.Int32"/>
+        <Column Name="ISM_GUVENLIK_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ACIKLAMA" DataType="System.String"/>
+        <Column Name="ISM_BILDIREN" DataType="System.String"/>
+        <Column Name="ISM_PUAN" DataType="System.String"/>
+        <Column Name="ISM_SONUC" DataType="System.String"/>
+        <Column Name="ISM_LOKASYON_ID" DataType="System.Int32"/>
+        <Column Name="ISM_DURUM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IPTAL_NEDEN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IPTAL_ONAY_PERSONEL_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IPTAL_ACIKLAMA" DataType="System.String"/>
+        <Column Name="ISM_NEDEN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ILETISIM_SEKLI_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_DURUM_ACIKLAMA" DataType="System.String"/>
+        <Column Name="ISM_IRTIBAT_TEL" DataType="System.String"/>
+        <Column Name="ISM_EMAIL" DataType="System.String"/>
+        <Column Name="ISM_KONU" DataType="System.String"/>
+        <Column Name="ISM_NOT" DataType="System.String"/>
+        <Column Name="ISM_YAPILDI" DataType="System.String"/>
+        <Column Name="ISM_YAPILAMAMA_NEDEN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_PLAN_BASLAMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_PLAN_BASLAMA_SAAT" DataType="System.String"/>
+        <Column Name="ISM_PLAN_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_PLAN_BITIS_SAAT" DataType="System.String"/>
+        <Column Name="ISM_TIP_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_ATOLYE_ID" DataType="System.Int32"/>
+        <Column Name="ISM_EKIPMAN_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_TIP" DataType="System.String"/>
+        <Column Name="ISM_OLUSTURAN_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OLUSTURMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_DEGISTIREN_ID" DataType="System.Int32"/>
+        <Column Name="ISM_DEGISTIRME_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_BAGLI_ISEMRI_ID" DataType="System.Int32"/>
+        <Column Name="ISM_MAKINE_DURUM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_TIP_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_BILDIREN" DataType="System.String"/>
+        <Column Name="ISM_IS_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_IS_SAAT" DataType="System.String"/>
+        <Column Name="ISM_MASRAF_MERKEZ_ID" DataType="System.Int32"/>
+        <Column Name="ISM_PROJE_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_REFERANS_NO" DataType="System.String"/>
+        <Column Name="ISM_TAMAMLANMA_ORAN" DataType="System.Int32"/>
+        <Column Name="ISM_FIRMA_ID" DataType="System.Int32"/>
+        <Column Name="ISM_FIRMA_SOZLESME_ID" DataType="System.Int32"/>
+        <Column Name="ISM_EVRAK_NO" DataType="System.String"/>
+        <Column Name="ISM_GARANTI_KAPSAMINDA" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISM_IS_DEPARTMAN_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_ILETISIM_SEKLI_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_IS_EMAIL" DataType="System.String"/>
+        <Column Name="ISM_IS_IRTIBAT_TEL" DataType="System.String"/>
+        <Column Name="ISM_IS_SONUC" DataType="System.String"/>
+        <Column Name="ISM_SURE_ISCILIK" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_CALISMA" DataType="System.Int32"/>
+        <Column Name="ISM_SONUC_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_KAPAT_MAKINE_DURUM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_SAYAC_DEGER" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_LOJISTIK" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_SEYAHAT" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_ONAY" DataType="System.Int32"/>
+        <Column Name="ISM_SURE_PLAN_MUDAHALE_DIGER" DataType="System.Int32"/>
+        <Column Name="ISM_PLAN_BASLAMA_TARIH_ILK" DataType="System.DateTime"/>
+        <Column Name="ISM_OTOMATIK_ISEMRI" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISM_TASERON_FIRMA_ID" DataType="System.Int32"/>
+        <Column Name="ISM_HAKEDIS_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_1" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_2" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_3" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_4" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_5" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_6" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_7" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_8" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_9" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_10" DataType="System.String"/>
+        <Column Name="ISM_OZEL_ALAN_11_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_12_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_13_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_14_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_15_KOD_ID" DataType="System.Int32"/>
+        <Column Name="ISM_OZEL_ALAN_16" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_17" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_18" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_19" DataType="System.Double"/>
+        <Column Name="ISM_OZEL_ALAN_20" DataType="System.Double"/>
+        <Column Name="ISM_EVRAK_TARIHI" DataType="System.DateTime"/>
+        <Column Name="ISM_MAKINE_GUVENLIK_NOTU" DataType="System.String"/>
+        <Column Name="ISM_PROJE_ID" DataType="System.Int32"/>
+        <Column Name="ISM_MALIYET_KDV" DataType="System.Double"/>
+        <Column Name="ISM_MALIYET_INDIRIM" DataType="System.Double"/>
+        <Column Name="ISM_KAPANMA_YDK_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISM_KAPANMA_YDK_SAAT" DataType="System.String"/>
+        <Column Name="ISM_IS_TALEP_NO" DataType="System.String"/>
+        <Column Name="TB_PERSONEL_ID" DataType="System.Int32"/>
+        <Column Name="PRS_PERSONEL_KOD" DataType="System.String"/>
+        <Column Name="PRS_ISIM" DataType="System.String"/>
+        <Column Name="PRS_UNVAN" DataType="System.String"/>
+        <Column Name="PRS_ACIKLAMA" DataType="System.String"/>
+        <Column Name="PRS_TELEFON" DataType="System.String"/>
+        <Column Name="PRS_GSM" DataType="System.String"/>
+        <Column Name="PRS_DAHILI" DataType="System.String"/>
+        <Column Name="PRS_EMAIL" DataType="System.String"/>
+        <Column Name="PRS_ISE_BASLAMA" DataType="System.DateTime"/>
+        <Column Name="PRS_DOGUM_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_CALISMA_GRUP_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_LOKASYON_ID" DataType="System.Int32"/>
+        <Column Name="PRS_DEPARTMAN_ID" DataType="System.Int32"/>
+        <Column Name="PRS_VASIF" DataType="System.String"/>
+        <Column Name="PRS_SSK_NO" DataType="System.String"/>
+        <Column Name="PRS_POZISYON_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_AKTIF" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_RESIM" DataType="System.Byte[]" BindableControl="Picture"/>
+        <Column Name="PRS_SAAT_UCRET" DataType="System.Double"/>
+        <Column Name="PRS_FAZLA_MESAI" DataType="System.Double"/>
+        <Column Name="PRS_BIRIM_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_KAN_GRUP" DataType="System.String"/>
+        <Column Name="PRS_EHLIYET" DataType="System.String"/>
+        <Column Name="PRS_EHLIYET_SINIF" DataType="System.String"/>
+        <Column Name="PRS_TOPLAM_SURE" DataType="System.Double"/>
+        <Column Name="PRS_TOPLAM_FMESAI" DataType="System.Double"/>
+        <Column Name="PRS_ATOLYE_ID" DataType="System.Int32"/>
+        <Column Name="PRS_OLUSTURAN_ID" DataType="System.Int32"/>
+        <Column Name="PRS_OLUSTURMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_DEGISTIREN_ID" DataType="System.Int32"/>
+        <Column Name="PRS_DEGISTIRME_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_ADRES" DataType="System.String"/>
+        <Column Name="PRS_PERSONEL_TIP_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_GOREV_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_IL" DataType="System.String"/>
+        <Column Name="PRS_ILCE" DataType="System.String"/>
+        <Column Name="PRS_FAX" DataType="System.String"/>
+        <Column Name="PRS_TELEFON1" DataType="System.String"/>
+        <Column Name="PRS_KANGRUBU" DataType="System.String"/>
+        <Column Name="PRS_VERGI_NO" DataType="System.String"/>
+        <Column Name="PRS_AYRILMATARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_EGITIM_DURUMU" DataType="System.String"/>
+        <Column Name="PRS_MEZUN_OLDUGU_OKUL" DataType="System.String"/>
+        <Column Name="PRS_MEZUN_OLDUGU_BOLUM" DataType="System.String"/>
+        <Column Name="PRS_MEZUNIYET_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_TCKIMLIK_NO" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_SERINO" DataType="System.String"/>
+        <Column Name="PRS_BABA_ADI" DataType="System.String"/>
+        <Column Name="PRS_ANA_ADI" DataType="System.String"/>
+        <Column Name="PRS_DOGUM_YERI" DataType="System.String"/>
+        <Column Name="PRS_DINI" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_KAYIT_NO" DataType="System.String"/>
+        <Column Name="PRS_MEDENI_HALI" DataType="System.String"/>
+        <Column Name="PRS_KAYITLI_OLDUGU_IL" DataType="System.String"/>
+        <Column Name="PRS_KAYITLI_OLDUGU_ILCE" DataType="System.String"/>
+        <Column Name="PRS_MAHALLE_KOY" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_CILT_NO" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_AILE_SIRA_NO" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_SIRA_NO" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_VERILDIGI_YER" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_VERILIS_NEDENI" DataType="System.String"/>
+        <Column Name="PRS_KIMLIK_VERILIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_EHLIYET_VERILDIGI_IL_ILCE" DataType="System.String"/>
+        <Column Name="PRS_EHLIYETNO" DataType="System.String"/>
+        <Column Name="PRS_EHLIYET_BELGE_TARIHI" DataType="System.DateTime"/>
+        <Column Name="PRS_EHLIYET_SERI_NO" DataType="System.String"/>
+        <Column Name="PRS_EHLIYET_KULLANDIGI_CIHAZ_PROTEZ" DataType="System.String"/>
+        <Column Name="PRS_MYB_VAR" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_MYB_VERILIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_MYB_BELGE_NO" DataType="System.String"/>
+        <Column Name="PRS_MYB_KAPSADIGI_DIGER_MYB" DataType="System.String"/>
+        <Column Name="PRS_MYB_TURU" DataType="System.String"/>
+        <Column Name="PRS_MYB_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_PSIKOTEKNIK" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_PSIKOTEKNIK_VERILIS_TARIHI" DataType="System.DateTime"/>
+        <Column Name="PRS_PSIKOTEKNIK_BELGE_NO" DataType="System.String"/>
+        <Column Name="PRS_PSIKOTEKNIK_BITIS_TARIH" DataType="System.DateTime"/>
+        <Column Name="PRS_SURUCU" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_OPERATOR" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_BAKIM" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_SANTIYE" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_DIGER" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="PRS_CEZAPUAN" DataType="System.Double"/>
+        <Column Name="PRS_BIRIM_UCRET" DataType="System.Double"/>
+        <Column Name="PRS_UCRET_TIPI" DataType="System.Int32"/>
+        <Column Name="PRS_SANTIYE_ID" DataType="System.Int32"/>
+        <Column Name="PRS_FIRMA_ID" DataType="System.Int32"/>
+        <Column Name="PRS_FINANS_CARI_ID" DataType="System.Int32"/>
+        <Column Name="PRS_POSTA_KOD" DataType="System.String"/>
+        <Column Name="PRS_ULKE" DataType="System.String"/>
+        <Column Name="PRS_DIL_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_UYRUK_KOD_ID" DataType="System.Int32"/>
+        <Column Name="PRS_CINSIYET" DataType="System.String"/>
+        <Column Name="PRS_IDARI_PERSONEL_ID" DataType="System.Int32"/>
+        <Column Name="PRS_IDARI_PERSONEL" DataType="System.String"/>
+        <Column Name="PRS_OZEL_ALAN_1" DataType="System.String"/>
+        <Column Name="PRS_OZEL_ALAN_2" DataType="System.String"/>
+        <Column Name="PRS_OZEL_ALAN_3" DataType="System.String"/>
+        <Column Name="PRS_OZEL_ALAN_4" DataType="System.String"/>
+        <Column Name="PRS_OZEL_ALAN_5" DataType="System.String"/>
+        <Column Name="PRS_OZEL_ALAN_6" DataType="System.Double"/>
+        <Column Name="PRS_OZEL_ALAN_7" DataType="System.Double"/>
+        <Column Name="PRS_OZEL_ALAN_8" DataType="System.Double"/>
+        <Column Name="PRS_OZEL_ALAN_9" DataType="System.Double"/>
+        <Column Name="PRS_OZEL_ALAN_10" DataType="System.Double"/>
+        <Column Name="PRS_TEKNISYEN" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <CommandParameter Name="ISMNO" DataType="22" Expression="[ISMNO]"/>
+      </TableDataSource>
+      <TableDataSource Name="msqFirma" DataType="System.Int32" Enabled="true" SelectCommand="SELECT * FROM OMEGA_MASTER.orjin.TB_FIRMA WHERE TB_FIRMA_ID = @TB_FIRMA_ID">
+        <Column Name="TB_FIRMA_ID" DataType="System.Int32"/>
+        <Column Name="ISL_KOD" DataType="System.String"/>
+        <Column Name="ISL_TANIM" DataType="System.String"/>
+        <Column Name="ISL_DONEM_BASLANGIC" DataType="System.DateTime"/>
+        <Column Name="ISL_DONEM_BITIS" DataType="System.DateTime"/>
+        <Column Name="ISL_ADRES_1" DataType="System.String"/>
+        <Column Name="ISL_ADRES_2" DataType="System.String"/>
+        <Column Name="ISL_SEHIR" DataType="System.String"/>
+        <Column Name="ISL_ILCE" DataType="System.String"/>
+        <Column Name="ISL_POSTA_KOD" DataType="System.String"/>
+        <Column Name="ISL_ULKE" DataType="System.String"/>
+        <Column Name="ISL_TELEFON_1" DataType="System.String"/>
+        <Column Name="ISL_TELEFON_2" DataType="System.String"/>
+        <Column Name="ISL_FAX" DataType="System.String"/>
+        <Column Name="ISL_EMAIL" DataType="System.String"/>
+        <Column Name="ISL_RESIM" DataType="System.Byte[]" BindableControl="Picture"/>
+        <Column Name="ISL_OLUSTURAN_ID" DataType="System.Int32"/>
+        <Column Name="ISL_OLUSTURMA_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISL_DEGISTIREN_ID" DataType="System.Int32"/>
+        <Column Name="ISL_DEGISTIRME_TARIH" DataType="System.DateTime"/>
+        <Column Name="ISL_AKTIF" DataType="System.Boolean" BindableControl="CheckBox"/>
+        <Column Name="ISL_BAGLANTIANAHTARI" DataType="System.String"/>
+        <Column Name="ISL_FDT" DataType="System.String"/>
+        <CommandParameter Name="TB_FIRMA_ID" DataType="22" Expression="[TB_FIRMA_ID]" DefaultValue="1"/>
+      </TableDataSource>
+    </MsSqlDataConnection>
+    <Parameter Name="ISMNO" DataType="System.String"/>
+    <Parameter Name="TB_FIRMA_ID" DataType="System.Int32"/>
+  </Dictionary>
+  <ReportPage Name="Page1" MirrorMargins="true" Watermark.Font="Arial, 60pt">
+    <PageHeaderBand Name="PageHeader1" Width="718.2" Height="79.25" BeforePrintEvent="BeforeHeaderPrint">
+      <TextObject Name="Memo128" Left="340.2" Top="30.18" Width="324.92" Height="18.9" Text="İş Emri ([ADOQuery1.IMT_TANIM]) / İş Emri No:  [ADOQuery1.ISM_ISEMRI_NO]" Padding="2, 1, 2, 1" AutoWidth="true" HorzAlign="Right" Font="Arial, 10pt, style=Bold"/>
+      <PictureObject Name="Picture1" Left="4.8" Top="1.83" Width="120.94" Height="75.59" Fill.Color="White" DataColumn="msqFirma.ISL_RESIM"/>
+    </PageHeaderBand>
+    <DataBand Name="MasterData1" Top="81.92" Width="718.2" Height="397.72" DataSource="ADOQuery1" PrintIfDetailEmpty="true">
+      <TextObject Name="Memo19" Left="369.64" Top="52.81" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo67" Left="0.56" Top="347.61" Width="718.11" Height="45.35" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 8pt, style=Bold"/>
+      <TextObject Name="Memo41" Left="392.07" Top="354.87" Width="147.4" Height="25.7" Padding="2, 1, 2, 1" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Memo9" Left="369.39" Top="167.3" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo17" Left="369.64" Top="29.57" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo8" Left="0.38" Top="166.3" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo3" Left="369.64" Top="121.06" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo89" Left="475.09" Top="34.14" Width="238.11" Height="15.12" Text="[ADOQuery1.LOK_TANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo2" Left="369.64" Top="75.71" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo91" Left="475.09" Top="103.28" Width="238.11" Height="15.12" Text="[ADOQuery1.EKP_KOD]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo92" Left="475.09" Top="125.28" Width="238.11" Height="15.12" Text="[ADOQuery1.EKP_TANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo28" Top="29.57" Width="102.05" Height="159.87" Border.Lines="All" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo29" Left="0.34" Top="74.93" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo31" Left="0.56" Top="29.57" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo33" Left="0.56" Top="120.28" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo35" Left="2.34" Top="33.35" Width="92.49" Height="15.12" Text="Tarih" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo36" Left="2.34" Top="78.71" Width="98.27" Height="15.12" Text="İş Emri Durumu" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo37" Left="2.34" Top="101.39" Width="83.15" Height="15.12" Text="Bağlı İş Emri" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo38" Left="2.34" Top="124.06" Width="82.49" Height="15.12" Text="Talep Eden" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo39" Left="2.34" Top="146.74" Width="83.15" Height="15.12" Text="Talep Tarihi" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo10" Top="196.79" Width="702.99" Height="45.35" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo11" Left="0.56" Top="196.79" Width="102.05" Height="45.35" Border.Lines="Left, Right, Top" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" HorzAlign="Center" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo12" Left="4.34" Top="200.57" Width="90.71" Height="34.02" Text="Teknisyen Notları" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo7" Left="369.83" Top="29.57" Width="102.05" Height="159.87" Border.Lines="All" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo15" Left="369.64" Top="98.39" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo20" Left="372.61" Top="56.35" Width="83.15" Height="15.12" Text="Makine Kodu" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo22" Left="372.61" Top="33.9" Width="83.15" Height="15.12" Text="Lokasyon" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo24" Left="372.61" Top="102.39" Width="93.15" Height="15.12" Text="Ekipman Kodu" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo25" Left="372.61" Top="125.06" Width="98.27" Height="15.12" Text="Ekipman Tanımı" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo14" Left="2.34" Top="56.03" Width="90.71" Height="15.12" Text="İş Emri Tipi" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo26" Left="372.61" Top="147.42" Width="96.93" Height="15.12" Text="Makine Durumu" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo43" Left="372.61" Top="79.03" Width="94.49" Height="15.12" Text="Makine Tanımı" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo66" Top="324.94" Width="718.11" Height="22.68" Border.Lines="All" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo68" Left="1.89" Top="328.94" Width="69.6" Height="15.12" Fill.Color="239, 239, 239" Text="Prosedür" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo69" Left="82.37" Top="328.94" Width="60.27" Height="15.12" Fill.Color="239, 239, 239" Text="İş Tanım" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo70" Left="254.81" Top="328.94" Width="64.15" Height="15.12" Fill.Color="239, 239, 239" Text="İş Tipi" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo72" Left="374.65" Top="169.87" Width="55.17" Height="15.12" Fill.Color="239, 239, 239" Text="Öncelik" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo73" Left="2.27" Top="169.87" Width="57.39" Height="15.12" Fill.Color="239, 239, 239" Text="Atölye" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo47" Top="3.12" Width="347.72" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="İş Emri Bilgileri" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo55" Left="369.39" Top="3.12" Width="347.72" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="Makine Bilgileri" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo75" Left="2.89" Top="354.87" Width="71.81" Height="25.7" Text="[ADOQuery1.ISKOD]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo76" Left="82.28" Top="354.87" Width="173.86" Height="25.7" Text="[ADOQuery1.ISTANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo77" Left="254.81" Top="354.87" Width="113.39" Height="25.7" Text="[ADOQuery1.ISTIP]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo79" Left="475.69" Top="170.57" Width="238.11" Height="18.14" Text="[ADOQuery1.SOC_TANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo80" Left="107.09" Top="169.57" Width="238.11" Height="14.36" Text="[ADOQuery1.ATL_TANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo50" Top="299.48" Width="718.11" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="İş Bilgileri" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo57" Left="392.8" Top="329.28" Width="144.32" Height="15.12" Fill.Color="239, 239, 239" Text="Başlama Tarihi / Saati" Padding="2, 1, 2, 1" HorzAlign="Center" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo60" Left="106.83" Top="33.27" Width="238.11" Height="15.12" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo61" Left="106.96" Top="56.28" Width="238.11" Height="15.12" Text="[ADOQuery1.ISTIP]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo74" Left="106.96" Top="78.28" Width="238.11" Height="15.12" Text="[ADOQuery1.ISDURUM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo83" Left="106.96" Top="101.28" Width="238.11" Height="15.12" Text="[ADOQuery1.ISM_ISEMRI_NO_1]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo84" Left="106.96" Top="124.28" Width="238.11" Height="15.12" Text="[ADOQuery1.ISM_BILDIREN]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo85" Left="106.96" Top="147.28" Width="238.11" Height="15.12" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo87" Left="475.09" Top="56.28" Width="90.71" Height="15.12" Text="[ADOQuery1.MKN_KOD]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo88" Left="475.09" Top="79.28" Width="238.11" Height="15.12" Text="[ADOQuery1.MKN_TANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo93" Left="475.09" Top="147.28" Width="238.11" Height="15.12" Text="[ADOQuery1.MKNDURUM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo6" Left="369.61" Top="144.52" Width="347.72" Height="22.68" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo27" Left="0.56" Top="29.57" Width="347.72" Height="136.06" Border.Lines="All" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo21" Left="559.37" Top="329.14" Width="144.32" Height="15.12" Fill.Color="239, 239, 239" Text="Bitiş Tarihi / Saati" Padding="2, 1, 2, 1" HorzAlign="Center" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo42" Left="559.37" Top="354.87" Width="147.4" Height="25.7" Padding="2, 1, 2, 1" HorzAlign="Center" Font="Arial, 8pt"/>
+      <TextObject Name="Memo48" Top="247.85" Width="102.05" Height="45.35" Border.Lines="All" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" HorzAlign="Center" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo49" Left="3.78" Top="251.63" Width="90.71" Height="34.02" Text="Açıklama" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo1" Left="102.05" Top="247.85" Width="600.95" Height="45.35" Border.Lines="All" Text="[ADOQuery1.ISM_IS_SONUC]" Padding="2, 1, 2, 1" Font="Arial, 9pt"/>
+      <TextObject Name="Memo153" Left="102.05" Top="200.32" Width="593.39" Height="30.24" Text="[ADOQuery1.ISM_SONUC]" Padding="2, 1, 2, 1" Font="Arial, 10pt"/>
+      <TextObject Name="Memo90" Left="566.93" Top="54.69" Width="49.13" Height="18.9" Fill.Color="239, 239, 239" Text="Sayaç" Padding="2, 1, 2, 1" VertAlign="Center" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo96" Left="619.84" Top="56.69" Width="90.71" Height="15.12" Text="[ADOQuery1.MES_GUNCEL_DEGER]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <DataBand Name="DetailData2" Top="482.3" Width="718.2" Height="56.69">
+        <TextObject Name="Memo16" Top="7.12" Width="718.11" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="Çalışan Personel" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo34" Top="30.91" Width="718.11" Height="22.68" Border.Lines="All" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo45" Left="3.78" Top="33.69" Width="98.27" Height="18.9" Fill.Color="239, 239, 239" Text="Personel Kodu" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo46" Left="122.72" Top="33.69" Width="136.06" Height="18.9" Fill.Color="239, 239, 239" Text="Personel İsim" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo64" Left="459" Top="33.56" Width="73.49" Height="18.9" Fill.Color="239, 239, 239" Text="Süre (dk.)" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo81" Left="638" Top="33.56" Width="71.49" Height="18.9" Fill.Color="239, 239, 239" Text="Maliyet" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo82" Left="542" Top="33.56" Width="88.06" Height="18.9" Fill.Color="239, 239, 239" Text="F. Mesai (dk.)" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <DataBand Name="SubdetailData2" Top="541.66" Width="718.2" Height="22.68" DataSource="ADOQuery4">
+          <TextObject Name="Memo110" Left="1.89" Top="3.78" Width="105.83" Height="15.12" Text="[ADOQuery4.PRS_PERSONEL_KOD]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+          <TextObject Name="Memo111" Left="121" Top="3.61" Width="286.17" Height="15.12" Text="[ADOQuery4.PRS_ISIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+          <TextObject Name="Memo119" Left="459" Top="3.78" Width="76.49" Height="15.12" Text="[ADOQuery4.IDK_SURE]" Padding="2, 1, 2, 1" HideValue="0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Arial, 8pt"/>
+          <TextObject Name="Memo126" Left="638" Top="3.78" Width="77.49" Height="15.12" Text="[ADOQuery4.IDK_MALIYET]" Padding="2, 1, 2, 1" HideValue="0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Arial, 8pt"/>
+          <TextObject Name="Memo127" Left="542" Top="3.78" Width="77.49" Height="15.12" Text="[ADOQuery4.IDK_FAZLA_MESAI_SURE]" Padding="2, 1, 2, 1" HideValue="0" Format="Number" Format.UseLocale="true" Format.DecimalDigits="2" Font="Arial, 8pt"/>
+          <TextObject Name="Memo23" Width="718.11" Height="22.68" Border.Lines="Left, Right, Bottom" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        </DataBand>
+      </DataBand>
+      <DataBand Name="DetailData1" Top="567.01" Width="718.2" Height="53.59">
+        <TextObject Name="Memo18" Top="7.12" Width="718.11" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="Malzemeler" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo30" Top="30.91" Width="718.11" Height="22.68" Border.Lines="All" Fill.Color="239, 239, 239" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo44" Left="3.93" Top="34.02" Width="211.65" Height="18.9" Fill.Color="239, 239, 239" Text="Malzeme Tanımı" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo52" Left="362.88" Top="34.02" Width="75.59" Height="18.9" Fill.Color="239, 239, 239" Text="Miktar" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo58" Left="523.1" Top="34.02" Width="188.98" Height="18.9" Fill.Color="239, 239, 239" Text="Malzeme Depo" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo59" Left="221.36" Top="34.02" Width="136.06" Height="18.9" Fill.Color="239, 239, 239" Text="Malzeme Tipi" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <TextObject Name="Memo32" Left="442.21" Top="34.02" Width="75.59" Height="18.9" Fill.Color="239, 239, 239" Text="Birim" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+        <DataBand Name="SubdetailData1" Top="623.26" Width="718.2" Height="26.46" DataSource="ADOQuery3">
+          <TextObject Name="Memo221" Width="718.11" Height="22.68" Border.Lines="Left, Right, Bottom" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+          <TextObject Name="Memo223" Left="4.15" Top="1.47" Width="211.65" Height="18.9" Border.Lines="All" Text="[ADOQuery3.IDM_STOK_TANIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+          <TextObject Name="Memo224" Left="221.58" Top="1.47" Width="136.06" Height="18.9" Border.Lines="All" Text="[ADOQuery3.IDM_MALZEMETIP]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+          <TextObject Name="Memo225" Left="363.1" Top="1.47" Width="75.59" Height="18.9" Border.Lines="All" Text="[ADOQuery3.IDM_MIKTAR]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+          <TextObject Name="Memo226" Left="523.32" Top="1.47" Width="188.98" Height="18.9" Border.Lines="All" Text="[ADOQuery3.IDM_DEPO]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+          <TextObject Name="Memo222" Left="442.43" Top="1.47" Width="75.59" Height="18.9" Border.Lines="All" Text="[ADOQuery3.IDM_BIRIM]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+        </DataBand>
+      </DataBand>
+    </DataBand>
+    <PageFooterBand Name="PageFooter2" Top="652.39" Width="718.2" Height="86.02">
+      <TextObject Name="Memo51" Left="622.84" Top="43.56" Width="92.15" Height="26.46" Text="[Page#] / [TotalPages#]" Padding="2, 1, 2, 1" HorzAlign="Right" Font="Arial, 8pt"/>
+      <TextObject Name="Memo53" Left="231.65" Top="49.35" Width="120.94" Height="15.12" Text="[Format(&quot;{0:dd.MM.yyyy}&quot;, DateTime.Now)] / [Format(&quot;{0:HH:mm}&quot;, DateTime.Now)]" Padding="2, 1, 2, 1" Font="Arial, 8pt"/>
+      <TextObject Name="Memo54" Left="3.78" Top="25.78" Width="170.08" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="Personel İmza" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo56" Left="233.65" Top="25.7" Width="170.08" Height="18.9" Border.Lines="Bottom" Border.Width="1.5" Text="Tarih" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+      <TextObject Name="Memo4" Left="3.78" Top="3.78" Width="170.08" Height="18.9" Text="F 520.007.0" Padding="2, 1, 2, 1" Font="Arial, 9pt, style=Bold"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>
