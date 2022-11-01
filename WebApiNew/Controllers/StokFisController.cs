@@ -662,5 +662,165 @@ namespace WebApiNew.Controllers
             }
             return bildirimEntity;
         }
+        [Route("api/StokFisOnayListesi")]
+        [HttpPost]
+        public List<StokFis> StokFisOnayListesi([FromBody] Filtre filtre, [FromUri] int page, [FromUri] int pageSize, [FromUri] string IslemTip, [FromUri] int tabDurumID, int ID)
+        {
+
+            //int ilkdeger = page * pageSize;
+            //int sondeger = ilkdeger + pageSize;
+            prms.Clear();
+            prms.Add("KUL_ID", ID);
+            prms.Add("SFS_ISLEM_TIP", IslemTip);
+            List<StokFis> listem = new List<StokFis>();
+            string query = @"SELECT * FROM orjin.VW_STOK_FIS SF 
+                LEFT JOIN orjin.VW_PERSONEL P ON SF.SFS_TALEP_EDEN_PERSONEL_ID=P.TB_PERSONEL_ID 
+                WHERE SFS_ISLEM_TIP = @SFS_ISLEM_TIP 
+                AND SFS_MODUL_NO = 1
+                AND orjin.UDF_LOKASYON_YETKI_KONTROL(SFS_LOKASYON_ID,@KUL_ID) = 1";
+
+            if (filtre != null)
+            {
+                if (filtre.MakineID > 0)
+                {
+                    prms.Add("SFS_MAKINE_ID", filtre.MakineID);
+                    query = query + " and SFS_MAKINE_ID=@SFS_MAKINE_ID";
+                }
+                if (filtre.durumID > 0)
+                {
+                    prms.Add("SFS_TALEP_DURUM_ID", filtre.durumID);
+                    query = query + " and SFS_TALEP_DURUM_ID=@SFS_TALEP_DURUM_ID";
+                }
+                if (tabDurumID != -1)
+                {
+                    if (tabDurumID == 1)
+                        query = query + " and SFS_TALEP_DURUM_ID IN (7)";
+                    else if (tabDurumID == 2)
+                        query = query + " and SFS_TALEP_DURUM_ID IN (8,9)";
+                }
+                if (filtre.LokasyonID > 0)
+                {
+                    prms.Add("SFS_LOKASYON_ID", filtre.LokasyonID);
+                    query = query + " and SFS_LOKASYON_ID=@SFS_LOKASYON_ID";
+                }
+                if (filtre.ProjeID > 0)
+                {
+                    prms.Add("SFS_PROJE_ID", filtre.ProjeID);
+                    query = query + " and SFS_PROJE_ID=@SFS_PROJE_ID";
+                }
+
+                if (filtre.nedenID > 0)
+                {
+                    prms.Add("SFS_TALEP_NEDEN_KOD_ID", filtre.nedenID);
+                    query = query + " and SFS_TALEP_NEDEN_KOD_ID=@SFS_TALEP_NEDEN_KOD_ID";
+                }
+
+                if (filtre.PersonelID > 0)
+                {
+                    prms.Add("SFS_TALEP_EDEN_PERSONEL_ID", filtre.PersonelID);
+                    query = query + " and SFS_TALEP_EDEN_PERSONEL_ID =@SFS_TALEP_EDEN_PERSONEL_ID";
+                }
+
+                if (filtre.BasTarih != "" && filtre.BitTarih != "")
+                {
+                    DateTime bas = Convert.ToDateTime(filtre.BasTarih);
+                    DateTime bit = Convert.ToDateTime(filtre.BitTarih);
+                    prms.Add("BAS_TARIH", bas.ToString("yyyy-MM-dd"));
+                    prms.Add("BIT_TARIH", bit.ToString("yyyy-MM-dd"));
+                    query = query + " AND SFS_TARIH BETWEEN  @BAS_TARIH and @BIT_TARIH";
+                }
+                else
+                if (filtre.BasTarih != "")
+                {
+                    DateTime bas = Convert.ToDateTime(filtre.BasTarih);
+                    prms.Add("BAS_TARIH", bas.ToString("yyyy-MM-dd"));
+                    query = query + " AND SFS_TARIH >= @BAS_TARIH ";
+                }
+                else
+                if (filtre.BitTarih != "")
+                {
+                    DateTime bit = Convert.ToDateTime(filtre.BitTarih);
+                    prms.Add("BIT_TARIH", bit.ToString("yyyy-MM-dd"));
+                    query = query + " AND SFS_TARIH <= @BIT_TARIH";
+                }
+                if (filtre.Kelime != "")
+                {
+                    prms.Add("KELIME", filtre.Kelime);
+                    query = query + @" AND     (SFS_FIS_NO      like '%'+@KELIME+'%' OR 
+                                                SFS_TALEP_NEDEN like '%'+@KELIME+'%' OR 
+                                                SFS_MAKINE      like '%'+@KELIME+'%' OR 
+                                                SFS_LOKASYON    like '%'+@KELIME+'%' OR 
+                                                SFS_BOLUM       like '%'+@KELIME+'%' OR 
+                                                SFS_BASLIK      like '%'+@KELIME+'%' OR 
+                                                SFS_TALEP_NEDEN like '%'+@KELIME+'%')";
+                }
+            }
+            //prms.Add("ILK_DEGER", ilkdeger);
+            //prms.Add("SON_DEGER", sondeger);
+            //query += " )SELECT * FROM mTable WHERE RowNum > @ILK_DEGER AND RowNum <= @SON_DEGER";
+            var rtb = new System.Windows.Forms.RichTextBox();
+            using (var conn = klas.baglanCmd())
+            {
+                var dprms = new DynamicParameters();
+                prms.PARAMS.ForEach(p => dprms.Add(p.ParametreAdi, p.ParametreDeger));
+                listem = conn.Query<StokFis, Personel, StokFis>(query, map: (s, p) =>
+                {
+                    try
+                    {
+                        rtb.Rtf = s.SFS_ACIKLAMA ?? "";
+                        s.SFS_ACIKLAMA = rtb.Text;
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+
+                    s.PERSONEL = p;
+                    s.SFS_BASLIK = s.SFS_BASLIK ?? "";
+                    s.SFS_BOLUM = s.SFS_BOLUM ?? "";
+                    s.SFS_CARI = s.SFS_CARI ?? "";
+                    s.SFS_CIKIS_DEPO = s.SFS_CIKIS_DEPO ?? "";
+                    s.SFS_DURUM = s.SFS_DURUM ?? "";
+                    s.SFS_FATURA_IRSALIYE_NO = s.SFS_FATURA_IRSALIYE_NO ?? "";
+                    s.SFS_FIS_NO = s.SFS_FIS_NO ?? "";
+                    s.SFS_GC = s.SFS_GC ?? "";
+                    s.SFS_GIRIS_DEPO = s.SFS_GIRIS_DEPO ?? "";
+                    s.SFS_ISLEM_TIP = s.SFS_ISLEM_TIP ?? "";
+                    s.SFS_ISLEM_TIP_DEGER = s.SFS_ISLEM_TIP_DEGER ?? "";
+                    s.SFS_KOD_ONCELIK = s.SFS_KOD_ONCELIK ?? "";
+                    s.SFS_LOKASYON = s.SFS_LOKASYON ?? "";
+                    s.SFS_MAKINE = s.SFS_MAKINE ?? "";
+                    s.SFS_MAKINE_KOD = s.SFS_MAKINE_KOD ?? "";
+                    s.SFS_ONAY_PERSONEL = s.SFS_ONAY_PERSONEL ?? "";
+                    s.SFS_ONCELIK = s.SFS_ONCELIK ?? "";
+                    s.SFS_PROFJE_TANIM = s.SFS_PROFJE_TANIM ?? "";
+                    s.SFS_REFERANS = s.SFS_REFERANS ?? "";
+                    s.SFS_REF_GRUP = s.SFS_REF_GRUP ?? "";
+                    s.SFS_SATINALMA_TALEP_EDEN = s.SFS_SATINALMA_TALEP_EDEN ?? "";
+                    s.SFS_S_TIP = s.SFS_S_TIP ?? "";
+                    s.SFS_TALEP_EDEN = s.SFS_TALEP_EDEN ?? "";
+                    s.SFS_TALEP_EDILEN = s.SFS_TALEP_EDILEN ?? "";
+                    s.SFS_TALEP_FIS_NO = s.SFS_TALEP_FIS_NO ?? "";
+                    s.SFS_TALEP_ISEMRI_NO = s.SFS_TALEP_ISEMRI_NO ?? "";
+                    s.SFS_TALEP_NEDEN = s.SFS_TALEP_NEDEN ?? "";
+                    s.SFS_TALEP_SIPARIS_NO = s.SFS_TALEP_SIPARIS_NO ?? "";
+                    s.SFS_TESLIM_ALAN = s.SFS_TESLIM_ALAN ?? "";
+                    s.SFS_TESLIM_YERI = s.SFS_TESLIM_YERI ?? "";
+                    s.SFS_TESLIM_YERI_TANIM = s.SFS_TESLIM_YERI_TANIM ?? "";
+                    if (p != null)
+                    {
+                        p.PRS_LOKASYON = p.PRS_LOKASYON ?? "";
+                        p.PRS_TIP = p.PRS_TIP ?? "";
+                        p.PRS_DEPARTMAN = p.PRS_DEPARTMAN ?? "";
+                    }
+
+                    return s;
+                },
+                splitOn: "TB_PERSONEL_ID",
+                param: dprms
+                ).ToList();
+            }
+            return listem;
+        }
     }
 }
