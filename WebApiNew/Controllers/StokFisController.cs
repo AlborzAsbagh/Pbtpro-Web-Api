@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,6 +9,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Unity;
+using Unity.Policy;
 using WebApiNew.App_GlobalResources;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -667,17 +671,20 @@ namespace WebApiNew.Controllers
         public List<StokFis> StokFisOnayListesi([FromBody] Filtre filtre, [FromUri] int page, [FromUri] int pageSize, [FromUri] string IslemTip, [FromUri] int tabDurumID, int ID)
         {
 
+
             //int ilkdeger = page * pageSize;
             //int sondeger = ilkdeger + pageSize;
             prms.Clear();
             prms.Add("KUL_ID", ID);
             prms.Add("SFS_ISLEM_TIP", IslemTip);
             List<StokFis> listem = new List<StokFis>();
-            string query = @"SELECT * FROM orjin.VW_STOK_FIS SF 
-                LEFT JOIN orjin.VW_PERSONEL P ON SF.SFS_TALEP_EDEN_PERSONEL_ID=P.TB_PERSONEL_ID 
+            string query = @"SELECT * FROM orjin.VW_STOK_FIS STF 
+                LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
                 WHERE SFS_ISLEM_TIP = @SFS_ISLEM_TIP 
                 AND SFS_MODUL_NO = 1
-                AND orjin.UDF_LOKASYON_YETKI_KONTROL(SFS_LOKASYON_ID,@KUL_ID) = 1";
+                AND SOL_SIRA_NO = SOL_SIRA_NO 
+                AND SOL_PERSONEL_ID = @KUL_ID
+                AND SOL_ONAY_DURUM_ID = SOL_ONAY_DURUM_ID";
 
             if (filtre != null)
             {
@@ -763,7 +770,7 @@ namespace WebApiNew.Controllers
             {
                 var dprms = new DynamicParameters();
                 prms.PARAMS.ForEach(p => dprms.Add(p.ParametreAdi, p.ParametreDeger));
-                listem = conn.Query<StokFis, Personel, StokFis>(query, map: (s, p) =>
+                listem = conn.Query<StokFis, SatinAlmaAyar, StokFis>(query, map: (s, p) =>
                 {
                     try
                     {
@@ -775,7 +782,6 @@ namespace WebApiNew.Controllers
 
                     }
 
-                    s.PERSONEL = p;
                     s.SFS_BASLIK = s.SFS_BASLIK ?? "";
                     s.SFS_BOLUM = s.SFS_BOLUM ?? "";
                     s.SFS_CARI = s.SFS_CARI ?? "";
@@ -807,20 +813,169 @@ namespace WebApiNew.Controllers
                     s.SFS_TESLIM_ALAN = s.SFS_TESLIM_ALAN ?? "";
                     s.SFS_TESLIM_YERI = s.SFS_TESLIM_YERI ?? "";
                     s.SFS_TESLIM_YERI_TANIM = s.SFS_TESLIM_YERI_TANIM ?? "";
-                    if (p != null)
-                    {
-                        p.PRS_LOKASYON = p.PRS_LOKASYON ?? "";
-                        p.PRS_TIP = p.PRS_TIP ?? "";
-                        p.PRS_DEPARTMAN = p.PRS_DEPARTMAN ?? "";
-                    }
+                    
 
                     return s;
                 },
-                splitOn: "TB_PERSONEL_ID",
+                splitOn: "SOL_REF_ID",
                 param: dprms
                 ).ToList();
             }
             return listem;
         }
+
+        [Route("api/MlzTransferOnaylananlar")]
+        [HttpPost]
+        public Bildirim MlzTransferOnaylananlar(int id, [FromBody] List<StokFis> values)
+        {
+            prms.Clear();
+            var hatali = false;
+            Bildirim bildirim = new Bildirim();
+            var idlist = new int[values.Count];
+            for (var i = 0; i < values.Count; i++)
+            {
+                idlist[i] = values[i].TB_STOK_FIS_ID;
+            }
+            foreach (var stokFisid in idlist) {
+                
+                try
+                    {
+                        klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+                        klas.cmd($"UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+
+                        klas.cmd($"INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
+                            $"(STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
+                            $"VALUES (CURRENT_TIMESTAMP, {id} , 8 , 'MALZEME TALEBI ONAYLANDI', {stokFisid})", prms.PARAMS);
+                }
+                catch (Exception e)
+                    {
+                    hatali = true;
+                    bildirim.Aciklama = String.Format(Localization.errorFormatted, e.Message);
+                    bildirim.MsgId = Bildirim.MSG_SFS_SIL_HATA;
+                    bildirim.HasExtra = true;
+                    bildirim.Durum = false;
+                    bildirim.Id = id;
+                    break;
+                    }
+            }
+            if(!hatali)
+            {
+                bildirim.Aciklama = "Malzeme talebi(leri) başarılı bir şekilde onaylandı ";
+                bildirim.MsgId = Bildirim.MSG_SFS_SIL_OK;
+                bildirim.Durum = true;
+                bildirim.Id = id;
+            }
+            return bildirim;
+        }
+
+        [Route("api/TekMlzTransferOnaylanan")]
+        [HttpPost]
+        public Bildirim TekMlzTransferOnaylanan(int id, [FromUri] int fisID)
+        {
+            Bildirim bildirimEntity = new Bildirim();
+            prms.Clear();
+            prms.Add("TB_STOK_FIS_ID", fisID);
+            prms.Add("KUL_ID", id);
+            try
+            {
+                klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+                klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+
+                klas.cmd("INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
+                    "  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
+                    " VALUES (CURRENT_TIMESTAMP, @KUL_ID , 8 , 'MALZEME TALEBI ONAYLANDI', @TB_STOK_FIS_ID)", prms.PARAMS);
+
+                bildirimEntity.Aciklama = "Malzeme talebi onaylandı";
+                bildirimEntity.MsgId = Bildirim.MSG_SFS_SIL_OK;
+                bildirimEntity.Durum = true;
+            }
+            catch (Exception e)
+            {
+                bildirimEntity.Aciklama = String.Format(Localization.errorFormatted, e.Message);
+                bildirimEntity.MsgId = Bildirim.MSG_SFS_SIL_HATA;
+                bildirimEntity.HasExtra = true;
+                bildirimEntity.Durum = false;
+            }
+            return bildirimEntity;
+        }
+
+        [Route("api/MlzTransferOnaylanmayanlar")]
+        [HttpPost]
+        public Bildirim MlzTransferOnaylanmayanlar(int id, [FromBody] List<StokFis> values)
+        {
+            prms.Clear();
+            var hatali = false;
+            Bildirim bildirim = new Bildirim();
+            var idlist = new int[values.Count];
+            for (var i = 0; i < values.Count; i++)
+            {
+                idlist[i] = values[i].TB_STOK_FIS_ID;
+            }
+            foreach (var stokFisid in idlist)
+            {
+                try
+                {
+                    klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+                    klas.cmd($"UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 9  WHERE TB_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+
+                    klas.cmd($"INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
+                    $"  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
+                    $" VALUES (CURRENT_TIMESTAMP, {id} , 9 , 'MALZEME TALEBI ONAYLANMADI', {stokFisid})", prms.PARAMS);
+                }
+                catch (Exception e)
+                {
+                    hatali = true;
+                    bildirim.Aciklama = String.Format(Localization.errorFormatted, e.Message);
+                    bildirim.MsgId = Bildirim.MSG_SFS_SIL_HATA;
+                    bildirim.HasExtra = true;
+                    bildirim.Durum = false;
+                    bildirim.Id = id;
+                    break;
+                }
+            }
+            if (!hatali)
+            {
+                bildirim.Aciklama = "Malzeme talebi(leri) onaylanmadı  ";
+                bildirim.MsgId = Bildirim.MSG_SFS_SIL_OK;
+                bildirim.Durum = true;
+                bildirim.Id = id;
+            }
+            return bildirim;
+        }
+
+        [Route("api/TekMlzTransferOnaylanmayan")]
+        [HttpPost]
+        public Bildirim TekMlzTransferOnaylanmayan(int id, [FromUri] int fisID)
+        {
+            Bildirim bildirimEntity = new Bildirim();
+            prms.Clear();
+            prms.Add("TB_STOK_FIS_ID", fisID);
+            prms.Add("KUL_ID", id);
+            try
+            {
+                klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+                klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 9  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+
+                klas.cmd("INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
+                    "  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
+                    " VALUES (CURRENT_TIMESTAMP, @KUL_ID , 9 , 'MALZEME TALEBI ONAYLANMADI', @TB_STOK_FIS_ID)", prms.PARAMS);
+
+                bildirimEntity.Aciklama = "Malzeme talebi onaylanamdı";
+                bildirimEntity.MsgId = Bildirim.MSG_SFS_SIL_OK;
+                bildirimEntity.Durum = true;
+            }
+            catch (Exception e)
+            {
+                bildirimEntity.Aciklama = String.Format(Localization.errorFormatted, e.Message);
+                bildirimEntity.MsgId = Bildirim.MSG_SFS_SIL_HATA;
+                bildirimEntity.HasExtra = true;
+                bildirimEntity.Durum = false;
+            }
+            return bildirimEntity;
+        }
+
     }
 }
+
+
+
