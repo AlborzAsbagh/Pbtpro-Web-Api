@@ -46,6 +46,11 @@ namespace WebApiNew.Controllers
                     prms.Add("MAK_ID", filtre.MakineID);
                     where += " AND ISM_MAKINE_ID = @MAK_ID";
                 }
+                if (filtre.MasterMakineID > 0)
+                {
+                    prms.Add("MAK_ID", filtre.MasterMakineID);
+                    where += " AND ISM_MAKINE_ID = @MAK_ID";
+                }
 
                 if (filtre.LokasyonID > 0)
                 {
