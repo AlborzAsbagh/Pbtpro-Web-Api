@@ -475,6 +475,12 @@ namespace WebApiNew.Controllers
                         where += " AND IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID";
 
                     }
+                    if (filtre.IlgiliKisiId > 0)
+                    {
+                        parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.IlgiliKisiId));
+                        where += " AND IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID";
+
+                    }
                     if (filtre.BasTarih != "" && filtre.BitTarih != "")
                     {
                         DateTime bas = Convert.ToDateTime(filtre.BasTarih);

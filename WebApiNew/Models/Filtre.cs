@@ -11,6 +11,8 @@ namespace WebApiNew.Models
         [DataMember]
         public int MasterMakineID { get; set; }
         [DataMember]
+        public int IlgiliKisiId { get; set; }
+        [DataMember]
         public int LokasyonID { get; set; }
         [DataMember]
         public int PersonelID { get; set; }
