@@ -467,18 +467,34 @@ namespace WebApiNew.Controllers
                     if (filtre.LokasyonID > 0)
                     {
                         parametreler.Add(new Prm("IST_BILDIREN_LOKASYON_ID", filtre.LokasyonID));
-                        where += " AND IST_BILDIREN_LOKASYON_ID = @IST_BILDIREN_LOKASYON_ID";
+                        where += " AND IST_BILDIREN_LOKASYON_ID = @IST_BILDIREN_LOKASYON_ID ";
                     }
                     if (filtre.PersonelID > 0)
                     {
-                        parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.PersonelID));
-                        where += " AND IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID";
+                        if(filtre.IlgiliKisiId > 0)
+                        {
+                            parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.PersonelID));
+                            where += " AND ( IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID ";
+                        }
+                        else
+                        {
+                            parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.PersonelID));
+                            where += " AND IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID ";
+                        }
 
                     }
                     if (filtre.IlgiliKisiId > 0)
                     {
-                        parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.IlgiliKisiId));
-                        where += " AND IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID";
+                        if (filtre.PersonelID > 0)
+                        {
+                            parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.IlgiliKisiId));
+                            where += " OR IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID ) ";
+                        }
+                        else
+                        {
+                            parametreler.Add(new Prm("IST_TALEP_EDEN_ID", filtre.IlgiliKisiId));
+                            where += " AND IST_TALEP_EDEN_ID = @IST_TALEP_EDEN_ID ";
+                        }
 
                     }
                     if (filtre.BasTarih != "" && filtre.BitTarih != "")
