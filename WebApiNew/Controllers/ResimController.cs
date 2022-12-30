@@ -413,7 +413,7 @@ namespace WebApiNew.Controllers
                 prms.Add("@ID", id);
                 string ResimYolu = klas.GetDataCell("select RSM_ARSIV_AD from orjin.TB_RESIM where TB_RESIM_ID=@ID", prms.PARAMS);
                 string filePath = prmresimYolu + "\\" + ResimYolu;
-                string extension = Path.GetExtension(ResimYolu);
+                string extension = Path.GetExtension("jpg");
 
 
                 if (File.Exists(filePath))
@@ -464,8 +464,8 @@ namespace WebApiNew.Controllers
                     }
                     catch (Exception e)
                     {
-                        //_logger.Error(e);
-                        //incomingBitmap?.Dispose();
+                        _logger.Error(e);
+                        incomingBitmap?.Dispose();
                         //throw;
                     }
                     finally
@@ -513,8 +513,18 @@ namespace WebApiNew.Controllers
                 prms.Add("ID_2", id_2);
                 prms.Add("REF_GRUP",refGrup);
                 prms.Add("REF_ID",refId);
-                klas.cmd($"SELECT *,CASE WHEN TB_RESIM_ID = {id_1} then {id_2} ELSE {id_1} END AS JoinId INTO #Temp2  FROM  [OMEGA_1].[orjin].[TB_RESIM]  WHERE TB_RESIM_ID in ({id_1},{id_2}) AND RSM_REF_GRUP = '{refGrup}' AND RSM_REF_ID = {refId} " +
-                 $"UPDATE y SET y.[RSM_REF_ID] = t.[RSM_REF_ID],  y.[RSM_REF_GRUP] = t.[RSM_REF_GRUP], y.[RSM_VARSAYILAN] = t.[RSM_VARSAYILAN], y.[RSM_UZANTI] = t.[RSM_UZANTI], y.[RSM_RESIM_AD] = t.[RSM_RESIM_AD], y.[RSM_YOL] = t.[RSM_YOL], y.[RSM_ARSIV_AD] = t.[RSM_ARSIV_AD], y.[RSM_ARSIV_YOL] = t.[RSM_ARSIV_YOL], y.[RSM_BOYUT] = t.[RSM_BOYUT],y.[RSM_ETIKET] = t.[RSM_ETIKET], y.[RSM_OLUSTURAN_ID] = t.[RSM_OLUSTURAN_ID], y.[RSM_OLUSTURMA_TARIH] = t.[RSM_OLUSTURMA_TARIH], y.[RSM_DEGISTIREN_ID] = t.[RSM_DEGISTIREN_ID], y.[RSM_DEGISTIRME_TARIH] = t.[RSM_DEGISTIRME_TARIH] FROM [OMEGA_1].[orjin].[TB_RESIM] as y INNER JOIN #Temp2  t ON y.TB_RESIM_ID = t.JoinId WHERE y.TB_RESIM_ID in ({id_1},{id_2}) AND y.RSM_REF_GRUP = '{refGrup}' AND y.RSM_REF_ID = {refId}", prms.PARAMS);
+
+                klas.cmd($"SELECT *,CASE WHEN TB_RESIM_ID = {id_1} then {id_2} ELSE {id_1} END AS JoinId INTO #Temp2  FROM  orjin.TB_RESIM" +
+                    $" WHERE TB_RESIM_ID in ({id_1},{id_2}) AND RSM_REF_GRUP = '{refGrup}' AND RSM_REF_ID = {refId} " +
+                 $"UPDATE y SET y.[RSM_REF_ID] = t.[RSM_REF_ID],  y.[RSM_REF_GRUP] = t.[RSM_REF_GRUP], y.[RSM_VARSAYILAN] = t.[RSM_VARSAYILAN], " +
+                 $"y.[RSM_UZANTI] = t.[RSM_UZANTI], y.[RSM_RESIM_AD] = t.[RSM_RESIM_AD], y.[RSM_YOL] = t.[RSM_YOL]," +
+                 $" y.[RSM_ARSIV_AD] = t.[RSM_ARSIV_AD], y.[RSM_ARSIV_YOL] = t.[RSM_ARSIV_YOL], y.[RSM_BOYUT] = t.[RSM_BOYUT]," +
+                 $"y.[RSM_ETIKET] = t.[RSM_ETIKET], y.[RSM_OLUSTURAN_ID] = t.[RSM_OLUSTURAN_ID], y.[RSM_OLUSTURMA_TARIH] = t.[RSM_OLUSTURMA_TARIH], " +
+                 $"y.[RSM_DEGISTIREN_ID] = t.[RSM_DEGISTIREN_ID], y.[RSM_DEGISTIRME_TARIH] = " +
+                 $"t.[RSM_DEGISTIRME_TARIH] FROM orjin.TB_RESIM as y INNER JOIN #Temp2  " +
+                 $"t ON y.TB_RESIM_ID = t.JoinId WHERE y.TB_RESIM_ID in ({id_1},{id_2}) AND y.RSM_REF_GRUP = '{refGrup}' AND y.RSM_REF_ID = {refId}", 
+                 prms.PARAMS);
+
                 bildirimEntity.MsgId = Bildirim.MSG_ISLEM_BASARILI;
                 bildirimEntity.Durum = true;
             }

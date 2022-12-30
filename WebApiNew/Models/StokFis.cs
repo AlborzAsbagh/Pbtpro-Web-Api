@@ -272,5 +272,7 @@ namespace WebApiNew.Models
 
         [DataMember]
         public Personel PERSONEL { get; set; }
+        [DataMember]
+        public int SOL_SIRA_NO { get; set; }
     }
 }

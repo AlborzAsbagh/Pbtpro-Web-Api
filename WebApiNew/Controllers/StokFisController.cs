@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Windows.Forms;
 using Unity;
 using Unity.Policy;
 using WebApiNew.App_GlobalResources;
@@ -668,165 +669,653 @@ namespace WebApiNew.Controllers
         }
         [Route("api/StokFisOnayListesi")]
         [HttpPost]
-        public List<StokFis> StokFisOnayListesi([FromBody] Filtre filtre, [FromUri] int page, [FromUri] int pageSize, [FromUri] string IslemTip, [FromUri] int tabDurumID, int ID)
+        public List<StokFis> StokFisOnayListesi([FromBody] Filtre filtre, [FromUri] int page, [FromUri] int pageSize, [FromUri] string IslemTip, [FromUri] int tabDurumID, [FromUri] int ID)
         {
+           
 
-
-            //int ilkdeger = page * pageSize;
-            //int sondeger = ilkdeger + pageSize;
+            int ilkdeger = page * pageSize;
+            int sondeger = ilkdeger + pageSize;
             prms.Clear();
             prms.Add("KUL_ID", ID);
             prms.Add("SFS_ISLEM_TIP", IslemTip);
             List<StokFis> listem = new List<StokFis>();
-            string query = @"SELECT * FROM orjin.VW_STOK_FIS STF 
-                LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
-                WHERE SFS_ISLEM_TIP = @SFS_ISLEM_TIP 
-                AND SFS_MODUL_NO = 1
-                AND SOL_SIRA_NO = SOL_SIRA_NO 
-                AND SOL_PERSONEL_ID = @KUL_ID
-                AND SOL_ONAY_DURUM_ID = SOL_ONAY_DURUM_ID";
+            string query = " ( select * FROM orjin.VW_STOK_FIS STF " +
+               " LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID  " +
+               "  LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID  " +
+               $" WHERE SFS_ISLEM_TIP = {IslemTip} " +
+                " AND SFS_MODUL_NO = 1 " +
+                $" AND SOL_PERSONEL_ID = {ID}";
 
-            if (filtre != null)
+            //if (filtre != null)
+            //{
+            //    if (filtre.MakineID > 0)
+            //    {
+            //        prms.Add("SFS_MAKINE_ID", filtre.MakineID);
+            //        query = query + " and SFS_MAKINE_ID=@SFS_MAKINE_ID";
+            //    }
+            //    if (filtre.durumID > 0)
+            //    {
+            //        prms.Add("SFS_TALEP_DURUM_ID", filtre.durumID);
+            //        query = query + " and SFS_TALEP_DURUM_ID=@SFS_TALEP_DURUM_ID";
+            //    }
+
+            if (tabDurumID != -1)
             {
-                if (filtre.MakineID > 0)
-                {
-                    prms.Add("SFS_MAKINE_ID", filtre.MakineID);
-                    query = query + " and SFS_MAKINE_ID=@SFS_MAKINE_ID";
-                }
-                if (filtre.durumID > 0)
-                {
-                    prms.Add("SFS_TALEP_DURUM_ID", filtre.durumID);
-                    query = query + " and SFS_TALEP_DURUM_ID=@SFS_TALEP_DURUM_ID";
-                }
-                if (tabDurumID != -1)
-                {
-                    if (tabDurumID == 1)
-                        query = query + " and SFS_TALEP_DURUM_ID IN (7)";
-                    else if (tabDurumID == 2)
-                        query = query + " and SFS_TALEP_DURUM_ID IN (8,9)";
-                }
-                if (filtre.LokasyonID > 0)
-                {
-                    prms.Add("SFS_LOKASYON_ID", filtre.LokasyonID);
-                    query = query + " and SFS_LOKASYON_ID=@SFS_LOKASYON_ID";
-                }
-                if (filtre.ProjeID > 0)
-                {
-                    prms.Add("SFS_PROJE_ID", filtre.ProjeID);
-                    query = query + " and SFS_PROJE_ID=@SFS_PROJE_ID";
-                }
-
-                if (filtre.nedenID > 0)
-                {
-                    prms.Add("SFS_TALEP_NEDEN_KOD_ID", filtre.nedenID);
-                    query = query + " and SFS_TALEP_NEDEN_KOD_ID=@SFS_TALEP_NEDEN_KOD_ID";
-                }
-
-                if (filtre.PersonelID > 0)
-                {
-                    prms.Add("SFS_TALEP_EDEN_PERSONEL_ID", filtre.PersonelID);
-                    query = query + " and SFS_TALEP_EDEN_PERSONEL_ID =@SFS_TALEP_EDEN_PERSONEL_ID";
-                }
-
-                if (filtre.BasTarih != "" && filtre.BitTarih != "")
-                {
-                    DateTime bas = Convert.ToDateTime(filtre.BasTarih);
-                    DateTime bit = Convert.ToDateTime(filtre.BitTarih);
-                    prms.Add("BAS_TARIH", bas.ToString("yyyy-MM-dd"));
-                    prms.Add("BIT_TARIH", bit.ToString("yyyy-MM-dd"));
-                    query = query + " AND SFS_TARIH BETWEEN  @BAS_TARIH and @BIT_TARIH";
-                }
-                else
-                if (filtre.BasTarih != "")
-                {
-                    DateTime bas = Convert.ToDateTime(filtre.BasTarih);
-                    prms.Add("BAS_TARIH", bas.ToString("yyyy-MM-dd"));
-                    query = query + " AND SFS_TARIH >= @BAS_TARIH ";
-                }
-                else
-                if (filtre.BitTarih != "")
-                {
-                    DateTime bit = Convert.ToDateTime(filtre.BitTarih);
-                    prms.Add("BIT_TARIH", bit.ToString("yyyy-MM-dd"));
-                    query = query + " AND SFS_TARIH <= @BIT_TARIH";
-                }
-                if (filtre.Kelime != "")
-                {
-                    prms.Add("KELIME", filtre.Kelime);
-                    query = query + @" AND     (SFS_FIS_NO      like '%'+@KELIME+'%' OR 
-                                                SFS_TALEP_NEDEN like '%'+@KELIME+'%' OR 
-                                                SFS_MAKINE      like '%'+@KELIME+'%' OR 
-                                                SFS_LOKASYON    like '%'+@KELIME+'%' OR 
-                                                SFS_BOLUM       like '%'+@KELIME+'%' OR 
-                                                SFS_BASLIK      like '%'+@KELIME+'%' OR 
-                                                SFS_TALEP_NEDEN like '%'+@KELIME+'%')";
-                }
+                if (tabDurumID == 1)
+                    query = query + " and SFS_TALEP_DURUM_ID = 7 AND ((SOL_ONAY_DURUM_ID != 8 AND SOL_ONAY_DURUM_ID != 9) or SOL_ONAY_DURUM_ID is null) ";
+                else if (tabDurumID == 2)
+                    query = query + " and SOL_ONAY_DURUM_ID IN (8,9) ";
             }
-            //prms.Add("ILK_DEGER", ilkdeger);
-            //prms.Add("SON_DEGER", sondeger);
-            //query += " )SELECT * FROM mTable WHERE RowNum > @ILK_DEGER AND RowNum <= @SON_DEGER";
-            var rtb = new System.Windows.Forms.RichTextBox();
-            using (var conn = klas.baglanCmd())
+
+            //    if (filtre.LokasyonID > 0)
+            //    {
+            //        prms.Add("SFS_LOKASYON_ID", filtre.LokasyonID);
+            //        query = query + " and SFS_LOKASYON_ID=@SFS_LOKASYON_ID";
+            //    }
+            //    if (filtre.ProjeID > 0)
+            //    {
+            //        prms.Add("SFS_PROJE_ID", filtre.ProjeID);
+            //        query = query + " and SFS_PROJE_ID=@SFS_PROJE_ID";
+            //    }
+
+            //    if (filtre.nedenID > 0)
+            //    {
+            //        prms.Add("SFS_TALEP_NEDEN_KOD_ID", filtre.nedenID);
+            //        query = query + " and SFS_TALEP_NEDEN_KOD_ID=@SFS_TALEP_NEDEN_KOD_ID";
+            //    }
+
+            //    if (filtre.PersonelID > 0)
+            //    {
+            //        prms.Add("SFS_TALEP_EDEN_PERSONEL_ID", filtre.PersonelID);
+            //        query = query + " and SFS_TALEP_EDEN_PERSONEL_ID =@SFS_TALEP_EDEN_PERSONEL_ID";
+            //    }
+
+            //    if (filtre.BasTarih != "" && filtre.BitTarih != "")
+            //    {
+            //        DateTime bas = Convert.ToDateTime(filtre.BasTarih);
+            //        DateTime bit = Convert.ToDateTime(filtre.BitTarih);
+            //        prms.Add("BAS_TARIH", bas.ToString("yyyy-MM-dd"));
+            //        prms.Add("BIT_TARIH", bit.ToString("yyyy-MM-dd"));
+            //        query = query + " AND SFS_TARIH BETWEEN  @BAS_TARIH and @BIT_TARIH";
+            //    }
+            //    else
+            //    if (filtre.BasTarih != "")
+            //    {
+            //        DateTime bas = Convert.ToDateTime(filtre.BasTarih);
+            //        prms.Add("BAS_TARIH", bas.ToString("yyyy-MM-dd"));
+            //        query = query + " AND SFS_TARIH >= @BAS_TARIH ";
+            //    }
+            //    else
+            //    if (filtre.BitTarih != "")
+            //    {
+            //        DateTime bit = Convert.ToDateTime(filtre.BitTarih);
+            //        prms.Add("BIT_TARIH", bit.ToString("yyyy-MM-dd"));
+            //        query = query + " AND SFS_TARIH <= @BIT_TARIH";
+            //    }
+            //    if (filtre.Kelime != "")
+            //    {
+            //        prms.Add("KELIME", filtre.Kelime);
+            //        query = query + @" AND     (SFS_FIS_NO      like '%'+@KELIME+'%' OR 
+            //                                    SFS_TALEP_NEDEN like '%'+@KELIME+'%' OR 
+            //                                    SFS_MAKINE      like '%'+@KELIME+'%' OR 
+            //                                    SFS_LOKASYON    like '%'+@KELIME+'%' OR 
+            //                                    SFS_BOLUM       like '%'+@KELIME+'%' OR 
+            //                                    SFS_BASLIK      like '%'+@KELIME+'%' OR 
+            //                                    SFS_TALEP_NEDEN like '%'+@KELIME+'%')";
+            //    }
+            //}
+
+            prms.Add("ILK_DEGER", ilkdeger);
+            prms.Add("SON_DEGER", sondeger);
+            query += $" ) SELECT * FROM mTable WHERE RowNum > {ilkdeger} AND RowNum <= {sondeger} ";
+            
+
+            using (var command = new SqlCommand(query, klas.baglanCmd()))
             {
-                var dprms = new DynamicParameters();
-                prms.PARAMS.ForEach(p => dprms.Add(p.ParametreAdi, p.ParametreDeger));
-                listem = conn.Query<StokFis, SatinAlmaAyar, StokFis>(query, map: (s, p) =>
+                using (var reader = command.ExecuteReader())
                 {
-                    try
+                    while (reader.Read())
                     {
-                        rtb.Rtf = s.SFS_ACIKLAMA ?? "";
-                        s.SFS_ACIKLAMA = rtb.Text;
+                        if (reader["STO_SIRA_NO"] == DBNull.Value || Convert.ToInt32(reader["STO_SIRA_NO"]) == 1 || Convert.ToInt32(reader["STO_SIRA_NO"]) == 0)
+                        {
+                            var s = new StokFis();
+                            s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                            s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                            s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                            s.SFS_CARI = reader["SFS_CARI"].ToString();
+                            s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                            if (reader["SOL_ONAY_DURUM_ID"] != DBNull.Value)
+                            {
+                                if (Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 9)
+                                {
+                                    s.SFS_DURUM = "ONAYLANMADI";
+                                }
+                                else if (Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 8)
+                                {
+                                    s.SFS_DURUM = "ONAYLANDI";
+                                }
+                                else
+                                {
+                                    s.SFS_DURUM = "ONAY BEKLİYOR";
+                                }
+                            } else { s.SFS_DURUM = "ONAY BEKLİYOR"; }
+
+                            s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                            s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                            s.SFS_GC = reader["SFS_GC"].ToString();
+                            s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                            s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                            s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                            s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                            s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                            s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                            s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                            s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                            s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                            s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                            s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                            s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                            s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                            s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                            s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                            s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                            s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                            s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                            s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                            s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                            s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                            s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                            s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                            s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                            s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                            listem.Add(s);
+                        }
+                        else
+                        {
+                           
+                            prms.Clear();
+                            prms.Add("STOK_FIS_ID", Convert.ToInt32(reader["TB_STOK_FIS_ID"]));
+                            int isStokFis ;
+                            int stokFisSayisi = 0;
+
+                            if (reader["SOL_ONAY_DURUM_ID"] != DBNull.Value && ((Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 9) || Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 8))
+                            {
+                                var s = new StokFis();
+                                s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                if (reader["SOL_ONAY_DURUM_ID"] != DBNull.Value)
+                                {
+                                    if (Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 9)
+                                    {
+                                        s.SFS_DURUM = "ONAYLANMADI";
+                                    }
+                                    else if (Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 8)
+                                    {
+                                        s.SFS_DURUM = "ONAYLANDI";
+                                    }
+                                    else
+                                    {
+                                        s.SFS_DURUM = "ONAY BEKLİYOR";
+                                    }
+                                }
+                                else { s.SFS_DURUM = "ONAY BEKLİYOR"; }
+
+                                s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                s.SFS_GC = reader["SFS_GC"].ToString();
+                                s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                listem.Add(s);
+                            }  
+
+                            else
+                            {
+
+                                if (Convert.ToInt32(reader["STO_SIRA_NO"]) == 2)
+                                {
+
+                                    isStokFis = Convert.ToInt32(klas.GetDataCell(
+                                   @" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                    LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                    LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                    where SFS_ISLEM_TIP = '09'
+                                    AND SFS_MODUL_NO = 1 
+                                    AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                    AND STO_SIRA_NO = 1", prms.PARAMS));
+
+                                    if (isStokFis > 0)
+                                    {
+                                        stokFisSayisi = Convert.ToInt32(klas.GetDataCell(
+                                      @" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                        LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                        LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                        where SFS_ISLEM_TIP = '09'
+                                        AND SFS_MODUL_NO = 1 
+                                        AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                        AND (SOL_ONAY_DURUM_ID = 8) 
+                                        AND STO_SIRA_NO = 1", prms.PARAMS));
+                                    }
+                                    else
+                                    {
+                                        var s = new StokFis();
+                                        s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                        s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                        s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                        s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                        s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                        s.SFS_DURUM = reader["SFS_DURUM"].ToString();
+                                        s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                        s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                        s.SFS_GC = reader["SFS_GC"].ToString();
+                                        s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                        s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                        s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                        s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                        s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                        s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                        s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                        s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                        s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                        s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                        s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                        s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                        s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                        s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                        s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                        s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                        s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                        s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                        s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                        s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                        s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                        s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                        s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                        s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                        s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                        listem.Add(s);
+                                    }
+                                    if (stokFisSayisi > 0)
+                                    {
+                                        var s = new StokFis();
+                                        s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                        s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                        s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                        s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                        s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                        s.SFS_DURUM = reader["SFS_DURUM"].ToString();
+                                        s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                        s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                        s.SFS_GC = reader["SFS_GC"].ToString();
+                                        s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                        s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                        s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                        s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                        s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                        s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                        s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                        s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                        s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                        s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                        s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                        s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                        s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                        s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                        s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                        s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                        s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                        s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                        s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                        s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                        s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                        s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                        s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                        s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                        s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                        listem.Add(s);
+                                    }
+
+                                }
+                                else if (Convert.ToInt32(reader["STO_SIRA_NO"]) == 3)
+                                {
+                                    int approvedFirstOrder = 0;
+                                    int firstOrder = 0;
+                                    int approvedSecondOrder = 0;
+                                    int secondOrder = 0;
+
+                                    isStokFis = Convert.ToInt32(klas.GetDataCell(
+                                   @" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                        LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                        LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                        where SFS_ISLEM_TIP = '09'
+                                        AND SFS_MODUL_NO = 1 
+                                        AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                        AND STO_SIRA_NO in (1,2)", prms.PARAMS));
+
+                                    if (isStokFis > 0)
+                                    {
+                                        firstOrder = Convert.ToInt32(klas.GetDataCell(@" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                        LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                        LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                        where SFS_ISLEM_TIP = '09'
+                                        AND SFS_MODUL_NO = 1 
+                                        AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                        AND STO_SIRA_NO = 1", prms.PARAMS));
+
+                                        approvedFirstOrder = Convert.ToInt32(klas.GetDataCell(@" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                        LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                        LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                        where SFS_ISLEM_TIP = '09'
+                                        AND SFS_MODUL_NO = 1 
+                                        AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                        AND (SOL_ONAY_DURUM_ID = 8) 
+                                        AND STO_SIRA_NO = 1", prms.PARAMS));
+
+                                        secondOrder = Convert.ToInt32(klas.GetDataCell(@" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                        LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                        LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                        where SFS_ISLEM_TIP = '09'
+                                        AND SFS_MODUL_NO = 1 
+                                        AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                        AND STO_SIRA_NO = 2", prms.PARAMS));
+
+                                        approvedSecondOrder = Convert.ToInt32(klas.GetDataCell(@" select count(*) FROM orjin.VW_STOK_FIS STF 
+                                        LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID 
+                                        LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID 
+                                        where SFS_ISLEM_TIP = '09'
+                                        AND SFS_MODUL_NO = 1 
+                                        AND TB_STOK_FIS_ID = @STOK_FIS_ID 
+                                        AND (SOL_ONAY_DURUM_ID = 8) 
+                                        AND STO_SIRA_NO = 2", prms.PARAMS));
+                                    }
+                                    else
+                                    {
+                                        var s = new StokFis();
+                                        s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                        s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                        s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                        s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                        s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                        s.SFS_DURUM = reader["SFS_DURUM"].ToString();
+                                        s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                        s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                        s.SFS_GC = reader["SFS_GC"].ToString();
+                                        s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                        s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                        s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                        s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                        s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                        s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                        s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                        s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                        s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                        s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                        s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                        s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                        s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                        s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                        s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                        s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                        s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                        s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                        s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                        s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                        s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                        s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                        s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                        s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                        s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                        listem.Add(s);
+                                    }
+                                    if( firstOrder > 0 )
+                                    {
+                                        if(approvedFirstOrder > 0)
+                                        {
+                                            if(secondOrder > 0)
+                                            {
+                                                if(approvedSecondOrder > 0)
+                                                {
+                                                    var s = new StokFis();
+                                                    s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                                    s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                                    s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                                    s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                                    s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                                    s.SFS_DURUM = reader["SFS_DURUM"].ToString();
+                                                    s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                                    s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                                    s.SFS_GC = reader["SFS_GC"].ToString();
+                                                    s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                                    s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                                    s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                                    s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                                    s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                                    s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                                    s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                                    s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                                    s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                                    s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                                    s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                                    s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                                    s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                                    s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                                    s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                                    s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                                    s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                                    s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                                    s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                                    s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                                    s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                                    s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                                    s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                                    s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                                    s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                                    listem.Add(s);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var s = new StokFis();
+                                                s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                                s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                                s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                                s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                                s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                                s.SFS_DURUM = reader["SFS_DURUM"].ToString();
+                                                s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                                s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                                s.SFS_GC = reader["SFS_GC"].ToString();
+                                                s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                                s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                                s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                                s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                                s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                                s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                                s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                                s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                                s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                                s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                                s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                                s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                                s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                                s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                                s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                                s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                                s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                                s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                                s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                                s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                                s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                                s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                                s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                                s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                                s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                                listem.Add(s);
+                                            }
+                                        }
+
+                                    }
+                                    if( secondOrder > 0 )
+                                    {
+                                        if(approvedSecondOrder > 0)
+                                        {
+                                            var s = new StokFis();
+                                            s.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                                            s.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                                            s.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                                            s.SFS_CARI = reader["SFS_CARI"].ToString();
+                                            s.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                                            s.SFS_DURUM = reader["SFS_DURUM"].ToString();
+                                            s.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                                            s.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                                            s.SFS_GC = reader["SFS_GC"].ToString();
+                                            s.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                                            s.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                                            s.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                                            s.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                                            s.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                                            s.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                                            s.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                                            s.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                                            s.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                                            s.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                                            s.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                                            s.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                                            s.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                                            s.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                                            s.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                                            s.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                                            s.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                                            s.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                                            s.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                                            s.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                                            s.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                                            s.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                                            s.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                                            s.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                                            s.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                                            listem.Add(s);
+                                        }
+                                    }
+
+                                }
+                                
+                            }
+                        }
                     }
-                    catch (Exception e)
-                    {
-
-                    }
-
-                    s.SFS_BASLIK = s.SFS_BASLIK ?? "";
-                    s.SFS_BOLUM = s.SFS_BOLUM ?? "";
-                    s.SFS_CARI = s.SFS_CARI ?? "";
-                    s.SFS_CIKIS_DEPO = s.SFS_CIKIS_DEPO ?? "";
-                    s.SFS_DURUM = s.SFS_DURUM ?? "";
-                    s.SFS_FATURA_IRSALIYE_NO = s.SFS_FATURA_IRSALIYE_NO ?? "";
-                    s.SFS_FIS_NO = s.SFS_FIS_NO ?? "";
-                    s.SFS_GC = s.SFS_GC ?? "";
-                    s.SFS_GIRIS_DEPO = s.SFS_GIRIS_DEPO ?? "";
-                    s.SFS_ISLEM_TIP = s.SFS_ISLEM_TIP ?? "";
-                    s.SFS_ISLEM_TIP_DEGER = s.SFS_ISLEM_TIP_DEGER ?? "";
-                    s.SFS_KOD_ONCELIK = s.SFS_KOD_ONCELIK ?? "";
-                    s.SFS_LOKASYON = s.SFS_LOKASYON ?? "";
-                    s.SFS_MAKINE = s.SFS_MAKINE ?? "";
-                    s.SFS_MAKINE_KOD = s.SFS_MAKINE_KOD ?? "";
-                    s.SFS_ONAY_PERSONEL = s.SFS_ONAY_PERSONEL ?? "";
-                    s.SFS_ONCELIK = s.SFS_ONCELIK ?? "";
-                    s.SFS_PROFJE_TANIM = s.SFS_PROFJE_TANIM ?? "";
-                    s.SFS_REFERANS = s.SFS_REFERANS ?? "";
-                    s.SFS_REF_GRUP = s.SFS_REF_GRUP ?? "";
-                    s.SFS_SATINALMA_TALEP_EDEN = s.SFS_SATINALMA_TALEP_EDEN ?? "";
-                    s.SFS_S_TIP = s.SFS_S_TIP ?? "";
-                    s.SFS_TALEP_EDEN = s.SFS_TALEP_EDEN ?? "";
-                    s.SFS_TALEP_EDILEN = s.SFS_TALEP_EDILEN ?? "";
-                    s.SFS_TALEP_FIS_NO = s.SFS_TALEP_FIS_NO ?? "";
-                    s.SFS_TALEP_ISEMRI_NO = s.SFS_TALEP_ISEMRI_NO ?? "";
-                    s.SFS_TALEP_NEDEN = s.SFS_TALEP_NEDEN ?? "";
-                    s.SFS_TALEP_SIPARIS_NO = s.SFS_TALEP_SIPARIS_NO ?? "";
-                    s.SFS_TESLIM_ALAN = s.SFS_TESLIM_ALAN ?? "";
-                    s.SFS_TESLIM_YERI = s.SFS_TESLIM_YERI ?? "";
-                    s.SFS_TESLIM_YERI_TANIM = s.SFS_TESLIM_YERI_TANIM ?? "";
-                    
-
-                    return s;
-                },
-                splitOn: "SOL_REF_ID",
-                param: dprms
-                ).ToList();
+                }
             }
             return listem;
+
         }
+
+
+        [Route("api/StokFisDetayRefresh")]
+        [HttpPost]
+        public StokFis StokFisDetayRefresh([FromUri] int userId, [FromUri] int fisId)
+        {
+            prms.Clear();
+            prms.Add("KLL_ID", userId);
+            prms.Add("FIS_ID", fisId);
+            StokFis stokFis = new StokFis();
+            string query = $" SELECT * FROM orjin.VW_STOK_FIS STF" +
+               " LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID " +
+                " WHERE  SFS_ISLEM_TIP = '09' " +
+                " AND SFS_MODUL_NO = 1 " +
+                $" AND SOL_PERSONEL_ID = {userId} " +
+                $" AND TB_STOK_FIS_ID = {fisId}";
+
+            using (var command = new SqlCommand(query, klas.baglanCmd()))
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        stokFis.TB_STOK_FIS_ID = Convert.ToInt32(reader["TB_STOK_FIS_ID"]);
+                        stokFis.SFS_BASLIK = reader["SFS_BASLIK"].ToString();
+                        stokFis.SFS_BOLUM = reader["SFS_BOLUM"].ToString();
+                        stokFis.SFS_CARI = reader["SFS_CARI"].ToString();
+                        stokFis.SFS_CIKIS_DEPO = reader["SFS_CIKIS_DEPO"].ToString();
+                        if (reader["SOL_ONAY_DURUM_ID"] != DBNull.Value)
+                        {
+                            if (Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 9)
+                            {
+                                stokFis.SFS_DURUM = "ONAYLANMADI";
+                            }
+                            else if (Convert.ToInt32(reader["SOL_ONAY_DURUM_ID"]) == 8)
+                            {
+                                stokFis.SFS_DURUM = "ONAYLANDI";
+                            }
+                            else
+                            {
+                                stokFis.SFS_DURUM = "ONAY BEKLİYOR";
+                            }
+                        }
+                        else { stokFis.SFS_DURUM = "ONAY BEKLİYOR"; }
+                        stokFis.SFS_FATURA_IRSALIYE_NO = reader["SFS_FATURA_IRSALIYE_NO"].ToString();
+                        stokFis.SFS_FIS_NO = reader["SFS_FIS_NO"].ToString();
+                        stokFis.SFS_GC = reader["SFS_GC"].ToString();
+                        stokFis.SFS_GIRIS_DEPO = reader["SFS_GIRIS_DEPO"].ToString();
+                        stokFis.SFS_ISLEM_TIP = reader["SFS_ISLEM_TIP"].ToString();
+                        stokFis.SFS_ISLEM_TIP_DEGER = reader["SFS_ISLEM_TIP_DEGER"].ToString();
+                        stokFis.SFS_KOD_ONCELIK = reader["SFS_KOD_ONCELIK"].ToString();
+                        stokFis.SFS_LOKASYON = reader["SFS_LOKASYON"].ToString();
+                        stokFis.SFS_MAKINE = reader["SFS_MAKINE"].ToString();
+                        stokFis.SFS_MAKINE_KOD = reader["SFS_MAKINE_KOD"].ToString();
+                        stokFis.SFS_ONAY_PERSONEL = reader["SFS_ONAY_PERSONEL"].ToString();
+                        stokFis.SFS_ONCELIK = reader["SFS_ONCELIK"].ToString();
+                        stokFis.SFS_PROFJE_TANIM = reader["SFS_PROFJE_TANIM"].ToString();
+                        stokFis.SFS_REFERANS = reader["SFS_REFERANS"].ToString();
+                        stokFis.SFS_REF_GRUP = reader["SFS_REF_GRUP"].ToString();
+                        stokFis.SFS_SATINALMA_TALEP_EDEN = reader["SFS_SATINALMA_TALEP_EDEN"].ToString();
+                        stokFis.SFS_S_TIP = reader["SFS_S_TIP"].ToString();
+                        stokFis.SFS_TALEP_EDEN = reader["SFS_TALEP_EDEN"].ToString();
+                        stokFis.SFS_TALEP_EDILEN = reader["SFS_TALEP_EDILEN"].ToString();
+                        stokFis.SFS_TALEP_FIS_NO = reader["SFS_TALEP_FIS_NO"].ToString();
+                        stokFis.SFS_TALEP_ISEMRI_NO = reader["SFS_TALEP_ISEMRI_NO"].ToString();
+                        stokFis.SFS_TALEP_NEDEN = reader["SFS_TALEP_NEDEN"].ToString();
+                        stokFis.SFS_TALEP_SIPARIS_NO = reader["SFS_TALEP_SIPARIS_NO"].ToString();
+                        stokFis.SFS_TESLIM_ALAN = reader["SFS_TESLIM_ALAN"].ToString();
+                        stokFis.SFS_TESLIM_YERI = reader["SFS_TESLIM_YERI"].ToString();
+                        stokFis.SFS_TESLIM_YERI_TANIM = reader["SFS_TESLIM_YERI_TANIM"].ToString();
+                        stokFis.SFS_TARIH = Convert.ToDateTime(reader["SFS_TARIH"]);
+                        stokFis.SFS_SAAT = (reader["SFS_SAAT"]).ToString();
+                    }
+                }
+            }
+            return stokFis;   
+
+        }
+
 
         [Route("api/MlzTransferOnaylananlar")]
         [HttpPost]
-        public Bildirim MlzTransferOnaylananlar(int id, [FromBody] List<StokFis> values)
+        public Bildirim MlzTransferOnaylananlar([FromUri] int id, [FromBody] List<StokFis> values)
         {
             prms.Clear();
             var hatali = false;
@@ -839,16 +1328,39 @@ namespace WebApiNew.Controllers
             foreach (var stokFisid in idlist) {
                 
                 try
+                {
+                    int userSiraNo = Convert.ToInt32(klas.GetDataCell(@"select STO_SIRA_NO from orjin.TB_SATINALMA_TALEP_ONAY where STO_PERSONEL_ID = @KUL_ID", prms.PARAMS));
+                    if (userSiraNo == 3)
                     {
-                        klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
-                        klas.cmd($"UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+                        klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = {stokFisid} ", prms.PARAMS);
+                        klas.cmd($"UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = {stokFisid} ", prms.PARAMS);
 
-                        klas.cmd($"INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
-                            $"(STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
-                            $"VALUES (CURRENT_TIMESTAMP, {id} , 8 , 'MALZEME TALEBI ONAYLANDI', {stokFisid})", prms.PARAMS);
+                    }
+                    else
+                    {
+                        int fisCountNumber = Convert.ToInt32(klas.GetDataCell(" select COUNT(*) FROM orjin.VW_STOK_FIS STF " +
+                               " LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID " +
+                               " LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID " +
+                               " WHERE SFS_ISLEM_TIP = '09' " +
+                               " AND SFS_MODUL_NO = 1 " +
+                               " AND SFS_TALEP_DURUM_ID = 7 AND ((SOL_ONAY_DURUM_ID != 8 AND SOL_ONAY_DURUM_ID != 9) or SOL_ONAY_DURUM_ID is null) " +
+                               $" AND TB_STOK_FIS_ID = {stokFisid} " +
+                               $" AND STO_SIRA_NO  = {userSiraNo + 1} ", prms.PARAMS));
+
+                        if (fisCountNumber == 0)
+                        {
+                            klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID ", prms.PARAMS);
+                            klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID ", prms.PARAMS);
+                        }
+                    }
+                    klas.cmd($"UPDATE orjin.TB_SATINALMA_ONAY_LISTE SET SOL_ONAY_DURUM_ID = 8  WHERE SOL_REF_ID = {stokFisid} AND SOL_PERSONEL_ID = {id}", prms.PARAMS);
+
+                    klas.cmd($"INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
+                            $"(STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID , STR_DETAY_ID) " +
+                            $"VALUES (CURRENT_TIMESTAMP, {id} , 8 , 'MALZEME TALEBI ONAYLANDI', {stokFisid} , -1)", prms.PARAMS);
                 }
                 catch (Exception e)
-                    {
+                 {
                     hatali = true;
                     bildirim.Aciklama = String.Format(Localization.errorFormatted, e.Message);
                     bildirim.MsgId = Bildirim.MSG_SFS_SIL_HATA;
@@ -856,7 +1368,7 @@ namespace WebApiNew.Controllers
                     bildirim.Durum = false;
                     bildirim.Id = id;
                     break;
-                    }
+                }
             }
             if(!hatali)
             {
@@ -870,7 +1382,7 @@ namespace WebApiNew.Controllers
 
         [Route("api/TekMlzTransferOnaylanan")]
         [HttpPost]
-        public Bildirim TekMlzTransferOnaylanan(int id, [FromUri] int fisID)
+        public Bildirim TekMlzTransferOnaylanan([FromUri] int id, [FromUri] int fisID)
         {
             Bildirim bildirimEntity = new Bildirim();
             prms.Clear();
@@ -878,12 +1390,36 @@ namespace WebApiNew.Controllers
             prms.Add("KUL_ID", id);
             try
             {
-                klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
-                klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+                int userSiraNo = Convert.ToInt32(klas.GetDataCell(@"select STO_SIRA_NO from orjin.TB_SATINALMA_TALEP_ONAY where STO_PERSONEL_ID = @KUL_ID", prms.PARAMS));
+                if (userSiraNo == 3)
+                {
+                    klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID ", prms.PARAMS);
+                    klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID ", prms.PARAMS);
+
+                } 
+                else
+                {
+                    int fisCountNumber = Convert.ToInt32(klas.GetDataCell(" select COUNT(*) FROM orjin.VW_STOK_FIS STF " +
+                           " LEFT JOIN orjin.TB_SATINALMA_ONAY_LISTE SAO ON SAO.SOL_REF_ID = STF.TB_STOK_FIS_ID " +
+                           " LEFT JOIN orjin.TB_SATINALMA_TALEP_ONAY ON STO_PERSONEL_ID =SAO.SOL_PERSONEL_ID " +
+                           " WHERE SFS_ISLEM_TIP = '09' " +
+                           " AND SFS_MODUL_NO = 1 " +
+                           " AND SFS_TALEP_DURUM_ID = 7 AND ((SOL_ONAY_DURUM_ID != 8 AND SOL_ONAY_DURUM_ID != 9) or SOL_ONAY_DURUM_ID is null) " +
+                           $" AND TB_STOK_FIS_ID = {fisID} " +
+                           $" AND STO_SIRA_NO  = {userSiraNo + 1} ", prms.PARAMS));
+
+                    if(fisCountNumber == 0)
+                    {
+                        klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 8 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID ", prms.PARAMS);
+                        klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 8  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID ", prms.PARAMS);
+                    }
+                }
+
+                klas.cmd("UPDATE orjin.TB_SATINALMA_ONAY_LISTE SET SOL_ONAY_DURUM_ID = 8  WHERE SOL_REF_ID = @TB_STOK_FIS_ID AND SOL_PERSONEL_ID = @KUL_ID ", prms.PARAMS);
 
                 klas.cmd("INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
-                    "  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
-                    " VALUES (CURRENT_TIMESTAMP, @KUL_ID , 8 , 'MALZEME TALEBI ONAYLANDI', @TB_STOK_FIS_ID)", prms.PARAMS);
+                    "  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID , STR_DETAY_ID ) " +
+                    " VALUES (CURRENT_TIMESTAMP, @KUL_ID , 8 , 'MALZEME TALEBI ONAYLANDI', @TB_STOK_FIS_ID , -1)", prms.PARAMS);
 
                 bildirimEntity.Aciklama = "Malzeme talebi onaylandı";
                 bildirimEntity.MsgId = Bildirim.MSG_SFS_SIL_OK;
@@ -901,7 +1437,7 @@ namespace WebApiNew.Controllers
 
         [Route("api/MlzTransferOnaylanmayanlar")]
         [HttpPost]
-        public Bildirim MlzTransferOnaylanmayanlar(int id, [FromBody] List<StokFis> values)
+        public Bildirim MlzTransferOnaylanmayanlar([FromUri] int id, [FromBody] List<StokFis> values)
         {
             prms.Clear();
             var hatali = false;
@@ -915,12 +1451,12 @@ namespace WebApiNew.Controllers
             {
                 try
                 {
-                    klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
-                    klas.cmd($"UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 9  WHERE TB_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+                    //klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
+                    klas.cmd($"UPDATE orjin.TB_SATINALMA_ONAY_LISTE SET SOL_ONAY_DURUM_ID = 9  WHERE SOL_REF_ID = {stokFisid} AND SOL_PERSONEL_ID = {id}", prms.PARAMS);
 
                     klas.cmd($"INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
-                    $"  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
-                    $" VALUES (CURRENT_TIMESTAMP, {id} , 9 , 'MALZEME TALEBI ONAYLANMADI', {stokFisid})", prms.PARAMS);
+                    $"  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID , STR_DETAY_ID) " +
+                    $" VALUES (CURRENT_TIMESTAMP, {id} , 9 , 'MALZEME TALEBI ONAYLANMADI', {stokFisid} , -1)", prms.PARAMS);
                 }
                 catch (Exception e)
                 {
@@ -945,7 +1481,7 @@ namespace WebApiNew.Controllers
 
         [Route("api/TekMlzTransferOnaylanmayan")]
         [HttpPost]
-        public Bildirim TekMlzTransferOnaylanmayan(int id, [FromUri] int fisID)
+        public Bildirim TekMlzTransferOnaylanmayan([FromUri] int id, [FromUri] int fisID)
         {
             Bildirim bildirimEntity = new Bildirim();
             prms.Clear();
@@ -953,12 +1489,12 @@ namespace WebApiNew.Controllers
             prms.Add("KUL_ID", id);
             try
             {
-                klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
-                klas.cmd("UPDATE orjin.VW_STOK_FIS SET SFS_TALEP_DURUM_ID = 9  WHERE TB_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+                //klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
+                klas.cmd("UPDATE orjin.TB_SATINALMA_ONAY_LISTE SET SOL_ONAY_DURUM_ID = 9  WHERE SOL_REF_ID = @TB_STOK_FIS_ID AND SOL_PERSONEL_ID = @KUL_ID ", prms.PARAMS);
 
                 klas.cmd("INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
-                    "  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID) " +
-                    " VALUES (CURRENT_TIMESTAMP, @KUL_ID , 9 , 'MALZEME TALEBI ONAYLANMADI', @TB_STOK_FIS_ID)", prms.PARAMS);
+                    "  (STR_ISLEM_ZAMANI, STR_ISLEM_YAPAN_ID, STR_ISLEM_DURUM_ID, STR_ISLEM, STR_TALEP_FIS_ID , STR_DETAY_ID) " +
+                    " VALUES (CURRENT_TIMESTAMP, @KUL_ID , 9 , 'MALZEME TALEBI ONAYLANMADI', @TB_STOK_FIS_ID , -1) ", prms.PARAMS);
 
                 bildirimEntity.Aciklama = "Malzeme talebi onaylanamdı";
                 bildirimEntity.MsgId = Bildirim.MSG_SFS_SIL_OK;

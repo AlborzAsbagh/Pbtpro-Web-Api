@@ -20,7 +20,7 @@ namespace WebApiNew.Controllers
                 klas.MasterBaglantisi = true;
                 string query = "SELECT * FROM orjin.TB_KULLANICI WHERE KLL_AKTIF = 1 AND KLL_DURUM = 'K' AND KLL_KOD =@KLL_KOD";
                 DataRow drKul = klas.GetDataRow(query, prms.PARAMS);
-
+                
                 if (drKul != null)
                 {
                     if ((drKul["KLL_SIFRE"] == DBNull.Value && gelenEntity.KLL_SIFRE == "") || drKul["KLL_SIFRE"].ToString() == gelenEntity.KLL_SIFRE)
