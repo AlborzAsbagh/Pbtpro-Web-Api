@@ -2554,7 +2554,11 @@ namespace WebApiNew.Controllers
         {
             prms.Clear();
             prms.Add("IS_EMRI_ID", isEmriID);
-            string sql = " select * from orjin.TB_COZUM_KATALOG CMK  join orjin.TB_ISEMRI ISM on ISM.TB_ISEMRI_ID = CMK.CMK_REF_ID join orjin.TB_KOD KOD on CMK.CMK_REF_ID = KOD.TB_KOD_ID  where ISM.TB_ISEMRI_ID = @IS_EMRI_ID";
+            string sql = @" select K1.KOD_TANIM AS TESHIS, K2.KOD_TANIM AS NEDEN,* from PBTPRO_1.orjin.TB_COZUM_KATALOG CK
+                            LEFT JOIN PBTPRO_1.orjin.TB_ISEMRI I ON (CK.CMK_REF_ID=TB_ISEMRI_ID)
+                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K1 ON (CK.CMK_TESHIS_ID=K1.TB_KOD_ID)
+                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K2 ON (CK.CMK_NEDEN_ID=K2.TB_KOD_ID)
+                            WHERE TB_ISEMRI_ID = @IS_EMRI_ID ";
             List<CozumKatalogModel> listem = new List<CozumKatalogModel>();
             DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
             for (int i = 0; i < dt.Rows.Count; i++)
@@ -2563,8 +2567,8 @@ namespace WebApiNew.Controllers
                 entity.TB_COZUM_KATALOG_ID = Convert.ToInt32(dt.Rows[i]["TB_COZUM_KATALOG_ID"]);
                 entity.CMK_KOD = (dt.Rows[i]["CMK_KOD"]).ToString();
                 entity.CMK_KONU = Util.getFieldString(dt.Rows[i], "CMK_KONU");
-                entity.CMK_TESHIS = dt.Rows[i]["KOD_TANIM"] != DBNull.Value ? dt.Rows[i]["KOD_TANIM"].ToString() : "";
-                entity.CMK_NEDEN = "Neden Yok";
+                entity.CMK_TESHIS = dt.Rows[i]["TESHIS"] != DBNull.Value ? dt.Rows[i]["TESHIS"].ToString() : "";
+                entity.CMK_NEDEN = dt.Rows[i]["NEDEN"] != DBNull.Value ? dt.Rows[i]["NEDEN"].ToString() : "";
                 listem.Add(entity);
             }
 
@@ -2599,7 +2603,11 @@ namespace WebApiNew.Controllers
                     "SELECT COUNT(TB_DOSYA_ID) FROM dbo.TB_DOSYA WHERE DSY_AKTIF = 1 AND DSY_REF_GRUP = 'ISEMRI' AND DSY_REF_ID = @ISM_ID",
                     prms.PARAMS));
                 entity.CozumKataloglarSayisi = Convert.ToInt32(klas.GetDataCell(
-                    " select COUNT(TB_COZUM_KATALOG_ID) from orjin.TB_COZUM_KATALOG CMK join orjin.TB_ISEMRI ISM on ISM.TB_ISEMRI_ID = CMK.CMK_REF_ID join orjin.TB_KOD KOD on CMK.CMK_REF_ID = KOD.TB_KOD_ID where ISM.TB_ISEMRI_ID = @ISM_ID",
+                    @" select COUNT(*) from PBTPRO_1.orjin.TB_COZUM_KATALOG CK
+                    LEFT JOIN PBTPRO_1.orjin.TB_ISEMRI I ON (CK.CMK_REF_ID=TB_ISEMRI_ID)
+                    LEFT JOIN PBTPRO_1.orjin.TB_KOD K1 ON (CMK_TESHIS_ID=K1.TB_KOD_ID)
+                    LEFT JOIN PBTPRO_1.orjin.TB_KOD K2 ON (CMK_NEDEN_ID=K2.TB_KOD_ID)
+                    WHERE TB_ISEMRI_ID = @ISM_ID ",
                     prms.PARAMS));
                 return entity;
             }

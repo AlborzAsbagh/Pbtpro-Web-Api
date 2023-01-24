@@ -581,6 +581,13 @@ namespace WebApiNew.Controllers
                                                   WHERE MB.MAB_MAKINE_ID=@MAK_ID AND 
                                                         MBT.MBT_OLUSTURAN_ID > 0 AND
                                                     orjin.UDF_LOKASYON_YETKI_KONTROL(M.MKN_LOKASYON_ID,@KLL_ID)=1
+
+                            SELECT COUNT(*) from PBTPRO_1.orjin.TB_COZUM_KATALOG CK
+                            LEFT JOIN PBTPRO_1.orjin.TB_ISEMRI I ON (CK.CMK_REF_ID=TB_ISEMRI_ID)
+                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K1 ON (CK.CMK_TESHIS_ID=K1.TB_KOD_ID)
+                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K2 ON (CK.CMK_NEDEN_ID=K2.TB_KOD_ID)
+                            WHERE ISM_MAKINE_ID = @MAK_ID
+                                
                                                                                                                                                                                 ";
                 
                 Sayilar entity = new Sayilar();
@@ -596,6 +603,7 @@ namespace WebApiNew.Controllers
                     entity.Yakithareketleri = result.ReadFirstOrDefault<int>();
                     entity.Dosya = result.ReadFirstOrDefault<int>();
                     entity.OtonomBakimTarihce = result.ReadFirstOrDefault<int>();
+                    entity.CozumKataloglarSayisi = result.ReadFirstOrDefault<int>();
                     return entity;
                 }
 
@@ -672,7 +680,12 @@ namespace WebApiNew.Controllers
         {
             prms.Clear();
             prms.Add("MAKINE_ID", makineID);
-            string sql = "  select * from orjin.TB_MAKINE MK join orjin.TB_ISEMRI ISM on MK.TB_MAKINE_ID = ISM.ISM_MAKINE_ID join orjin.TB_COZUM_KATALOG CMK on ISM.ISM_MAKINE_ID = CMK.CMK_REF_ID join orjin.TB_KOD KOD on CMK.CMK_REF_ID = KOD.TB_KOD_ID  where TB_MAKINE_ID = @MAKINE_ID";
+            string sql = @" select K1.KOD_TANIM AS TESHIS, K2.KOD_TANIM AS NEDEN,* from PBTPRO_1.orjin.TB_COZUM_KATALOG CK
+                            LEFT JOIN PBTPRO_1.orjin.TB_ISEMRI I ON (CK.CMK_REF_ID=TB_ISEMRI_ID)
+                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K1 ON (CK.CMK_TESHIS_ID=K1.TB_KOD_ID)
+                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K2 ON (CK.CMK_NEDEN_ID=K2.TB_KOD_ID)
+                            WHERE ISM_MAKINE_ID = @MAKINE_ID ";
+
             List<CozumKatalogModel> listem = new List<CozumKatalogModel>();
             DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
             for (int i = 0; i < dt.Rows.Count; i++)
@@ -681,8 +694,8 @@ namespace WebApiNew.Controllers
                 entity.TB_COZUM_KATALOG_ID = Convert.ToInt32(dt.Rows[i]["TB_COZUM_KATALOG_ID"]);
                 entity.CMK_KOD = (dt.Rows[i]["CMK_KOD"]).ToString();
                 entity.CMK_KONU = Util.getFieldString(dt.Rows[i], "CMK_KONU");
-                entity.CMK_TESHIS = dt.Rows[i]["KOD_TANIM"] != DBNull.Value ? dt.Rows[i]["KOD_TANIM"].ToString() : "";
-                entity.CMK_NEDEN = "Neden Yok";
+                entity.CMK_TESHIS = dt.Rows[i]["TESHIS"] != DBNull.Value ? dt.Rows[i]["TESHIS"].ToString() : "";
+                entity.CMK_NEDEN = dt.Rows[i]["NEDEN"] != DBNull.Value ? dt.Rows[i]["NEDEN"].ToString() : "";
                 listem.Add(entity);
             }
 
