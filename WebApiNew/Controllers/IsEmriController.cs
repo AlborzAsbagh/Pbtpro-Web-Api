@@ -1206,9 +1206,22 @@ namespace WebApiNew.Controllers
         [HttpPost]
         public Bildirim KontrolListKaydet([FromBody] IsEmriKontrolList entity)
         {
+            string plainText, rtfText;
+
             Bildirim bldr = new Bildirim();
             try
             {
+                if(entity.DKN_ACIKLAMA.StartsWith(@"{\rtf"))
+                {
+
+                    System.Windows.Forms.RichTextBox rtBox = new System.Windows.Forms.RichTextBox();
+                    rtfText = entity.DKN_ACIKLAMA;
+                    rtBox.Rtf = rtfText;
+                    plainText = rtBox.Text;
+                } 
+
+                else { plainText = entity.DKN_ACIKLAMA; }
+
                 if (entity.TB_ISEMRI_KONTROLLIST_ID < 1)
                 {
                     // Yeni Ekle
@@ -1254,7 +1267,7 @@ namespace WebApiNew.Controllers
                     prms.Add("DKN_YAPILDI_MESAI_KOD_ID", -1);
                     prms.Add("DKN_YAPILDI_ATOLYE_ID", -1);
                     prms.Add("DKN_YAPILDI_SURE", 0);
-                    prms.Add("DKN_ACIKLAMA", entity.DKN_ACIKLAMA);
+                    prms.Add("DKN_ACIKLAMA", plainText);
                     prms.Add("DKN_REF_ID", entity.DKN_REF_ID);
                     klas.cmd(query, prms.PARAMS);
 
@@ -1284,7 +1297,7 @@ namespace WebApiNew.Controllers
                     prms.Add("DKN_TANIM", entity.DKN_TANIM);
                     prms.Add("DKN_DEGISTIREN_ID", entity.DKN_OLUSTURAN_ID);
                     prms.Add("DKN_DEGISTIRME_TARIH", DateTime.Now);
-                    prms.Add("DKN_ACIKLAMA", entity.DKN_ACIKLAMA);
+                    prms.Add("DKN_ACIKLAMA", plainText);
                     prms.Add("DKN_REF_ID", entity.DKN_REF_ID);
                     klas.cmd(query, prms.PARAMS);
                     bldr.Aciklama = "İş emri kontrol listesi başarılı bir şekilde güncellendi.";
@@ -1957,17 +1970,30 @@ namespace WebApiNew.Controllers
         [Route("api/IsEmriKontrolList")]
         public List<IsEmriKontrolList> GetIsEmriKontrolList([FromUri] int isemriID)
         {
+            string rtfText, plainText;
+
             prms.Clear();
             prms.Add("ISM_ID", isemriID);
             string sql = "select * from orjin.TB_ISEMRI_KONTROLLIST where DKN_ISEMRI_ID = @ISM_ID";
             List<IsEmriKontrolList> listem = new List<IsEmriKontrolList>();
             DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
+
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 IsEmriKontrolList entity = new IsEmriKontrolList();
                 entity.DKN_SIRANO = dt.Rows[i]["DKN_SIRANO"] != DBNull.Value ? dt.Rows[i]["DKN_SIRANO"].ToString() : "";
                 entity.DKN_TANIM = dt.Rows[i]["DKN_TANIM"] != DBNull.Value ? dt.Rows[i]["DKN_TANIM"].ToString() : "";
-                entity.DKN_ACIKLAMA = dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value ? dt.Rows[i]["DKN_ACIKLAMA"].ToString() : "";
+
+                if (dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value && dt.Rows[i]["DKN_ACIKLAMA"].ToString().StartsWith(@"{\rtf"))
+                {
+
+                    System.Windows.Forms.RichTextBox rtBox = new System.Windows.Forms.RichTextBox();
+                    rtfText = dt.Rows[i]["DKN_ACIKLAMA"].ToString();
+                    rtBox.Rtf = rtfText;
+                    plainText = rtBox.Text;
+                    entity.DKN_ACIKLAMA = plainText;
+                }
+                else { entity.DKN_ACIKLAMA = dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value ? dt.Rows[i]["DKN_ACIKLAMA"].ToString() : ""; }
                 entity.TB_ISEMRI_KONTROLLIST_ID = Convert.ToInt32(dt.Rows[i]["TB_ISEMRI_KONTROLLIST_ID"]);
                 entity.DKN_ISEMRI_ID = Convert.ToInt32(dt.Rows[i]["DKN_ISEMRI_ID"]);
                 entity.DKN_YAPILDI = Convert.ToBoolean(dt.Rows[i]["DKN_YAPILDI"]);
@@ -2522,6 +2548,29 @@ namespace WebApiNew.Controllers
             }
         }
 
+        [Route("api/IsEmriCozumKatalog")]
+        [HttpGet]
+        public List<CozumKatalogModel> GetCozumKatalogListByIsEmri([FromUri] int isEmriID)
+        {
+            prms.Clear();
+            prms.Add("IS_EMRI_ID", isEmriID);
+            string sql = " select * from orjin.TB_COZUM_KATALOG CMK  join orjin.TB_ISEMRI ISM on ISM.TB_ISEMRI_ID = CMK.CMK_REF_ID join orjin.TB_KOD KOD on CMK.CMK_REF_ID = KOD.TB_KOD_ID  where ISM.TB_ISEMRI_ID = @IS_EMRI_ID";
+            List<CozumKatalogModel> listem = new List<CozumKatalogModel>();
+            DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                CozumKatalogModel entity = new CozumKatalogModel();
+                entity.TB_COZUM_KATALOG_ID = Convert.ToInt32(dt.Rows[i]["TB_COZUM_KATALOG_ID"]);
+                entity.CMK_KOD = (dt.Rows[i]["CMK_KOD"]).ToString();
+                entity.CMK_KONU = Util.getFieldString(dt.Rows[i], "CMK_KONU");
+                entity.CMK_TESHIS = dt.Rows[i]["KOD_TANIM"] != DBNull.Value ? dt.Rows[i]["KOD_TANIM"].ToString() : "";
+                entity.CMK_NEDEN = "Neden Yok";
+                listem.Add(entity);
+            }
+
+            return listem;
+        }
+
         [Route("api/IsEmriDetaySayilar")]
         [HttpGet]
         public Sayilar IsEmriDetaySayilar([FromUri] int isemriID)
@@ -2548,6 +2597,9 @@ namespace WebApiNew.Controllers
                     prms.PARAMS));
                 entity.Dosya = Convert.ToInt32(klas.GetDataCell(
                     "SELECT COUNT(TB_DOSYA_ID) FROM dbo.TB_DOSYA WHERE DSY_AKTIF = 1 AND DSY_REF_GRUP = 'ISEMRI' AND DSY_REF_ID = @ISM_ID",
+                    prms.PARAMS));
+                entity.CozumKataloglarSayisi = Convert.ToInt32(klas.GetDataCell(
+                    " select COUNT(TB_COZUM_KATALOG_ID) from orjin.TB_COZUM_KATALOG CMK join orjin.TB_ISEMRI ISM on ISM.TB_ISEMRI_ID = CMK.CMK_REF_ID join orjin.TB_KOD KOD on CMK.CMK_REF_ID = KOD.TB_KOD_ID where ISM.TB_ISEMRI_ID = @ISM_ID",
                     prms.PARAMS));
                 return entity;
             }

@@ -313,6 +313,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Localization.resx</DependentUpon>
     </Compile>
+    <Compile Include="Models\CozumKatalogModel.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Models\Olcum.cs" />
@@ -930,4 +931,3 @@
   <Target Name="AfterBuild">
   </Target> -->
 </Project>
-

@@ -33,6 +33,8 @@ namespace WebApiNew.Models
         public int Dosya { get; set; }
         [DataMember]
         public int OtonomBakimTarihce { get; set; }
-        
+        [DataMember]
+        public int CozumKataloglarSayisi { get; set; }
+
     }
 }

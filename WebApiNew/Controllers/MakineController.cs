@@ -69,7 +69,6 @@ namespace WebApiNew.Controllers
                                 MKN.MKN_AKTIF = 1 AND
                                 orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(MKN_LOKASYON_ID,-1),@KUL_ID) = 1 AND 
                                 orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(MKN_ATOLYE_ID,-1), @KUL_ID ) = 1 ";
-
             if (Tip != -1)
             {
                 prms.Add("MKN_TIP_KOD_ID", Tip);
@@ -115,6 +114,129 @@ namespace WebApiNew.Controllers
                     '*' = @KELIME)";
                 }
             }
+            prms.Add("ILK_DEGER", ilkDeger);
+            prms.Add("SON_DEGER", sonDeger);
+            prms.Add("KUL_ID", ID);
+            query = query + @")  SELECT * FROM MTABLE WHERE RowNum > @ILK_DEGER AND RowNum <= @SON_DEGER";
+
+
+
+            IEnumerable<Makine> listem = new List<Makine>();
+            try
+            {
+                using (var conn = klas.baglan())
+                {
+                    listem = conn.Query<Makine>(query, prms);
+                }
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+            return listem;
+        }
+
+        [Route("api/MakineBakim")]
+        [HttpGet]
+        public object GetMknBkm([FromUri] int ilkDeger, [FromUri] int sonDeger, [FromUri] int ID, [FromUri] int Tip, [FromUri] int kategori, [FromUri] string prm, [FromUri] Boolean b, [FromUri] int lokasyonID, [FromUri] int YakitKullanimi, [FromUri] Boolean otonombakim, [FromUri] int prsId)
+        {
+            var prms = new DynamicParameters();
+            string query = @";WITH MTABLE AS(
+                                SELECT 
+                                TB_MAKINE_ID
+                                ,MKN.MKN_KOD 					
+                                ,MKN_TANIM 					 					
+                                ,MKN_TIP_KOD_ID 					
+                                ,TIP.KOD_TANIM MKN_TIP 					
+                                ,LOK.LOK_TANIM MKN_LOKASYON 				
+                                ,OPR.PRS_ISIM MKN_OPERATOR 				
+                                ,MKN_OPERATOR_PERSONEL_ID 	
+                                ,LOK.LOK_TUM_YOL MKN_TAM_LOKASYON 			
+                                ,MES.MES_GUNCEL_DEGER MKN_SAYAC_GUNCEL_DEGER 		
+                                ,MES.MES_SAYAC_BIRIM MKN_SAYAC_BIRIM 			
+                                ,KTG.KOD_TANIM MKN_KATEGORI 
+                                ,(SELECT COUNT(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI WHERE ISM_MAKINE_ID= TB_MAKINE_ID AND ISM_KAPATILDI=0) MKN_ACIK_ISEMRI_SAYISI
+                                ,(SELECT COUNT(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI WHERE ISM_MAKINE_ID= TB_MAKINE_ID AND ISM_KAPATILDI=1) MKN_KAPALI_ISEMRI_SAYISI
+                                ,(SELECT COUNT(TB_IS_TALEP_ID) FROM orjin.TB_IS_TALEBI WHERE IST_MAKINE_ID= TB_MAKINE_ID AND IST_DURUM_ID IN (0,1)) MKN_ACIK_ISTALEP_SAYISI
+                                ,(SELECT COUNT(TB_IS_TALEP_ID) FROM orjin.TB_IS_TALEBI WHERE IST_MAKINE_ID= TB_MAKINE_ID AND IST_DURUM_ID NOT IN (0,1)) MKN_KAPALI_ISTALEP_SAYISI 
+                                ,MKN_DURUM_KOD_ID				
+                                ,DRM.KOD_TANIM MKN_DURUM 					
+                                ,MRK.KOD_TANIM MKN_MARKA 					
+                                ,MDL.KOD_TANIM MKN_MODEL 					
+                                ,MKN_LOKASYON_ID 			
+                                ,MKN_URETIM_YILI 			
+                                ,MKN_SERI_NO 				
+                                ,ARC.ARC_PLAKA MKN_ARAC_PLAKA 				
+                                ,PRJ.PRJ_TANIM MKN_PROJE 					
+                                ,MKN_PROJE_ID
+                                ,(select COALESCE(TB_RESIM_ID,0) from orjin.TB_RESIM where RSM_VARSAYILAN = 1 AND RSM_REF_GRUP = 'MAKINE' and RSM_REF_ID = TB_MAKINE_ID) as RSM_VAR_ID 
+                                ,stuff((SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID)    FROM orjin.TB_RESIM R    WHERE R.RSM_REF_GRUP = 'MAKINE' and R.RSM_REF_ID = TB_MAKINE_ID    FOR XML PATH('')), 1, 1, '') [RSM_IDS]	
+                                ,ROW_NUMBER() OVER (ORDER BY MKN.TB_MAKINE_ID) AS RowNum 	
+                                FROM orjin.TB_MAKINE MKN
+                                LEFT JOIN orjin.TB_LOKASYON LOK on MKN.MKN_LOKASYON_ID = LOK.TB_LOKASYON_ID
+                                LEFT JOIN orjin.TB_KOD MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_KOD_ID
+                                LEFT JOIN orjin.TB_KOD MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_KOD_ID
+                                LEFT JOIN orjin.TB_KOD KTG ON MKN.MKN_KATEGORI_KOD_ID=KTG.TB_KOD_ID
+                                LEFT JOIN orjin.TB_KOD DRM ON MKN.MKN_DURUM_KOD_ID=DRM.TB_KOD_ID
+                                LEFT JOIN orjin.TB_KOD TIP ON MKN.MKN_TIP_KOD_ID=TIP.TB_KOD_ID
+                                LEFT JOIN orjin.TB_PROJE PRJ ON MKN.MKN_PROJE_ID=PRJ.TB_PROJE_ID
+                                LEFT JOIN orjin.TB_ARAC ARC ON MKN.TB_MAKINE_ID=ARC.ARC_MAKINE_ID
+                                LEFT JOIN orjin.VW_SAYAC MES ON (MES.MES_REF_ID = MKN.TB_MAKINE_ID) AND (MES_VARSAYILAN = 1)
+                                LEFT JOIN orjin.TB_PERSONEL OPR ON MKN.MKN_OPERATOR_PERSONEL_ID=OPR.TB_PERSONEL_ID
+								LEFT JOIN orjin.TB_MAKINE_BAKIM MBAK ON MKN.TB_MAKINE_ID =MBAK.MAB_MAKINE_ID
+								LEFT JOIN orjin.TB_IS_TANIM IST  ON IST.TB_IS_TANIM_ID = MAB_BAKIM_ID
+							
+                                WHERE
+                                orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(MKN_LOKASYON_ID,-1), @KUL_ID) = 1 AND 
+                                orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(MKN_ATOLYE_ID,-1), @KUL_ID) = 1 
+								AND IST_PERSONEL_ID = @IST_PERSONEL_ID ";
+           
+            if (Tip != -1)
+            {
+                prms.Add("MKN_TIP_KOD_ID", Tip);
+                query = query + " and MKN_TIP_KOD_ID = @MKN_TIP_KOD_ID";
+            }
+            if (kategori != -1)
+            {
+                prms.Add("MKN_KATEGORI_KOD_ID", kategori);
+                query = query + " and MKN_KATEGORI_KOD_ID = @MKN_KATEGORI_KOD_ID";
+            }
+            if (YakitKullanimi > -1)
+            {
+                prms.Add("MKN_YAKIT_KULLANIM", YakitKullanimi);
+                query = query + " and MKN_YAKIT_KULLANIM = @MKN_YAKIT_KULLANIM";
+            }
+            if (otonombakim)
+            {
+                query = query + " and MKN_OTONOM_BAKIM = 1";
+            }
+            if (lokasyonID != -1)
+            {
+                prms.Add("MKN_LOKASYON_ID", lokasyonID);
+                query = query + " and MKN_LOKASYON_ID IN (select (TB_LOKASYON_ID) from orjin.UDF_LOKASYON_ALT_AGAC(@MKN_LOKASYON_ID))";
+            }
+            if (!String.IsNullOrEmpty(prm))
+            {
+                if (b)
+                {
+                    prms.Add("MKN_KOD", prm);
+                    query = query + " and MKN_KOD = @MKN_KOD";
+                }
+                else
+                {
+                    prms.Add("KELIME", prm);
+                    query = query + @" and (
+                    MKN_KOD         LIKE '%'+@KELIME+'%' OR 
+                    ARC.ARC_PLAKA   LIKE '%'+@KELIME+'%' OR 
+                    LOK.LOK_TANIM   LIKE '%'+@KELIME+'%' OR 
+                    MKN_TANIM       LIKE '%'+@KELIME+'%' OR 
+                    MRK.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                    KTG.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                    DRM.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                    '*' = @KELIME)";
+                }
+            }
+            prms.Add("IST_PERSONEL_ID", prsId);
             prms.Add("ILK_DEGER", ilkDeger);
             prms.Add("SON_DEGER", sonDeger);
             prms.Add("KUL_ID", ID);
@@ -543,6 +665,28 @@ namespace WebApiNew.Controllers
                 bildirim.Durum = false;
                 return bildirim;
             }
+        }
+        [Route("api/MakineCozumKatalog")]
+        [HttpGet]
+        public List<CozumKatalogModel> GetCozumKatalogListByMakine([FromUri] int makineID)
+        {
+            prms.Clear();
+            prms.Add("MAKINE_ID", makineID);
+            string sql = "  select * from orjin.TB_MAKINE MK join orjin.TB_ISEMRI ISM on MK.TB_MAKINE_ID = ISM.ISM_MAKINE_ID join orjin.TB_COZUM_KATALOG CMK on ISM.ISM_MAKINE_ID = CMK.CMK_REF_ID join orjin.TB_KOD KOD on CMK.CMK_REF_ID = KOD.TB_KOD_ID  where TB_MAKINE_ID = @MAKINE_ID";
+            List<CozumKatalogModel> listem = new List<CozumKatalogModel>();
+            DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                CozumKatalogModel entity = new CozumKatalogModel();
+                entity.TB_COZUM_KATALOG_ID = Convert.ToInt32(dt.Rows[i]["TB_COZUM_KATALOG_ID"]);
+                entity.CMK_KOD = (dt.Rows[i]["CMK_KOD"]).ToString();
+                entity.CMK_KONU = Util.getFieldString(dt.Rows[i], "CMK_KONU");
+                entity.CMK_TESHIS = dt.Rows[i]["KOD_TANIM"] != DBNull.Value ? dt.Rows[i]["KOD_TANIM"].ToString() : "";
+                entity.CMK_NEDEN = "Neden Yok";
+                listem.Add(entity);
+            }
+
+            return listem;
         }
 
     }

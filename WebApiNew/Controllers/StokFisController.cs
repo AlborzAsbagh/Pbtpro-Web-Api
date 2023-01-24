@@ -1451,7 +1451,6 @@ namespace WebApiNew.Controllers
             {
                 try
                 {
-                    //klas.cmd($"UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = {stokFisid}", prms.PARAMS);
                     klas.cmd($"UPDATE orjin.TB_SATINALMA_ONAY_LISTE SET SOL_ONAY_DURUM_ID = 9  WHERE SOL_REF_ID = {stokFisid} AND SOL_PERSONEL_ID = {id}", prms.PARAMS);
 
                     klas.cmd($"INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
@@ -1489,7 +1488,6 @@ namespace WebApiNew.Controllers
             prms.Add("KUL_ID", id);
             try
             {
-                //klas.cmd("UPDATE orjin.VW_STOK_FIS_DETAY SET SFD_DURUM = 9 WHERE SFD_STOK_FIS_ID = @TB_STOK_FIS_ID", prms.PARAMS);
                 klas.cmd("UPDATE orjin.TB_SATINALMA_ONAY_LISTE SET SOL_ONAY_DURUM_ID = 9  WHERE SOL_REF_ID = @TB_STOK_FIS_ID AND SOL_PERSONEL_ID = @KUL_ID ", prms.PARAMS);
 
                 klas.cmd("INSERT INTO orjin.TB_SATINALMA_TARIHCE " +
