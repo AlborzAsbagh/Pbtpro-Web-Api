@@ -15,5 +15,10 @@ namespace WebApiNew.Models
         public int ISK_LOKASYON_ID { get; set; }
         [DataMember]
         public int ISK_PERSONEL_ID { get; set; }
+
+        [DataMember]
+        public string ISK_MAIL { get; set; }
+		[DataMember]
+		public string ISK_TELEFON_1 { get; set; }
     }
 }

@@ -8,6 +8,7 @@ using System.Transactions;
 using System.Web.Http;
 using Dapper;
 using Dapper.Contrib.Extensions;
+using Microsoft.Ajax.Utilities;
 using WebApiNew.App_GlobalResources;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -1234,5 +1235,51 @@ namespace WebApiNew.Controllers
             return isTalepEkleData;
         }
 
-    }
+		[HttpGet]
+		[Route("api/postIsTalebi")]
+		public string postIsTalebi(
+            [FromUri] int istKodNumber,
+            [FromUri] string istKod ,  
+            [FromUri] string tanimi , 
+            [FromUri] string konu ,  
+            [FromUri] string telNo , 
+            [FromUri] string mail ,
+			[FromUri] int talepEdenId,
+            [FromUri] int lokasyonId
+			)
+		{
+			try
+			{
+				string query1 = @" insert into [PBTPRO_1].[orjin].[TB_IS_TALEBI] 
+                            (IST_KOD,IST_ACILIS_TARIHI,IST_ACILIS_SAATI,IST_TANIMI,IST_KONU,IST_IRTIBAT_TELEFON,
+                            IST_MAIL_ADRES,IST_TALEP_EDEN_ID,IST_TALEPEDEN_LOKASYON_ID)
+
+                              values(@IST_KOD,(select convert (varchar(10) , GETDATE() , 101)),
+                                    (select convert (varchar(8) , GETDATE() , 108)),@IST_TANIMI,
+                                @IST_KONU,@IST_IRTIBAT_TELEFON,@IST_MAIL_ADRES,@IST_TALEP_EDEN_ID,@IST_TALEPEDEN_LOKASYON_ID) ";
+				prms.Clear();
+				prms.Add("IST_KOD", istKod);
+				prms.Add("IST_TANIMI", tanimi);
+				prms.Add("IST_KONU", konu);
+				prms.Add("IST_IRTIBAT_TELEFON", telNo);
+				prms.Add("IST_MAIL_ADRES", mail);
+				prms.Add("IST_TALEP_EDEN_ID", talepEdenId);
+				prms.Add("IST_TALEPEDEN_LOKASYON_ID", lokasyonId);
+				klas.cmd(query1, prms.PARAMS);
+
+
+				string query2 = @" update orjin.TB_NUMARATOR set NMR_NUMARA = @NMR_NUMARA where NMR_KOD = 'IST_KOD' ";
+				prms.Clear();
+				prms.Add("NMR_NUMARA", (istKodNumber+1));
+				klas.cmd(query2, prms.PARAMS);
+				return "true";
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+                return e.ToString();
+			}
+		}
+
+	}
 }

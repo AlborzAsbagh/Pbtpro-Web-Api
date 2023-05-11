@@ -234,6 +234,8 @@ namespace WebApiNew.Models
         public int ResimVarsayilanID { get; set; }
         [DataMember]
         public string ResimIDleri { get; set; }
+        [DataMember]
+        public int IST_TALEPEDEN_LOKASYON_ID { get; set; }
 
     }
 

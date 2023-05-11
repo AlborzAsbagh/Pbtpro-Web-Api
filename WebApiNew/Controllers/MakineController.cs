@@ -701,6 +701,12 @@ namespace WebApiNew.Controllers
 
             return listem;
         }
+        [Route("api/kir")]
+        [HttpGet]
+        public int getOne()
+        {
+            return 1;
+        }
 
     }
 }

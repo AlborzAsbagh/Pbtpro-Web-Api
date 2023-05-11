@@ -25,6 +25,8 @@ namespace WebApiNew.Controllers
                 entity.TB_IS_TALEBI_KULLANICI_ID = Convert.ToInt32(dt.Rows[i]["TB_IS_TALEBI_KULLANICI_ID"]);
                 entity.ISK_LOKASYON_ID = Util.getFieldInt(dt.Rows[i],"ISK_LOKASYON_ID");
                 entity.ISK_PERSONEL_ID = Util.getFieldInt(dt.Rows[i], "ISK_PERSONEL_ID");
+                entity.ISK_MAIL = Util.getFieldString(dt.Rows[i], "ISK_MAIL");
+                entity.ISK_TELEFON_1 = Util.getFieldString(dt.Rows[i], "ISK_TELEFON_1");
                 listem.Add(entity);
             }
             return listem;
