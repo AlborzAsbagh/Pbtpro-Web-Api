@@ -49,6 +49,7 @@ namespace WebApiNew.Models
          [DataMember] public DateTime? DKN_DEGISTIRME_TARIH { get; set; }
 
          [DataMember] public Boolean DKN_SILINDI { get; set; }
+         [DataMember] public int DKN_RESIM_ID { get; set; }
 
 
 

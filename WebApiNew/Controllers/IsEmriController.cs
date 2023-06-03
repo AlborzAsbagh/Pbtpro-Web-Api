@@ -1997,6 +1997,7 @@ namespace WebApiNew.Controllers
                 entity.TB_ISEMRI_KONTROLLIST_ID = Convert.ToInt32(dt.Rows[i]["TB_ISEMRI_KONTROLLIST_ID"]);
                 entity.DKN_ISEMRI_ID = Convert.ToInt32(dt.Rows[i]["DKN_ISEMRI_ID"]);
                 entity.DKN_YAPILDI = Convert.ToBoolean(dt.Rows[i]["DKN_YAPILDI"]);
+                entity.DKN_RESIM_ID = Convert.ToInt32(dt.Rows[i]["DKN_RESIM_ID"] != DBNull.Value ? dt.Rows[i]["DKN_RESIM_ID"] : -1);
 
                 listem.Add(entity);
             }
