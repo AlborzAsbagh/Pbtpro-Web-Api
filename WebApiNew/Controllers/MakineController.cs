@@ -680,11 +680,13 @@ namespace WebApiNew.Controllers
         {
             prms.Clear();
             prms.Add("MAKINE_ID", makineID);
-            string sql = @" select K1.KOD_TANIM AS TESHIS, K2.KOD_TANIM AS NEDEN,* from PBTPRO_1.orjin.TB_COZUM_KATALOG CK
-                            LEFT JOIN PBTPRO_1.orjin.TB_ISEMRI I ON (CK.CMK_REF_ID=TB_ISEMRI_ID)
-                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K1 ON (CK.CMK_TESHIS_ID=K1.TB_KOD_ID)
-                            LEFT JOIN PBTPRO_1.orjin.TB_KOD K2 ON (CK.CMK_NEDEN_ID=K2.TB_KOD_ID)
-                            WHERE ISM_MAKINE_ID = @MAKINE_ID ";
+            string sql = @" SELECT CMK_KONU,CMK_TESHIS_ID,CMK_NEDEN_ID, IML.TB_IS_TANIM_MAKINE_ID,IML_IS_TANIM_ID,IML_MAKINE_ID FROM orjin.TB_IS_TANIM_MAKINE_LISTE IML
+                            INNER JOIN orjin.TB_IS_TANIM_COZUM_KATALOG ISC ON IML.IML_IS_TANIM_ID = ISC.ISC_IS_TANIM_ID
+                            INNER JOIN orjin.TB_COZUM_KATALOG CMK ON CMK.TB_COZUM_KATALOG_ID = ISC.ISC_COZUMKATALOG_ID
+                            INNER JOIN orjin.TB_KOD K1 ON (CMK.CMK_TESHIS_ID=K1.TB_KOD_ID)
+                            INNER JOIN orjin.TB_KOD K2 ON (CMK.CMK_NEDEN_ID=K2.TB_KOD_ID)
+  
+                            WHERE IML_MAKINE_ID = @MAKINE_ID ";
 
             List<CozumKatalogModel> listem = new List<CozumKatalogModel>();
             DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
@@ -700,12 +702,6 @@ namespace WebApiNew.Controllers
             }
 
             return listem;
-        }
-        [Route("api/kir")]
-        [HttpGet]
-        public int getOne()
-        {
-            return 1;
         }
 
     }
