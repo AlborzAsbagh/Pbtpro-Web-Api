@@ -2618,5 +2618,25 @@ namespace WebApiNew.Controllers
                 throw;
             }
         }
-    }
+
+        [Route("api/getIsEmriOncelik")]
+        [HttpGet]
+		public String getIsEmriOncelik([FromUri] int isEmriId)
+		{
+			try
+			{
+				var util = new Util();
+				using (var conn = util.baglan())
+				{
+					var sql = $"SELECT SOC_TANIM FROM orjin.TB_ISEMRI left join orjin.TB_SERVIS_ONCELIK on TB_SERVIS_ONCELIK_ID = ISM_ONCELIK_ID where TB_ISEMRI_ID = {isEmriId}";
+					var oncelik = conn.Query<String>(sql).FirstOrDefault();
+					return oncelik;
+				}
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
+	}
 }
