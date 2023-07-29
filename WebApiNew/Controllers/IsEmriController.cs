@@ -294,7 +294,7 @@ namespace WebApiNew.Controllers
             }
             catch (Exception e)
             {
-                throw e;
+                return e;
             }
         }
 
@@ -2146,6 +2146,8 @@ namespace WebApiNew.Controllers
                                       ,ISM_SONUC_KOD_ID = @ISM_SONUC_KOD_ID                                    
                                       ,ISM_DEGISTIREN_ID=@ISM_DEGISTIREN_ID
                                       ,ISM_DEGISTIRME_TARIH=@ISM_DEGISTIRME_TARIH                                   
+                                      ,ISM_BITIS_TARIH=@ISM_BITIS_TARIH                                   
+                                      ,ISM_BITIS_SAAT=@ISM_BITIS_SAAT                                   
                                        WHERE TB_ISEMRI_ID = @TB_ISEMRI_ID";
                 prms.Clear();
                 prms.Add("@TB_ISEMRI_ID", entity.TB_ISEMRI_ID);
@@ -2164,6 +2166,8 @@ namespace WebApiNew.Controllers
                 prms.Add("@ISM_SONUC_KOD_ID", entity.ISM_SONUC_KOD_ID);
                 prms.Add("@ISM_DEGISTIREN_ID", entity.ISM_DEGISTIREN_ID);
                 prms.Add("@ISM_DEGISTIRME_TARIH", DateTime.Now);
+                prms.Add("@ISM_BITIS_TARIH", entity.ISM_BITIS_TARIH);
+                prms.Add("@ISM_BITIS_SAAT", entity.ISM_BITIS_SAAT);
                 klas.cmd(qu1, prms.PARAMS);
                 string query = @"INSERT INTO orjin.TB_ISEMRI_LOG
                                            (ISL_ISEMRI_ID
