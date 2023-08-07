@@ -1250,7 +1250,7 @@ namespace WebApiNew.Controllers
 		{
 			try
 			{
-				string query1 = @" insert into [PBTPRO_1].[orjin].[TB_IS_TALEBI] 
+				string query1 = @" insert into orjin.TB_IS_TALEBI 
                             (IST_KOD,IST_ACILIS_TARIHI,IST_ACILIS_SAATI,IST_TANIMI,IST_KONU,IST_IRTIBAT_TELEFON,
                             IST_MAIL_ADRES,IST_TALEP_EDEN_ID,IST_TALEPEDEN_LOKASYON_ID)
 

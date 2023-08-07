@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using System.Web.Http;
 using WebApiNew.App_GlobalResources;
 using WebApiNew.Filters;
@@ -63,7 +65,11 @@ namespace WebApiNew.Controllers
             List<SayacOkuma> listem = new List<SayacOkuma>();
             string sort = sortAsc ? "ASC" : "DESC";
             string query = @";WITH mTable AS
-            (select so.*,M.TB_MAKINE_ID as SYO_MAKINE_ID,MES_SAYAC_BIRIM,MES_TANIM,MES_SAYAC_TIP,('[' +M.MKN_KOD + '] ' + M.MKN_TANIM) AS SYO_MAKINE,(select LOK_TANIM from orjin.TB_LOKASYON where TB_LOKASYON_ID = SYO_LOKASYON_ID) AS SYO_LOK_TANIM,ROW_NUMBER() OVER(ORDER BY SYO_TARIH "+sort+", SYO_SAAT "+sort+") AS satir from orjin.TB_SAYAC_OKUMA so left join orjin.VW_SAYAC s on TB_SAYAC_ID= SYO_SAYAC_ID left join orjin.TB_MAKINE m on TB_MAKINE_ID=MES_REF_ID where 1=1 ";
+            (select so.*,M.TB_MAKINE_ID as SYO_MAKINE_ID,MES_SAYAC_BIRIM,MES_TANIM,MES_SAYAC_TIP,('[' +M.MKN_KOD + '] ' + M.MKN_TANIM) AS SYO_MAKINE,
+            STUFF(( SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'SAYAC_OKUMA' AND R.RSM_REF_ID = TB_SAYAC_OKUMA_ID FOR XML PATH('')),1,1,'') AS ResimIDleri,
+            (select LOK_TANIM from orjin.TB_LOKASYON where TB_LOKASYON_ID = SYO_LOKASYON_ID) AS SYO_LOK_TANIM,ROW_NUMBER() 
+            OVER(ORDER BY SYO_TARIH " + sort+", SYO_SAAT "+sort+") AS satir from orjin.TB_SAYAC_OKUMA so left join orjin.VW_SAYAC s on " +
+            "TB_SAYAC_ID= SYO_SAYAC_ID left join orjin.TB_MAKINE m on TB_MAKINE_ID=MES_REF_ID where 1=1 ";
 
             if (filtre != null)
             {
@@ -131,6 +137,7 @@ namespace WebApiNew.Controllers
                 entity.SYO_SAYAC_ID = dt.Rows[i]["SYO_SAYAC_ID"] != DBNull.Value ? Convert.ToInt32(dt.Rows[i]["SYO_SAYAC_ID"]) : -1;
                 entity.SYO_TARIH = Util.getFieldDateTime(dt.Rows[i],"SYO_TARIH");
                 entity.SYO_MAKINE_ID = Util.getFieldInt(dt.Rows[i], "SYO_MAKINE_ID");
+                entity.ResimIDleri = Util.getFieldString(dt.Rows[i], "ResimIDleri");
                 listem.Add(entity);
             }
             return listem;
@@ -160,7 +167,7 @@ namespace WebApiNew.Controllers
         }
         [Route("api/SayacKayit")]
         [HttpPost]
-        public Bildirim SayacKayit([FromBody] SayacOkuma entity)
+		public async Task<Bildirim> SayacKayit([FromBody] SayacOkuma entity)
         {
             Bildirim bildirimEntity = new Bildirim();
             try
@@ -219,7 +226,12 @@ namespace WebApiNew.Controllers
                     prms.Add("@SYO_OLUSTURAN_ID", entity.SYO_OLUSTURAN_ID);
                     prms.Add("@SYO_OLUSTURMA_TARIH", DateTime.Now);
                     klas.cmd(query, prms.PARAMS);
-                    bildirimEntity.Aciklama = "Sayac kaydı başarılı bir şekilde gerçekleştirildi.";
+                    var util = new Util();
+					using(var cnn = util.baglan())
+                    {
+						bildirimEntity.Id = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_SAYAC_OKUMA_ID) FROM orjin.TB_SAYAC_OKUMA");
+					}
+					bildirimEntity.Aciklama = "Sayac kaydı başarılı bir şekilde gerçekleştirildi.";
                     bildirimEntity.MsgId = Bildirim.MSG_SYO_KAYIT_OK;
                     bildirimEntity.Durum = true;
                 }

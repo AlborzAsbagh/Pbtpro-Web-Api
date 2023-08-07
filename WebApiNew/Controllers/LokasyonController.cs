@@ -7,22 +7,22 @@ using WebApiNew.Models;
 
 namespace WebApiNew.Controllers
 {
-    [MyBasicAuthenticationFilter]
-    public class LokasyonController : ApiController
-    {
-        public List<Lokasyon> Get([FromUri] int ID)
-        {
-            Util klas = new Util();
-            List<Lokasyon> listem = new List<Lokasyon>();
-            string query = @"select * from orjin.TB_LOKASYON where orjin.UDF_LOKASYON_YETKI_KONTROL(TB_LOKASYON_ID,@KUL_ID) = 1";
-            using (var conn = klas.baglan())
-            {
-                listem=conn.Query<Lokasyon>(query,new {@KUL_ID=ID }).ToList();
-            }
-                return listem;
-        }
+	[MyBasicAuthenticationFilter]
+	public class LokasyonController : ApiController
+	{
+		public List<Lokasyon> Get([FromUri] int ID)
+		{
+			Util klas = new Util();
+			List<Lokasyon> listem = new List<Lokasyon>();
+			string query = @"select * from orjin.TB_LOKASYON where orjin.UDF_LOKASYON_YETKI_KONTROL(TB_LOKASYON_ID,@KUL_ID) = 1";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<Lokasyon>(query, new { @KUL_ID = ID }).ToList();
+			}
+			return listem;
+		}
 
-        [Route("api/getLokasyonById")]
+		[Route("api/getLokasyonById")]
 		public List<string> getLokasyonById([FromUri] int ID)
 		{
 			Util klas = new Util();
@@ -49,7 +49,19 @@ namespace WebApiNew.Controllers
 		}
 
 
-
+		[Route("api/getLokasyonlar")]
+		[HttpGet] 
+		public List<string> getLokasyonlar()
+		{
+			Util klas = new Util();
+			List<string> listem = new List<string>();
+			string query = @"select LOK_TANIM from orjin.TB_LOKASYON";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<string>(query).ToList();
+			}
+			return listem;
+		}
 
 	}
 }

@@ -83,8 +83,11 @@ namespace WebApiNew.Models
         [DataMember]
         public int SYO_MAKINE_ID { get; set; }
 
+		[DataMember]
+		public String ResimIDleri { get; set; }
 
 
 
-    }
+
+	}
 }
