@@ -398,7 +398,8 @@ namespace WebApiNew.Models
         public string ISM_IS_TALEP_BINA { get; set; }
         [DataMember]
         public string ISM_IS_TALEP_KAT { get; set; }
-        //----------------------------------------------------------
+
+        //Mobile New Features Added---------------------------------------
 
         [DataMember]
         public int MalzemeCount { get; set; }
