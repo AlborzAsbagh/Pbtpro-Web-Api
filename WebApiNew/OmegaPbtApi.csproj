@@ -269,10 +269,12 @@
     <Compile Include="App_Start\UnityWebApiActivator.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="C.cs" />
+    <Compile Include="Controllers\WebAppVersionIsEmriController.cs" />
     <Compile Include="Controllers\OlcumController.cs" />
     <Compile Include="Controllers\DurusController.cs" />
     <Compile Include="Controllers\OnayController.cs" />
     <Compile Include="Controllers\OtonomBakimController.cs" />
+    <Compile Include="Controllers\WebAppVersionMakineController.cs" />
     <Compile Include="Filters\Authorization.cs" />
     <Compile Include="Controllers\MakineCalismaController.cs" />
     <Compile Include="Controllers\CipherController.cs" />
@@ -315,8 +317,9 @@
     </Compile>
     <Compile Include="Models\CozumKatalogModel.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
-    <Compile Include="Models\IsEmriWebVersionModel.cs" />
+    <Compile Include="Models\WebVersionIsEmriModel.cs" />
     <Compile Include="Models\MainModel.cs" />
+    <Compile Include="Models\WebVersionMakineModel.cs" />
     <Compile Include="Models\Olcum.cs" />
     <Compile Include="Models\OlcumGirisData.cs" />
     <Compile Include="Models\OlcumParametre.cs" />

@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace WebApiNew.Models
 {
 	[DataContract]
-	public class IsEmriWebVersionModel
+	public class WebVersionIsEmriModel
 	{
 		[DataMember]
 		public int TB_ISEMRI_ID { get; set; }
@@ -110,7 +110,7 @@ namespace WebApiNew.Models
 		public string IS_TIPI { get; set; }
 
 		[DataMember]
-		public string IS_NDEDNI { get; set;}
+		public string IS_NEDENI { get; set;}
 
 		[DataMember]
 		public string ATOLYE { get; set; }
@@ -203,10 +203,10 @@ namespace WebApiNew.Models
 		public double OZEL_ALAN_20 { get; set; }
 
 		[DataMember]
-		public string BILDIRILEN_KAT { get; set; }
+		public int BILDIRILEN_KAT { get; set; }
 
 		[DataMember]
-		public string BILDIRILEN_BINA { get; set; }
+		public int BILDIRILEN_BINA { get; set; }
 
 		[DataMember]
 		public string PERSONEL_ADI { get; set; }
