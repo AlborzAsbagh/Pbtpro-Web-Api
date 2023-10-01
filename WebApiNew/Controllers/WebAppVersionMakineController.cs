@@ -50,8 +50,8 @@ namespace WebApiNew.Controllers
 
 				if (!string.IsNullOrEmpty(parametre))
 				{
-					query += $" and ( MAKINE_KOD like '%{parametre}%' or "; toplamMakineSayisiQuery += $" and ( MAKINE_KOD like '%{parametre}%' or ";
-					query += $" MAKINE_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_TANIM like '%{parametre}%' or ";
+					query += $" and ( MKN_KOD like '%{parametre}%' or "; toplamMakineSayisiQuery += $" and ( MKN_KOD like '%{parametre}%' or ";
+					query += $" MKN_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_TANIM like '%{parametre}%' or ";
 					query += $" MAKINE_LOKASYON like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_LOKASYON like '%{parametre}%' or ";
 					query += $" MAKINE_TIP like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_TIP like '%{parametre}%' or ";
 					query += $" MAKINE_KATEGORI like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_KATEGORI like '%{parametre}%' or ";
