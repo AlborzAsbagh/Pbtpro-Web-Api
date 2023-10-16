@@ -1,8 +1,11 @@
-using System;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Web.Http;
+using Dapper;
 using Newtonsoft.Json.Linq;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -28,6 +31,8 @@ namespace WebApiNew.Controllers
 		Parametreler prms = new Parametreler();
 		private readonly System.Windows.Forms.RichTextBox RTB = new System.Windows.Forms.RichTextBox();
 		private readonly ILogger _logger;
+		string query = "";
+		SqlCommand cmd = null;
 
 		public WebAppVersionIsEmriController(ILogger logger)
 		{
@@ -53,7 +58,7 @@ namespace WebApiNew.Controllers
 
 			try
 			{
-				MAIN_QUERY = "SELECT * from (select ROW_NUMBER() over (order by TB_ISEMRI_ID) as RowIndex , * FROM VW_WEB_VERSION_ISEMRI WHERE 1 = 1 ";
+				MAIN_QUERY = "SELECT * from (select ROW_NUMBER() over (order by TB_ISEMRI_ID DESC) as RowIndex , * FROM VW_WEB_VERSION_ISEMRI WHERE 1 = 1 ";
 
 				string lokasyonQuery = "", durumQuery = "", isemritipQuery = "", customfilterQuery = "";
 				int counter = 0;
@@ -187,7 +192,7 @@ namespace WebApiNew.Controllers
 				else
 				{
 
-					MAIN_QUERY = @" SELECT * FROM ( SELECT ROW_NUMBER() OVER (ORDER BY TB_ISEMRI_ID) as RowIndex , * FROM VW_WEB_VERSION_ISEMRI ) as SubRow 
+					MAIN_QUERY = @" SELECT * FROM ( SELECT ROW_NUMBER() OVER (ORDER BY TB_ISEMRI_ID DESC) as RowIndex , * FROM VW_WEB_VERSION_ISEMRI ) as SubRow 
 		                               where SubRow.RowIndex >= @PAGING_ILK_DEGER and SubRow.RowIndex < @PAGING_SON_DEGER ";
 					TOTAL_IS_EMRI_QUERY = " select count(*) from (select * from dbo.VW_WEB_VERSION_ISEMRI where 1=1) as TotalIsEmriSayisi ";
 				}
@@ -287,14 +292,121 @@ namespace WebApiNew.Controllers
 			}
 		}
 
+		//Get Is Emri Durum List
+		[Route("api/GetIsEmriDurum")]
+		[HttpGet]
+		public Object GetIsEmriDurum()
+		{
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32801";
+			var klas = new Util();
+			List<Kod> listem = new List<Kod>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<Kod>(query).ToList();
+			}
 
-		//[Route("api/AddIsEmri")]
-		//[HttpPost]
-		//public Bildirim AddIsEmri()
-		//{
-			
-		//}
+			return Json(new { isEmriDurumlari = listem});
+		}
 
+
+
+		//Add Is Emri Durum Web App Version
+		[Route("api/AddIsEmriDurum")]
+		[HttpPost]
+		public Object AddIsEmriDurum([FromUri] string yeniDurum)
+		{
+			try
+			{
+				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 32801 , '{yeniDurum}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
+
+
+		//Is Emri Durum Varsayilan Yap
+		[Route("api/IsEmriDurumVarsayilanYap")]
+		[HttpGet]
+		public Object IsEmriDurumVarsayilanYap([FromUri] int kodId,[FromUri] bool isVarsayilan)
+		{
+			try
+			{
+				query = $" update orjin.TB_KOD set KOD_ISM_DURUM_VARSAYILAN = 0 where KOD_GRUP = 32801 ";
+				query += $" update orjin.TB_KOD set KOD_ISM_DURUM_VARSAYILAN = 1 where TB_KOD_ID = {kodId} and KOD_GRUP = 32801 ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ayarlama başarılı ! " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ayarlama başarısız ! " });
+			}
+
+		}
+
+		//Add Is Emri Durum Degisikligi Web App Version
+		[Route("api/AddIsEmriDurumDegisikligi")]
+		[HttpPost]
+		public Object AddIsEmriDurumDegisikligi([FromBody] IsEmriLog entity)
+		{
+			try
+			{
+				query = " insert into orjin.TB_ISEMRI_LOG";
+				query += @" (ISL_ISEMRI_ID , ISL_KULLANICI_ID , ISL_TARIH , ISL_SAAT , ISL_ISLEM , ISL_ACIKLAMA , ISL_DURUM_ESKI_KOD_ID ,
+						ISL_DURUM_YENI_KOD_ID , ISL_OLUSTURAN_ID , ISL_OLUSTURMA_TARIH , ISL_DEGISTIRME_TARIH ) values ";
+
+				if (entity != null)
+				{
+					klas.baglan();
+					query += @" (@ISL_ISEMRI_ID , @ISL_KULLANICI_ID , @ISL_TARIH , @ISL_SAAT , @ISL_ISLEM , @ISL_ACIKLAMA , @ISL_DURUM_ESKI_KOD_ID ,
+						@ISL_DURUM_YENI_KOD_ID , @ISL_OLUSTURAN_ID , @ISL_OLUSTURMA_TARIH , @ISL_DEGISTIRME_TARIH ) ";
+					prms.Clear();
+					prms.Add("ISL_ISEMRI_ID", entity.ISL_ISEMRI_ID);
+					prms.Add("ISL_KULLANICI_ID", entity.ISL_KULLANICI_ID);
+					prms.Add("ISL_TARIH", DateTime.Now);
+					prms.Add("ISL_SAAT", DateTime.Now.ToString("HH:mm:ss"));
+					prms.Add("ISL_ISLEM", entity.ISL_ISLEM);
+					prms.Add("ISL_ACIKLAMA", entity.ISL_ACIKLAMA);
+					prms.Add("ISL_DURUM_ESKI_KOD_ID", entity.ISL_DURUM_ESKI_KOD_ID);
+					prms.Add("ISL_DURUM_YENI_KOD_ID", entity.ISL_DURUM_YENI_KOD_ID);
+					prms.Add("ISL_OLUSTURAN_ID", entity.ISL_OLUSTURAN_ID);
+					prms.Add("ISL_OLUSTURMA_TARIH", DateTime.Now);
+					prms.Add("ISL_DEGISTIRME_TARIH", DateTime.Now);
+
+					klas.cmd(query, prms.PARAMS);
+					klas.kapat();
+					return Json(new { success = "Ekleme başarılı " });
+				}
+				else
+				{
+					return null;
+
+				}
+			} 
+			catch (Exception ex) 
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
 	}
 }
 

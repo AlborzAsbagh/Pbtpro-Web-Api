@@ -8,11 +8,9 @@ using System.Transactions;
 using System.Web.Http;
 using Dapper;
 using Dapper.Contrib.Extensions;
-using Microsoft.Ajax.Utilities;
 using WebApiNew.App_GlobalResources;
 using WebApiNew.Filters;
 using WebApiNew.Models;
-using WebApiNew.Utility;
 using WebApiNew.Utility.Abstract;
 
 namespace WebApiNew.Controllers
@@ -1033,7 +1031,7 @@ namespace WebApiNew.Controllers
 
                 entity.ISM_OLUSTURAN_ID = userId;
                 entity.ISM_ACIKLAMA = String.Format("'{0}' koldu iş talebi", drTalep["IST_KOD"].ToString());
-                ismCont.Post(entity, userId);
+				await ismCont.Post(entity, userId);
                 parametreler.Clear();
                 int _isemriID = Convert.ToInt32(klas.GetDataCell("SELECT MAX(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI", parametreler));
                 // iş talep durumu değiştiriliyor.
@@ -1235,6 +1233,7 @@ namespace WebApiNew.Controllers
             return isTalepEkleData;
         }
 
+        //Is Talebi Post Method For Hacettepe Web Form
 		[HttpGet]
 		[Route("api/postIsTalebi")]
 		public string postIsTalebi(
@@ -1245,26 +1244,31 @@ namespace WebApiNew.Controllers
             [FromUri] string telNo , 
             [FromUri] string mail ,
 			[FromUri] int talepEdenId,
-            [FromUri] int lokasyonId
+            [FromUri] int lokasyonId ,
+            [FromUri] string birimBolum , 
+            [FromUri] string birimBolumYetkilisi
 			)
 		{
 			try
 			{
 				string query1 = @" insert into orjin.TB_IS_TALEBI 
-                            (IST_KOD,IST_ACILIS_TARIHI,IST_ACILIS_SAATI,IST_TANIMI,IST_KONU,IST_IRTIBAT_TELEFON,
-                            IST_MAIL_ADRES,IST_TALEP_EDEN_ID,IST_TALEPEDEN_LOKASYON_ID)
+                            (IST_KOD,IST_BILDIREN_LOKASYON_ID,IST_DURUM_ID,IST_ACILIS_TARIHI,IST_ACILIS_SAATI,IST_TANIMI,IST_KONU,IST_IRTIBAT_TELEFON,
+                            IST_MAIL_ADRES,IST_TALEP_EDEN_ID,IST_TALEPEDEN_LOKASYON_ID,IST_BIRIM_BOLUM,IST_BIRIM_BOLUM_YETKILISI)
 
-                              values(@IST_KOD,(select convert (varchar(10) , GETDATE() , 101)),
+                              values(@IST_KOD,@IST_BILDIREN_LOKASYON_ID,1,(select convert (varchar(10) , GETDATE() , 101)),
                                     (select convert (varchar(8) , GETDATE() , 108)),@IST_TANIMI,
-                                @IST_KONU,@IST_IRTIBAT_TELEFON,@IST_MAIL_ADRES,@IST_TALEP_EDEN_ID,@IST_TALEPEDEN_LOKASYON_ID) ";
+                                @IST_KONU,@IST_IRTIBAT_TELEFON,@IST_MAIL_ADRES,@IST_TALEP_EDEN_ID,@IST_TALEPEDEN_LOKASYON_ID,@IST_BIRIM_BOLUM,@IST_BIRIM_BOLUM_YETKILISI) ";
 				prms.Clear();
 				prms.Add("IST_KOD", istKod);
+				prms.Add("IST_BILDIREN_LOKASYON_ID", lokasyonId);
 				prms.Add("IST_TANIMI", tanimi);
 				prms.Add("IST_KONU", konu);
 				prms.Add("IST_IRTIBAT_TELEFON", telNo);
 				prms.Add("IST_MAIL_ADRES", mail);
 				prms.Add("IST_TALEP_EDEN_ID", talepEdenId);
 				prms.Add("IST_TALEPEDEN_LOKASYON_ID", lokasyonId);
+				prms.Add("IST_BIRIM_BOLUM", birimBolum);
+				prms.Add("IST_BIRIM_BOLUM_YETKILISI", birimBolumYetkilisi);
 				klas.cmd(query1, prms.PARAMS);
 
 
@@ -1277,7 +1281,7 @@ namespace WebApiNew.Controllers
 			catch (Exception e)
 			{
 				klas.kapat();
-                return e.ToString();
+                return "Ekleme başarısız !";
 			}
 		}
 

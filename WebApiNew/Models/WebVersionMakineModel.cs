@@ -19,6 +19,9 @@ namespace WebApiNew.Models
 		public string MAKINE_LOKASYON { get; set; }
 
 		[DataMember]
+		public string MAKINE_TUM_LOKASYON { get; set; }
+
+		[DataMember]
 		public string MAKINE_LOKASYON_ID { get; set; }
 
 		[DataMember]
@@ -35,7 +38,14 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public string MAKINE_SERI_NO { get; set; }
-		
+
+		[DataMember]
+		public DateTime MAKINE_GARANTI_BITIS { get; set; }
+
+		[DataMember]
+		public int MAKINE_GARANTI_KAPSAMINDA { get; set; }
+
+
 	}
 }
 

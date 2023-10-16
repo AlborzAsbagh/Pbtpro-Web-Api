@@ -13,5 +13,9 @@ namespace WebApiNew.Models
 
         [DataMember]
         public string KOD_TANIM { get; set; }
-    }
+
+        //Is Emri Durum Icin
+		[DataMember]
+		public bool KOD_ISM_DURUM_VARSAYILAN { get; set; }
+	}
 }

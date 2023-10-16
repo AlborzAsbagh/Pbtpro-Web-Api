@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Http;
 using Dapper;
+using Newtonsoft.Json.Linq;
 using WebApiNew.Filters;
 using WebApiNew.Models;
 
@@ -26,8 +27,6 @@ namespace WebApiNew.Controllers
 	public class WebAppVersionMakineController : ApiController
 	{
 		Util klas = new Util();
-		Parametreler prms = new Parametreler();
-		Bildirim bld = new Bildirim();
 		string query = "";
 		SqlCommand cmd = null;
 
@@ -35,17 +34,18 @@ namespace WebApiNew.Controllers
 		//Get Makine Full List For Web App Version
 		[Route("api/GetMakineFullList")]
 		[HttpPost]
-		public object GetMakineFullList([FromUri] int pagingDeger , [FromUri] int? lokasyonId , [FromUri] string parametre = null) 
+		public object GetMakineFullList([FromUri] int? lokasyonId, [FromUri] string parametre , [FromBody] JObject filters , [FromUri] int pagingDeger = 1) 
 		{
 			int pagingIlkDeger = pagingDeger == 1 ? 1 : ((pagingDeger * 10) - 10);
 			int pagingSonDeger = pagingIlkDeger == 1 ? 10 : ((pagingDeger * 10));
-			int toplamMakineSayisi = 0; 
+			int toplamMakineSayisi = 0;
+			int counter = 0;
 			string toplamMakineSayisiQuery = ""; 
 
 			List<WebVersionMakineModel> listem = new List<WebVersionMakineModel>();
 			try
 			{
-				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_MAKINE_ID) AS subRow FROM dbo.VW_WEB_VERSION_MAKINE where 1=1";
+				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_MAKINE_ID DESC) AS subRow FROM dbo.VW_WEB_VERSION_MAKINE where 1=1";
 				toplamMakineSayisiQuery = @"select count(*) from (select * from dbo.VW_WEB_VERSION_MAKINE where 1=1" ;
 
 				if (!string.IsNullOrEmpty(parametre))
@@ -59,7 +59,26 @@ namespace WebApiNew.Controllers
 					query += $" MAKINE_MODEL like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_MODEL like '%{parametre}%' or ";
 					query += $" MAKINE_SERI_NO like '%{parametre}%' ) "; toplamMakineSayisiQuery += $" MAKINE_SERI_NO like '%{parametre}%' ) ";
 				}
-				if (lokasyonId > 0)
+				if((filters["customfilters"] as JObject) != null && (filters["customfilters"] as JObject).Count > 0)
+				{
+					query += " and ( ";
+					toplamMakineSayisiQuery += " and ( ";
+					counter = 0;
+					foreach (var property in filters["customfilters"] as JObject) 
+					{
+						query += $" {property.Key} LIKE '%{property.Value}%' ";
+						toplamMakineSayisiQuery += $" {property.Key} LIKE '%{property.Value}%' ";
+						if(counter < (filters["customfilters"] as JObject).Count - 1)
+						{
+							query += " and ";
+							toplamMakineSayisiQuery += " and ";
+						}
+						counter++;
+					}
+					query += " ) ";
+					toplamMakineSayisiQuery += " ) ";
+				}
+				if (lokasyonId > 0 && lokasyonId != null)
 				{
 					query += $" and MAKINE_LOKASYON_ID = {lokasyonId} ";
 					toplamMakineSayisiQuery += $" and MAKINE_LOKASYON_ID = {lokasyonId} ";
@@ -90,13 +109,13 @@ namespace WebApiNew.Controllers
 		[HttpGet]
 		public Object GetMakineDurum()
 		{
-			List<string> listem = new List<string>();
-			query = $"SELECT KOD_TANIM FROM [orjin].[TB_KOD] where KOD_GRUP = 32505";
+			List<Kod> listem = new List<Kod>();
+			query = $"SELECT * FROM [orjin].[TB_KOD] where KOD_GRUP = 32505";
 			using (var con = klas.baglan())
 			{
-				listem = con.Query<string>(query).ToList();
+				listem = con.Query<Kod>(query).ToList();
 			}
-
+			klas.kapat();
 			return Json(new { MAKINE_DURUM = listem });
 		}
 
@@ -116,14 +135,16 @@ namespace WebApiNew.Controllers
 					cmd = new SqlCommand(query, con);
 					cmd.ExecuteNonQuery();
 				}
-
+				klas.kapat();
 				return Json(new  { success = "Ekleme başarılı " });
-
-			} catch (Exception e) 
+			} catch (Exception e)
 			{
+				klas.kapat();
 				return Json(new { error = " Ekleme başarısız " });
 			}
 		}
 
+
+		
 	}
 }

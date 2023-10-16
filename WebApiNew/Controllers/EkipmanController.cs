@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Dapper;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Web.Http;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -31,5 +34,43 @@ namespace WebApiNew.Controllers
             }
             return listem;
         }
-    }
+
+        [Route("api/GetEkipmanFullList")]
+        [HttpGet]
+		public Object GetEkipmanFullList([FromUri] int? MakineID)
+		{
+            string query = "";
+			List<Ekipman> listem = new List<Ekipman>();
+			try
+            {
+				if(MakineID > 0 && MakineID!=null) 
+                {
+					query = $"select * from orjin.TB_EKIPMAN where EKP_MAKINE_ID = {MakineID}";
+					using (var cnn = klas.baglan())
+					{
+						listem = cnn.Query<Ekipman>(query).ToList();
+						klas.kapat();
+					}
+					return Json(new { ekipmanListe = listem });
+				} 
+                else
+                {
+					query = $"select * from orjin.TB_EKIPMAN ";
+					
+					using (var cnn = klas.baglan())
+					{
+						listem = cnn.Query<Ekipman>(query).ToList();
+						klas.kapat();
+					}
+					return Json(new { ekipmanListe = listem });
+				}
+			} 
+            catch(Exception e)
+            {
+				return Json(new { error = e.Message });
+
+			}
+
+		}
+	}
 }
