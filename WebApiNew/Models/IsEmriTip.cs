@@ -210,29 +210,29 @@ namespace WebApiNew.Models
         
         [DataMember]
         public bool IMT_OZEL_ALAN_3 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_4 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_5 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_6 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_7 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_8 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_9 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_10 { get; set; }
-        
-        [DataMember]
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_4 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_5 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_6 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_7 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_8 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_9 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_10 { get; set; }
+
+		[DataMember]
         public bool IMT_OZEL_ALAN_11 { get; set; }
         
         [DataMember]
@@ -240,29 +240,29 @@ namespace WebApiNew.Models
         
         [DataMember]
         public bool IMT_OZEL_ALAN_13 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_14 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_15 { get; set; }
-        
-        [DataMember]
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_14 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_15 { get; set; }
+
+		[DataMember]
         public bool IMT_OZEL_ALAN_16 { get; set; }
         
         [DataMember]
         public bool IMT_OZEL_ALAN_17 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_18 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_19 { get; set; }
-        
-        [DataMember]
-        public bool IMT_OZEL_ALAN_20 { get; set; }
-        
-        [DataMember]
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_18 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_19 { get; set; }
+
+		[DataMember]
+		public bool IMT_OZEL_ALAN_20 { get; set; }
+
+		[DataMember]
         public bool IMT_MAKINE_KAPAT { get; set; }
         
         [DataMember]

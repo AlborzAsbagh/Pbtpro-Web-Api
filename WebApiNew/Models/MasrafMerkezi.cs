@@ -14,5 +14,12 @@ namespace WebApiNew.Models
         [DataMember]
         public string MAM_TANIM { get; set; }
 
-    }
+        [DataMember]
+        public string MAM_ACIKLAMA { get; set; }
+
+        [DataMember]
+        public int MAM_USTGRUP_ID { get; set; }
+
+
+	}
 }

@@ -19,6 +19,7 @@ namespace WebApiNew.Controllers
         List<Prm> parametreler = new List<Prm>();
         Parametreler prms = new Parametreler();
         Util klas = new Util();
+        SqlCommand cmd = null;
 
         [Route("api/AtolyeList")]
         [HttpGet]
@@ -56,6 +57,7 @@ namespace WebApiNew.Controllers
                 entity.TB_MASRAF_MERKEZ_ID = (int) dt.Rows[i]["TB_MASRAF_MERKEZ_ID"];
                 entity.MAM_KOD = Util.getFieldString(dt.Rows[i], "MAM_KOD");
                 entity.MAM_TANIM = Util.getFieldString(dt.Rows[i], "MAM_TANIM");
+                entity.MAM_USTGRUP_ID = Util.getFieldInt(dt.Rows[i], "MAM_USTGRUP_ID");
                 listem.Add(entity);
             }
             return listem;
@@ -530,10 +532,50 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
         }
 
 
+        //Takvim List For Web App Version
 
+        [Route("api/GetTakvimList")]
+        [HttpGet]
+        public Object GetTakvimList()
+        {
+            string query = "select * from orjin.TB_TAKVIM";
+            List<Takvim> listem = new List<Takvim>();
+            try
+            {
+                using(var cnn = klas.baglan())
+                {
+                    listem = cnn.Query<Takvim>(query).ToList();
+                }
+                return Json(new { Takvim_Liste = listem });
+            }
+            catch(Exception ex) 
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
 
-    }
+		//Talimat List For Web App Version
 
+		[Route("api/GetTalimatList")]
+		[HttpGet]
+		public Object GetTalimatList()
+		{
+			string query = "select * from orjin.VW_TALIMAT";
+			List<Talimat> listem = new List<Talimat>();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<Talimat>(query).ToList();
+				}
+				return Json(new { Talimat_Liste = listem });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { error = ex.Message });
+			}
+		}
+	}
 
 
 

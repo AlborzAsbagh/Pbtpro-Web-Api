@@ -95,7 +95,49 @@ namespace WebApiNew.Controllers
         [HttpGet]
         public Object AddIsEmriTipi([FromUri] string isEmriTipiKey)
         {
-            query = $"insert orjin.TB_ISEMRI_TIP (IMT_TANIM,IMT_OLUSTURMA_TARIH,IMT_AKTIF) values('{isEmriTipiKey}','{DateTime.Now}',1)";
+            //Default olarak bu alanlar 'false' olmalidir web'de hata verdigi icin. Sebep Belirsiz :( 
+            query = @"insert into orjin.TB_ISEMRI_TIP (IMT_TANIM,
+                    IMT_RENK,
+                    IMT_MALZEME_FIYAT_TIP,
+                    IMT_VARSAYILAN_MALZEME_MIKTAR,
+                    IMT_ONCELIK,
+                    IMT_FIRMA,
+                    IMT_MAKINE_DURUM_DETAY,
+                    IMT_SOZLESME,
+                    IMT_SAYAC_DEGERI,
+                    IMT_KONU,IMT_PLAN_BITIS,
+                    IMT_PERSONEL_SURE,
+                    IMT_REFERANS_NO,
+                    IMT_EVRAK_NO,
+                    IMT_EVRAK_TARIHI,
+                    IMT_MALIYET,
+                    IMT_ACIKLAMA_USTTAB,
+                    IMT_OZEL_ALAN_1,
+                    IMT_OZEL_ALAN_2,
+                    IMT_OZEL_ALAN_3,
+                    IMT_OZEL_ALAN_11,
+                    IMT_OZEL_ALAN_12,
+                    IMT_OZEL_ALAN_16,
+                    IMT_OZEL_ALAN_17,
+                    IMT_MAKINE_KAPAT,
+                    IMT_EKIPMAN_KAPAT,
+                    IMT_MAKINE_DURUM_KAPAT,
+                    IMT_SAYAC_DEGER_KAPAT,
+                    IMT_PROSEDUR_KAPAT,
+                    IMT_IS_TIPI_KAPAT,
+                    IMT_IS_NEDENI_KAPAT,
+                    IMT_KONU_KAPAT,
+                    IMT_ONCELIK_KAPAT,
+                    IMT_ATOLYE_KAPAT,
+                    IMT_PROJE_KAPAT,
+                    IMT_REFNO_KAPAT,
+                    IMT_FIRMA_KAPAT,
+                    IMT_SOZLESME_KAPAT,
+                    IMT_OZEL_ALAN_13,
+                    IMT_AKTIF,
+                    IMT_TOPLAM_MALIYET_ZORUNLU) values"; 
+            query += $"('{isEmriTipiKey}',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0)";
+
             try
             {
 				using (var cnn = klas.baglan())
@@ -109,7 +151,7 @@ namespace WebApiNew.Controllers
 			} 
             catch(Exception e) 
             {
-				return Json(new { error = "Ekleme Başarısız !" });
+				return Json(new { error = e.Message });
 			}
         }
 

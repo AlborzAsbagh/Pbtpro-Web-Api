@@ -237,6 +237,9 @@ namespace WebApiNew.Models
         [DataMember]
         public int IST_TALEPEDEN_LOKASYON_ID { get; set; }
 
+        [DataMember]
+        public int USER_ID { get; set; }
+
     }
 
 }

@@ -71,4 +71,175 @@ namespace WebApiNew.Models
         public double PIS_OZEL_ALAN_10 { get; set; }
     }
 
+
+    public class ProjeListWebApp
+    {
+		[DataMember]
+		public int TB_PROJE_ID { get; set; }
+
+		[DataMember]
+		public string PRJ_KOD { get; set; }
+
+		[DataMember]
+		public string PRJ_TANIM { get; set; }
+
+		[DataMember]
+		public bool PRJ_AKTIF { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_BASLAMA_TARIHI { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_BITIS_TARIH { get; set; }
+
+		[DataMember]
+		public int PRJ_SORUMLU_ID { get; set; }
+
+		[DataMember]
+		public string PRJ_ACIKLAMA { get; set; }
+
+		[DataMember]
+		public int PRJ_OLUSTURAN_ID { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_OLUSTURMA_TARIH { get; set; }
+
+		[DataMember]
+		public int PRJ_DEGISTIREN_ID { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_DEGISTIRME_TARIH { get; set; }
+
+		[DataMember]
+		public int PRJ_TIP_KOD_ID { get; set; }
+
+		[DataMember]
+		public int PRJ_DURUM_KOD_ID { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_PLAN_BASLAMA_TARIH { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_PLAN_BITIS_TARIH { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_BASLAMA_TARIH { get; set; }
+
+		[DataMember]
+		public decimal PRJ_KESIF_BEDELI { get; set; }
+
+		[DataMember]
+		public decimal PRJ_TAHMINI_MALIYET { get; set; }
+
+		[DataMember]
+		public decimal PRJ_GERCEKLESEN_MALIYET { get; set; }
+
+		[DataMember]
+		public int PRJ_LOKASYON_ID { get; set; }
+
+		[DataMember]
+		public int PRJ_FIRMA_ID { get; set; }
+
+		[DataMember]
+		public int PRJ_MASRAF_MERKEZ_ID { get; set; }
+
+		[DataMember]
+		public int PRJ_BAGLI_PROJE_ID { get; set; }
+
+		[DataMember]
+		public int PRJ_ONCELIK_ID { get; set; }
+
+		[DataMember]
+		public int PRJ_KALAN_ZAMAN_GUN { get; set; }
+
+		[DataMember]
+		public int PRJ_KALAN_ZAMAN_SAAT { get; set; }
+
+		[DataMember]
+		public int PRJ_KALAN_ZAMAN_DAKIKA { get; set; }
+
+		[DataMember]
+		public decimal PRJ_TAMAMLANMA_ORAN { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_MESAI_SURE_BASLAMA { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_MESAI_SURE_BITIS { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_OGLE_MOLA_BASLAMA { get; set; }
+
+		[DataMember]
+		public DateTime PRJ_OGLE_MOLA_BITIS { get; set; }
+
+		[DataMember]
+		public string PRJ_CALISILMAYAN_GUNLER { get; set; }
+
+		[DataMember]
+		public bool PRJ_OGLE_ARASI_AKTIF { get; set; }
+
+		[DataMember]
+		public int PRJ_CALISMA_SURE { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_1 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_2 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_3 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_4 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_5 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_6 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_7 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_8 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_9 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_10 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_11 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_12 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_13 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_14 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_15 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_16 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_17 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_18 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_19 { get; set; }
+
+		[DataMember]
+		public string PRJ_OZEL_ALAN_20 { get; set; }
+	}
 }

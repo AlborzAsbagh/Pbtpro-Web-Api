@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -406,6 +405,40 @@ namespace WebApiNew.Controllers
 				klas.kapat();
 				return Json(new { error = " Ekleme başarısız " });
 			}
+		}
+
+
+		//Get Is Tipi
+		[Route("api/GetIsTipi")]
+		[HttpGet]
+		public Object GetIsTipi()
+		{
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=40002";
+			var klas = new Util();
+			List<Kod> listem = new List<Kod>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<Kod>(query).ToList();
+			}
+
+			return Json(new { is_tipi = listem });
+		}
+
+
+		//Get Is Emri Nedeni
+		[Route("api/GetIsEmriNedeni")]
+		[HttpGet]
+		public Object GetIsEmriNedeni()
+		{
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32830";
+			var klas = new Util();
+			List<Kod> listem = new List<Kod>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<Kod>(query).ToList();
+			}
+
+			return Json(new { is_emri_nedeni = listem });
 		}
 	}
 }

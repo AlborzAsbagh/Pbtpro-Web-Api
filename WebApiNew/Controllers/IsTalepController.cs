@@ -581,6 +581,12 @@ namespace WebApiNew.Controllers
                         {
                             #region Kaydet
                             var isemritipId = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 ISP_ISEMRI_TIPI_ID FROM orjin.TB_IS_TALEBI_PARAMETRE");
+
+                            var userId = cnn.QueryFirstOrDefault<int>(@" select isk.TB_IS_TALEBI_KULLANICI_ID
+	                                FROM [PBTPRO_MASTER].[orjin].[TB_KULLANICI] kll
+	                                left join [PBTPRO_1].[orjin].[TB_PERSONEL] prs on prs.TB_PERSONEL_ID = kll.KLL_PERSONEL_ID " + 
+	                                $" left join [PBTPRO_1].[orjin].[TB_IS_TALEBI_KULLANICI] isk on prs.TB_PERSONEL_ID = isk.ISK_PERSONEL_ID where kll.TB_KULLANICI_ID = {entity.USER_ID}");
+
                             if (entity.IST_TIP_KOD_ID < 1)
                                 entity.IST_TIP_KOD_ID = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 ISP_VARSAYILAN_IS_TIPI FROM orjin.TB_IS_TALEBI_PARAMETRE");
                             string qu1 = @"INSERT INTO orjin.TB_IS_TALEBI
@@ -660,8 +666,8 @@ namespace WebApiNew.Controllers
                             prms1.Add("IST_ACILIS_TARIHI", entity.IST_ACILIS_TARIHI);
                             prms1.Add("IST_ACILIS_SAATI", entity.IST_ACILIS_SAATI);
                             prms1.Add("IST_GUNCELEYEN_ID", -1);
-                            prms1.Add("IST_TALEP_EDEN_ID", entity.IST_TALEP_EDEN_ID);
-                            prms1.Add("IST_IS_TAKIPCISI_ID", -1);
+                            prms1.Add("IST_TALEP_EDEN_ID", userId);
+                            prms1.Add("IST_IS_TAKIPCISI_ID", entity.IST_TALEP_EDEN_ID);
                             prms1.Add("IST_TIP_KOD_ID", entity.IST_TIP_KOD_ID);
                             prms1.Add("IST_KOTEGORI_KODI_ID", -1);
                             prms1.Add("IST_SERVIS_NEDENI_KOD_ID", -1);
@@ -1284,6 +1290,52 @@ namespace WebApiNew.Controllers
                 return "Ekleme başarısız !";
 			}
 		}
+
+        [Route("api/talepIptalEt")]
+        [HttpGet]
+		public void IsTalepIptalEt([FromUri] int talepID, [FromUri] int userId, [FromUri] string talepNo, [FromUri] string userName)
+		{
+			    string isTalepLogQuery =
+				    @"
+                    insert into orjin.TB_IS_TALEBI_LOG (
+                    ITL_IS_TANIM_ID,
+                    ITL_KULLANICI_ID,
+                    ITL_TARIH,
+                    ITL_SAAT,
+                    ITL_ISLEM,
+                    ITL_ACIKLAMA,
+                    ITL_ISLEM_DURUM,
+                    ITL_TALEP_ISLEM,
+                    ITL_OLUSTURAN_ID ) values (";
+
+			    isTalepLogQuery += $" {talepID} , ";
+			    isTalepLogQuery += $" {userId} , ";
+			    isTalepLogQuery += $" '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , "; // Changed date format
+			    isTalepLogQuery += $" '{DateTime.Now.ToString("HH:mm:ss")}' , ";
+			    isTalepLogQuery += " 'İptal' , ";
+			    isTalepLogQuery += $" 'Talep no : {talepNo} - Konu : {userName} tarafından iptal edildi' , ";
+			    isTalepLogQuery += " 'İPTAL EDİLDİ' , ";
+			    isTalepLogQuery += " 'İptal' , ";
+			    isTalepLogQuery += $" {userId} )";
+
+			    try
+			    {
+				    var util = new Util();
+				    using (var cnn = util.baglan())
+				    {
+					    var parametreler = new DynamicParameters();
+					    parametreler.Add("IS_TALEP_ID", talepID);
+					    // Log data is recorded
+					    cnn.Execute(isTalepLogQuery, parametreler);
+					    // Job request status is being canceled
+					    cnn.Execute("update orjin.TB_IS_TALEBI set IST_DURUM_ID = 5 WHERE TB_IS_TALEP_ID = @IS_TALEP_ID", parametreler);
+				    }
+			    }
+			    catch (Exception)
+			    {
+				    throw;
+			    }
+		    }
 
 	}
 }
