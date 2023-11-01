@@ -306,5 +306,9 @@ namespace WebApiNew.Models
         
         [DataMember]
         public bool IMT_TOPLAM_MALIYET_ZORUNLU { get; set; }
-    }
+
+        [DataMember]
+        public int IMT_KATEGORI_ID { get; set; }
+
+	}
 }

@@ -162,16 +162,16 @@ namespace WebApiNew.Models
 		public decimal PRJ_TAMAMLANMA_ORAN { get; set; }
 
 		[DataMember]
-		public DateTime PRJ_MESAI_SURE_BASLAMA { get; set; }
+		public string PRJ_MESAI_SURE_BASLAMA { get; set; }
 
 		[DataMember]
-		public DateTime PRJ_MESAI_SURE_BITIS { get; set; }
+		public string PRJ_MESAI_SURE_BITIS { get; set; }
 
 		[DataMember]
-		public DateTime PRJ_OGLE_MOLA_BASLAMA { get; set; }
+		public string PRJ_OGLE_MOLA_BASLAMA { get; set; }
 
 		[DataMember]
-		public DateTime PRJ_OGLE_MOLA_BITIS { get; set; }
+		public string PRJ_OGLE_MOLA_BITIS { get; set; }
 
 		[DataMember]
 		public string PRJ_CALISILMAYAN_GUNLER { get; set; }
@@ -180,7 +180,7 @@ namespace WebApiNew.Models
 		public bool PRJ_OGLE_ARASI_AKTIF { get; set; }
 
 		[DataMember]
-		public int PRJ_CALISMA_SURE { get; set; }
+		public decimal PRJ_CALISMA_SURE { get; set; }
 
 		[DataMember]
 		public string PRJ_OZEL_ALAN_1 { get; set; }
@@ -241,5 +241,45 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public string PRJ_OZEL_ALAN_20 { get; set; }
+
+		[DataMember]
+		public byte PER_BELGE { get; set; }
+
+		[DataMember]
+		public byte PER_RESIM { get; set; }
+
+		[DataMember]
+		public string PRJ_TIP { get; set; }
+
+		[DataMember]
+		public string PRJ_DURUM { get; set; }
+
+		[DataMember]
+		public string PRJ_LOKASYON { get; set; }
+
+		[DataMember]
+		public string PRJ_YONETICI { get; set; }
+
+		[DataMember]
+		public string PRJ_FIRMA { get; set; }
+
+		[DataMember]
+		public string PRJ_MASRAF_MERKEZ { get; set; }
+
+		[DataMember]
+		public string PRJ_BAGLI_PROJE { get; set; }
+
+		[DataMember]
+		public string PRJ_ONCELIK { get; set; }
+
+		[DataMember]
+		public string PROJE_BILGI { get; set; }
+
+		[DataMember]
+		public decimal TAMAMLANMA_ORAN { get; set; }
+
+		[DataMember]
+		public decimal KULLANILAN_BUTCE { get; set; }
+
 	}
 }

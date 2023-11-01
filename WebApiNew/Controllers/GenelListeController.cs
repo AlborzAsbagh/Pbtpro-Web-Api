@@ -25,22 +25,22 @@ namespace WebApiNew.Controllers
         [HttpGet]
         public List<Atolye> AtolyeListesi(int kulID)
         {
-            parametreler.Clear();
-            parametreler.Add(new Prm("KUL_ID", kulID));
             string query =
-                @"select * from orjin.TB_ATOLYE where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, @KUL_ID) = 1";
-            DataTable dt = klas.GetDataTable(query, parametreler);
+                $"select * from orjin.TB_ATOLYE where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, {kulID}) = 1";
             List<Atolye> listem = new List<Atolye>();
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                Atolye entity = new Atolye();
-                entity.TB_ATOLYE_ID = (int) dt.Rows[i]["TB_ATOLYE_ID"];
-                entity.ATL_KOD = Util.getFieldString(dt.Rows[i], "ATL_KOD");
-                entity.ATL_TANIM = Util.getFieldString(dt.Rows[i], "ATL_TANIM");
-                listem.Add(entity);
-            }
-            return listem;
-        }
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<Atolye>(query).ToList();
+				}
+				return listem;
+			}
+			catch (Exception ex)
+			{
+				return listem;
+			}
+		}
 
         [Route("api/MasrafMerkeziList")]
         [HttpGet]
@@ -68,18 +68,20 @@ namespace WebApiNew.Controllers
         public List<Oncelik> OncelikList()
         {
             string query = @"select * from orjin.TB_SERVIS_ONCELIK";
-            DataTable dt = klas.GetDataTable(query, new List<Prm>());
             List<Oncelik> listem = new List<Oncelik>();
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                Oncelik entity = new Oncelik();
-                entity.TB_SERVIS_ONCELIK_ID = (int) dt.Rows[i]["TB_SERVIS_ONCELIK_ID"];
-                entity.SOC_KOD = Util.getFieldString(dt.Rows[i], "SOC_KOD");
-                entity.SOC_TANIM = Util.getFieldString(dt.Rows[i], "SOC_TANIM");
-                listem.Add(entity);
-            }
-            return listem;
-        }
+         	try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<Oncelik>(query).ToList();
+				}
+				return listem;
+			}
+			catch (Exception ex)
+			{
+				return listem;
+			}
+		}
 
         [Route("api/ProjeList")]
         [HttpGet]
@@ -569,6 +571,26 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 					listem = cnn.Query<Talimat>(query).ToList();
 				}
 				return Json(new { Talimat_Liste = listem });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { error = ex.Message });
+			}
+		}
+
+		[Route("api/GetProjeList")]
+		[HttpGet]
+		public Object GetProjeList()
+		{
+			string query = "select * from orjin.VW_PROJE";
+			List<ProjeListWebApp> listem = new List<ProjeListWebApp>();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<ProjeListWebApp>(query).ToList();
+				}
+				return Json(new { Proje_Liste = listem });
 			}
 			catch (Exception ex)
 			{
