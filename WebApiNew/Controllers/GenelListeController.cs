@@ -578,6 +578,8 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 			}
 		}
 
+		//Proje List For Web App Version
+
 		[Route("api/GetProjeList")]
 		[HttpGet]
 		public Object GetProjeList()
@@ -596,6 +598,133 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 			{
 				return Json(new { error = ex.Message });
 			}
+		}
+
+
+        //Firma List For Web App Version
+
+        [Route("api/GetFirmaList")]
+        [HttpGet]
+        public Object GetFirmaList([FromUri] int userId, [FromUri] int pagingDeger, [FromUri] string search = "")
+        {
+			var util = new Util();
+            int pageSize = 0;
+			int pagingIlkDeger = pagingDeger == 1 ? 1 : ((pagingDeger * 10) - 9);
+			int pagingSonDeger = pagingIlkDeger == 1 ? 10 : ((pagingDeger * 10));
+			List<Cari> listem = new List<Cari>();
+		
+			#region sql
+
+			var sql =
+				$";WITH MTABLE AS (SELECT * , ROW_NUMBER() OVER(ORDER BY CAR_TANIM) AS RN FROM orjin.VW_CARI WHERE orjin.UDF_LOKASYON_YETKI_KONTROL(CAR_LOKASYON_ID, {userId}) = 1 ";
+			if (!search.IsEmpty())
+				sql += $"  AND (CAR_TANIM LIKE '%{search}%' "+
+                                    $" OR CAR_ADRES LIKE '%{search}%' "+
+								    $" OR CAR_SEHIR LIKE '%{search}%' "+
+                                    $" OR CAR_ILCE LIKE '%{search}%' "+
+									$" OR CAR_BOLGE LIKE '%{search}%' "+
+									$" OR CAR_LOKASYON LIKE '%{search}%' "+
+									$" OR CAR_POSTA_KOD LIKE '%{search}%' "+
+									$" OR CAR_KOD LIKE '{search}%' "+
+									$" OR CAR_EMAIL LIKE '%{search}%')";
+
+            var sqlCountQuery = sql + $" ) SELECT COUNT(*) AS ResultCount FROM MTABLE ";
+			sql += $" ) SELECT * FROM MTABLE WHERE RN >= {pagingIlkDeger} AND RN <= {pagingSonDeger} ";
+            
+			#endregion
+			try
+			{
+				using (var conn = util.baglan())
+				{
+                    listem = conn.Query<Cari>(sql).ToList();
+                    pageSize = (int) conn.ExecuteScalar(sqlCountQuery);
+					return Json(new { pageSize = (int)Math.Ceiling((decimal)pageSize / 10) , Firma_Liste = listem  });
+				}
+			}
+			catch (Exception e)
+			{
+				return Json(new {error = e.Message});
+			}
+		}
+
+
+        //Get Sozlesme List For Web App Version
+        [Route("api/GetSozlesmeler")]
+        [HttpGet]
+        public Object GetSozlesmeler([FromUri] int firmaId = 0)
+        {
+			string query = "";
+			List<CariSozlesme> listem = new List<CariSozlesme>();
+
+			if (firmaId == 0)
+            {
+				query = "select * from orjin.VW_CARI_SOZLESME";
+				try
+				{
+					using (var cnn = klas.baglan())
+					{
+						listem = cnn.Query<CariSozlesme>(query).ToList();
+					}
+					return Json(new { Sozlesme_Liste = listem });
+				}
+				catch (Exception ex)
+				{
+					return Json(new { error = ex.Message });
+				}
+			}
+            else
+            {
+				query = $"select * from orjin.VW_CARI_SOZLESME where CAS_CARI_ID = {firmaId}";
+				try
+				{
+					using (var cnn = klas.baglan())
+					{
+						listem = cnn.Query<CariSozlesme>(query).ToList();
+					}
+					return Json(new { Sozlesme_Liste = listem });
+				}
+				catch (Exception ex)
+				{
+					return Json(new { error = ex.Message });
+				}
+			}
+        }
+
+		//Get Arac Gerec List For Web App Version
+		[Route("api/GetAracGerec")]
+		[HttpGet]
+		public Object GetAracGerec()
+		{
+			string query = "select * from orjin.TB_ARAC_GEREC";
+			List<AracGerec> listem = new List<AracGerec>();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<AracGerec>(query).ToList();
+				}
+				return Json(new { ARAC_GEREC_LISTE = listem });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { error = ex.Message });
+			}
+		}
+
+        //Get Birimler For Web App Version
+		[Route("api/GetBirimler")]
+		[HttpGet]
+		public Object GetBirimler()
+		{
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32001";
+			var klas = new Util();
+			List<Kod> listem = new List<Kod>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<Kod>(query).ToList();
+			}
+
+			return Json(new { birimler = listem });
 		}
 	}
 

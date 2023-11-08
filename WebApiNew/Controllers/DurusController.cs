@@ -122,6 +122,19 @@ namespace WebApiNew.Controllers
         }
 
 
+        [Route("api/GetDurusNedenleri")]
+        [HttpGet]
+        public Object GetDurusNedenleri()
+        {
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32300";
+			var klas = new Util();
+			List<Kod> listem = new List<Kod>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<Kod>(query).ToList();
+			}
 
+			return Json(new { durus_nedenleri = listem });
+		}
     }
 }

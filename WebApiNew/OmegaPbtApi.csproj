@@ -315,6 +315,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Localization.resx</DependentUpon>
     </Compile>
+    <Compile Include="Models\AracGerec.cs" />
     <Compile Include="Models\CozumKatalogModel.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
     <Compile Include="Models\Takvim.cs" />

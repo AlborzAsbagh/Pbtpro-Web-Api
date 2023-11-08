@@ -26,15 +26,16 @@ namespace WebApiNew.Controllers
                         prms.Add("USER_ID", ID);
                 var util = new Util();
                 string mainQuery =
-                    @"SELECT (select count(*) from orjin.TB_ISEMRI WHERE ISM_KAPATILDI=1 AND orjin.UDF_ATOLYE_YETKI_KONTROL(ISM_ATOLYE_ID, @USER_ID) = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(ISM_LOKASYON_ID, @USER_ID) = 1) AS KIS_EMRI,
-                                        (select count(*) from orjin.TB_ISEMRI WHERE ISM_KAPATILDI=0 AND orjin.UDF_ATOLYE_YETKI_KONTROL(ISM_ATOLYE_ID, @USER_ID) = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(ISM_LOKASYON_ID, @USER_ID) = 1) AS AIS_EMRI,
-                                        (select count(*) from orjin.TB_IS_TALEBI WHERE (IST_DURUM_ID=0 OR IST_DURUM_ID=1) AND orjin.UDF_LOKASYON_YETKI_KONTROL(IST_BILDIREN_LOKASYON_ID, @USER_ID) = 1 AND orjin.UDF_ATOLYE_YETKI_KONTROL(IST_ATOLYE_GRUP_ID,@USER_ID)=1) AS AIS_TALEP,
-                                        (select count(*) from orjin.TB_IS_TALEBI WHERE IST_DURUM_ID NOT IN (0,1) AND orjin.UDF_LOKASYON_YETKI_KONTROL(IST_BILDIREN_LOKASYON_ID, @USER_ID) = 1) AS KIS_TALEP,
-                                        (select count(*) from orjin.TB_MAKINE WHERE orjin.UDF_ATOLYE_YETKI_KONTROL(MKN_ATOLYE_ID, @USER_ID) = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(MKN_LOKASYON_ID, @USER_ID) = 1) AS TOPLAM_MAKINE,
-                                        (select count(*) from orjin.TB_MAKINE WHERE MKN_AKTIF = 1 AND  orjin.UDF_ATOLYE_YETKI_KONTROL(MKN_ATOLYE_ID, @USER_ID) = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(MKN_LOKASYON_ID, @USER_ID) = 1) AS AKTIF_MAKINE,
-                                        (select count(*) from orjin.VW_STOK_FIS where orjin.UDF_LOKASYON_YETKI_KONTROL(SFS_LOKASYON_ID,@USER_ID) = 1 and SFS_ISLEM_TIP = '09' and SFS_TALEP_DURUM_ID IN (1)) AS BMALZEME_TALEBI,
-                                        /*(stuff((SELECT ';' + CONVERT(varchar(50), MME_KOD)    FROM {0}.orjin.TB_KULLANICI_MOBIL_MENU tkm left join {0}.orjin.TB_MOBIL_MENU tm on tm.TB_MOBIL_MENU_ID = tkm.KMM_MOBIL_MENU_ID where KMM_GOR= 1 AND KMM_KULLANICI_ID = @USER_ID  FOR XML PATH('')), 1, 1, '')) AS YETKILI_MENULER,*/
-                                        (select COALESCE((select COALESCE(TB_RESIM_ID,-1) from orjin.TB_RESIM where RSM_VARSAYILAN = 1 AND RSM_REF_GRUP = 'PERSONEL' and RSM_REF_ID = (SELECT KLL_PERSONEL_ID from {0}.orjin.TB_KULLANICI WHERE TB_KULLANICI_ID = @USER_ID)),(select TOP 1 COALESCE(TB_RESIM_ID,-1) from orjin.TB_RESIM where RSM_REF_GRUP = 'PERSONEL' and RSM_REF_ID = (SELECT KLL_PERSONEL_ID from {0}.orjin.TB_KULLANICI WHERE TB_KULLANICI_ID = @USER_ID)))) AS RESIM_ID;";
+					@" SELECT 
+                    (select count(*) from orjin.TB_ISEMRI WHERE ISM_KAPATILDI=1 AND orjin.UDF_ATOLYE_YETKI_KONTROL(ISM_ATOLYE_ID, @USER_ID) = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(ISM_LOKASYON_ID, @USER_ID) = 1) AS KIS_EMRI,
+                    (select count(*) from orjin.TB_ISEMRI WHERE ISM_KAPATILDI=0 AND orjin.UDF_ATOLYE_YETKI_KONTROL(ISM_ATOLYE_ID, @USER_ID) = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(ISM_LOKASYON_ID, @USER_ID) = 1) AS AIS_EMRI,
+                    (select count(*) from orjin.TB_IS_TALEBI WHERE (IST_DURUM_ID=0 OR IST_DURUM_ID=1) AND orjin.UDF_LOKASYON_YETKI_KONTROL(IST_BILDIREN_LOKASYON_ID, @USER_ID) = 1 AND orjin.UDF_ATOLYE_YETKI_KONTROL(IST_ATOLYE_GRUP_ID,@USER_ID)=1) AS AIS_TALEP,
+                    (select count(*) from orjin.TB_IS_TALEBI WHERE IST_DURUM_ID NOT IN (0,1) AND orjin.UDF_LOKASYON_YETKI_KONTROL(IST_BILDIREN_LOKASYON_ID, @USER_ID) = 1) AS KIS_TALEP,
+                    /*(select count(*) from orjin.TB_MAKINE) AS TOPLAM_MAKINE,*/
+                    /*(select count(*) from orjin.TB_MAKINE WHERE MKN_AKTIF = 1)AS AKTIF_MAKINE,*/
+                    (select count(*) from orjin.VW_STOK_FIS where orjin.UDF_LOKASYON_YETKI_KONTROL(SFS_LOKASYON_ID,@USER_ID) = 1 and SFS_ISLEM_TIP = '09' and SFS_TALEP_DURUM_ID IN (1)) AS BMALZEME_TALEBI,
+                    /*(stuff((SELECT ';' + CONVERT(varchar(50), MME_KOD)    FROM {0}.orjin.TB_KULLANICI_MOBIL_MENU tkm left join {0}.orjin.TB_MOBIL_MENU tm on tm.TB_MOBIL_MENU_ID = tkm.KMM_MOBIL_MENU_ID where KMM_GOR= 1 AND KMM_KULLANICI_ID = @USER_ID  FOR XML PATH('')), 1, 1, '')) AS YETKILI_MENULER,*/
+                    (select COALESCE((select COALESCE(TB_RESIM_ID,-1) from orjin.TB_RESIM where RSM_VARSAYILAN = 1 AND RSM_REF_GRUP = 'PERSONEL' and RSM_REF_ID = (SELECT KLL_PERSONEL_ID from {0}.orjin.TB_KULLANICI WHERE TB_KULLANICI_ID = @USER_ID)),(select TOP 1 COALESCE(TB_RESIM_ID,-1) from orjin.TB_RESIM where RSM_REF_GRUP = 'PERSONEL' and RSM_REF_ID = (SELECT KLL_PERSONEL_ID from {0}.orjin.TB_KULLANICI WHERE TB_KULLANICI_ID = @USER_ID)))) AS RESIM_ID ";
                
                 string yetkiQuery = @"SELECT TB_KULLANICI_YETKI_ID
                                           ,KYT_KULLANICI_ID
@@ -70,7 +71,7 @@ namespace WebApiNew.Controllers
 
             catch (Exception e)
             {
-                return e;
+                return e.Message;
             }
         }
 

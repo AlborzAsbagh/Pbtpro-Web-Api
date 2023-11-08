@@ -239,6 +239,7 @@ namespace WebApiNew.Controllers
                                       ,OA13.KOD_TANIM ISM_OZEL_ALAN_13_KOD_TANIM
                                       ,OA14.KOD_TANIM ISM_OZEL_ALAN_14_KOD_TANIM
                                       ,OA15.KOD_TANIM ISM_OZEL_ALAN_15_KOD_TANIM
+                                      ,IS_EMRI_DURUM.KOD_TANIM AS IS_EMRI_DURUMU_TANIM
                     ,(select COALESCE(TB_RESIM_ID,0) from orjin.TB_RESIM where RSM_VARSAYILAN= 1 AND RSM_REF_GRUP = 'ISEMRI' and RSM_REF_ID = TB_ISEMRI_ID) as ResimVarsayilanID
                     ,stuff((SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'ISEMRI' and R.RSM_REF_ID = TB_ISEMRI_ID FOR XML PATH('')),1,1,'') ResimIDleri
                     ,ROW_NUMBER() OVER (ORDER BY ISM_DUZENLEME_TARIH {sortstr}, ISM_DUZENLEME_SAAT {sortstr}) AS RowNum
@@ -248,6 +249,7 @@ namespace WebApiNew.Controllers
                             LEFT JOIN orjin.TB_KOD OA13 ON OA13.TB_KOD_ID=ISM_OZEL_ALAN_13_KOD_ID
                             LEFT JOIN orjin.TB_KOD OA14 ON OA14.TB_KOD_ID=ISM_OZEL_ALAN_14_KOD_ID
                             LEFT JOIN orjin.TB_KOD OA15 ON OA15.TB_KOD_ID=ISM_OZEL_ALAN_15_KOD_ID
+                            LEFT JOIN orjin.TB_KOD IS_EMRI_DURUM ON IS_EMRI_DURUM.TB_KOD_ID = ISM_DURUM_KOD_ID
 ";
 
                 //var q2 = "SELECT COUNT(*) as cnt FROM orjin.VW_ISEMRI " + where + " AND ISM_KAPATILDI=0;";
@@ -403,6 +405,7 @@ namespace WebApiNew.Controllers
                                       ,OA13.KOD_TANIM ISM_OZEL_ALAN_13_KOD_TANIM
                                       ,OA14.KOD_TANIM ISM_OZEL_ALAN_14_KOD_TANIM
                                       ,OA15.KOD_TANIM ISM_OZEL_ALAN_15_KOD_TANIM
+                                      ,IS_EMRI_DURUM.KOD_TANIM AS IS_EMRI_DURUMU_TANIM
                     ,(select COALESCE(TB_RESIM_ID,0) from orjin.TB_RESIM where RSM_VARSAYILAN= 1 AND RSM_REF_GRUP = 'ISEMRI' and RSM_REF_ID = TB_ISEMRI_ID) as ResimVarsayilanID
                     ,stuff((SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'ISEMRI' and R.RSM_REF_ID = TB_ISEMRI_ID FOR XML PATH('')),1,1,'') ResimIDleri
                     ,ROW_NUMBER() OVER (ORDER BY ISM_DUZENLEME_TARIH {sortstr}, ISM_DUZENLEME_SAAT {sortstr}) AS RowNum
@@ -412,6 +415,7 @@ namespace WebApiNew.Controllers
                             LEFT JOIN orjin.TB_KOD OA13 ON OA13.TB_KOD_ID=ISM_OZEL_ALAN_13_KOD_ID
                             LEFT JOIN orjin.TB_KOD OA14 ON OA14.TB_KOD_ID=ISM_OZEL_ALAN_14_KOD_ID
                             LEFT JOIN orjin.TB_KOD OA15 ON OA15.TB_KOD_ID=ISM_OZEL_ALAN_15_KOD_ID
+                            LEFT JOIN orjin.TB_KOD IS_EMRI_DURUM ON IS_EMRI_DURUM.TB_KOD_ID = ISM_DURUM_KOD_ID
 ";
                 var wResult = GetFilteredIsemriListWhere(filtre, ID);
                 string where = (string)wResult[0];

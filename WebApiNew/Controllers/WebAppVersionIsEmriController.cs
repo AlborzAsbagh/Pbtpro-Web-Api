@@ -291,7 +291,7 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		//Get Is Emri Durum List
+		//Get Is Emri Durum List For Web App Version
 		[Route("api/GetIsEmriDurum")]
 		[HttpGet]
 		public Object GetIsEmriDurum()
@@ -309,7 +309,7 @@ namespace WebApiNew.Controllers
 
 
 
-		//Add Is Emri Durum Web App Version
+		//Add Is Emri Durum Web For App Version
 		[Route("api/AddIsEmriDurum")]
 		[HttpPost]
 		public Object AddIsEmriDurum([FromUri] string yeniDurum)
@@ -488,6 +488,22 @@ namespace WebApiNew.Controllers
 				klas.kapat();
 				return Json(new { error = " Ekleme başarısız " });
 			}
+		}
+
+		//Get Is Emri Ozel Alanlar Content (11,12,13,14,15)
+		[Route("api/GetIsEmriOzelAlanlar")]
+		[HttpGet]
+		public Object GetIsEmriOzelAlanlar([FromUri] int KodGrup)
+		{
+			string query = $"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP={KodGrup}";
+			var klas = new Util();
+			List<Kod> listem = new List<Kod>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<Kod>(query).ToList();
+			}
+
+			return Json(new { is_emri_ozel_alanlar = listem });
 		}
 	}
 }

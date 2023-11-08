@@ -250,9 +250,12 @@ namespace WebApiNew.Models
         [DataMember]
         public string ISM_OZEL_ALAN_15_KOD_TANIM { get; set; }
 
-        //----------------------------------------------------------
-        
         [DataMember]
+        public string IS_EMRI_DURUMU_TANIM { get; set;}
+
+		//----------------------------------------------------------
+
+		[DataMember]
         public double ISM_MALIYET_MLZ { get; set; }
         [DataMember]
         public double ISM_MALIYET_PERSONEL { get; set; }

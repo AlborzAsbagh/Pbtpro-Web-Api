@@ -9,6 +9,7 @@ using WebApiNew.Models;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using WebApiNew.Utility.Abstract;
+using System.Web.Helpers;
 
 namespace WebApiNew.Controllers
 {
@@ -234,6 +235,16 @@ namespace WebApiNew.Controllers
             }
             return bildirim;
         }
-    
+
+
+        //Get Prosedur Web App Version (Is Emri Ekleme Syafasi)
+        [Route("api/GetProsedur")]
+        [HttpGet]
+        public Object GetProsedur([FromUri] string tip)
+        {
+            if (tip == "ARIZA") return Json(new { PROSEDUR_LISTE = ArizaGetir() });
+            else if (tip == "BAKIM") return Json(new { PROSEDUR_LISTE = BakimGetir() });
+            else return Json(new { error = "Tanimsiz !" });
+		}
     }
 }

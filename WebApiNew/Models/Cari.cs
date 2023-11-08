@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 
 namespace WebApiNew.Models
@@ -70,4 +71,179 @@ namespace WebApiNew.Models
         public string CAR_LOKASYON { get; set; }
     }
 
+    public class CariSozlesme
+    {
+		[DataMember]
+		public int TB_CARI_SOZLESME_ID { get; set; }
+
+		[DataMember]
+		public int CAS_CARI_ID { get; set; }
+
+		[DataMember]
+		public string CAS_TANIM { get; set; }
+
+		[DataMember]
+		public DateTime CAS_BASLANGIC_TARIH { get; set; }
+
+		[DataMember]
+		public DateTime? CAS_BITIS_TARIH { get; set; }
+
+		[DataMember]
+		public int CAS_TIP_KOD_ID { get; set; }
+
+		[DataMember]
+		public int CAS_MUDAHALE_SURE { get; set; }
+
+		[DataMember]
+		public int CAS_ONARIM_SURE { get; set; }
+
+		[DataMember]
+		public int CAS_MALZEME_TEMIN_SURE { get; set; }
+
+		[DataMember]
+		public bool CAS_PARCA_DAHIL { get; set; }
+
+		[DataMember]
+		public bool CAS_AKTIF { get; set; }
+
+		[DataMember]
+		public string CAS_SOZLESME_ACIKLAMA { get; set; }
+
+		[DataMember]
+		public int CAS_OLUSTURAN_ID { get; set; }
+
+		[DataMember]
+		public DateTime CAS_OLUSTURMA_TARIH { get; set; }
+
+		[DataMember]
+		public int CAS_DEGISTIREN_ID { get; set; }
+
+		[DataMember]
+		public DateTime? CAS_DEGISTIRME_TARIH { get; set; }
+
+		[DataMember]
+		public string CAS_SOZLESME_NO { get; set; }
+
+		[DataMember]
+		public int CAS_KATEGORI_KOD_ID { get; set; }
+
+		[DataMember]
+		public string CAS_REFERANS_NO { get; set; }
+
+		[DataMember]
+		public decimal CAS_SOZLESME_BEDELI { get; set; }
+
+		[DataMember]
+		public int CAS_LOKASYON_ID { get; set; }
+
+		[DataMember]
+		public int CAS_MUDAHALE_SURESI_GUN { get; set; }
+
+		[DataMember]
+		public int CAS_MUDAHALE_SURESI_SAAT { get; set; }
+
+		[DataMember]
+		public int CAS_MUDAHALE_SURESI_DAKIKA { get; set; }
+
+		[DataMember]
+		public int CAS_ONARIM_SURESI_GUN { get; set; }
+
+		[DataMember]
+		public int CAS_ONARIM_SURESI_SAAT { get; set; }
+
+		[DataMember]
+		public int CAS_ONARIM_SURESI_DAKIKA { get; set; }
+
+		[DataMember]
+		public int CAS_PARCA_TEMIN_SURESI_GUN { get; set; }
+
+		[DataMember]
+		public int CAS_PARCA_TEMIN_SURESI_SAAT { get; set; }
+
+		[DataMember]
+		public int CAS_PARCA_TEMIN_SURESI_DAKIKA { get; set; }
+
+		[DataMember]
+		public string CAS_SOZLESME_ICERIGI { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_1 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_2 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_3 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_4 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_5 { get; set; }
+
+		[DataMember]
+		public int CAS_MAZLEME_TIPI_KOD_ID { get; set; }
+
+		[DataMember]
+		public string CAS_IMZALAYAN { get; set; }
+
+		[DataMember]
+		public int CAS_ODEME_SEKLI_KOD_ID { get; set; }
+
+		[DataMember]
+		public int CAS_ODEME_VADESI { get; set; }
+
+		[DataMember]
+		public string CAS_REF_GRUP { get; set; }
+
+		[DataMember]
+		public int CAS_TESLIM_SURESI { get; set; }
+
+		[DataMember]
+		public int CAS_HATIRLATICI_SURE { get; set; }
+
+		[DataMember]
+		public int CAS_REF_ID { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_6 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_7 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_8 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_9 { get; set; }
+
+		[DataMember]
+		public string CAS_OZEL_ALAN_10 { get; set; }
+
+		[DataMember]
+		public string CAS_TIP { get; set; }
+
+		[DataMember]
+		public string CAS_KATEGORI { get; set; }
+
+		[DataMember]
+		public string CAS_MALZEME_TIPI { get; set; }
+
+		[DataMember]
+		public string CAS_ODEME_SEKLI { get; set; }
+
+		[DataMember]
+		public string CAS_LOKASYON { get; set; }
+
+		[DataMember]
+		public string CAS_SOZLESME_DURUM { get; set; }
+
+		[DataMember]
+		public int CAS_SOZLESME_DURUM_ID { get; set; }
+
+		[DataMember]
+		public string CAS_KALAN_GUN { get; set; }
+
+	}
 }
+
