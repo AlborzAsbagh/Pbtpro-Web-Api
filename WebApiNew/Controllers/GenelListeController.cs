@@ -695,7 +695,7 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 		[HttpGet]
 		public Object GetAracGerec()
 		{
-			string query = "select * from orjin.TB_ARAC_GEREC";
+			string query = "select * from orjin.VW_ARAC_GEREC";
 			List<AracGerec> listem = new List<AracGerec>();
 			try
 			{

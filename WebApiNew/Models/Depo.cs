@@ -40,5 +40,29 @@ namespace WebApiNew.Models
 
         [DataMember]
         public string DEP_STOK_BIRIM { get; set; }
-    }
+	}
+
+    //Web App Version
+
+    public class DeopWebApp
+    {
+		[DataMember]
+		public int TB_DEPO_ID { get; set; }
+
+		[DataMember]
+		public string DEP_KOD { get; set; }
+
+		[DataMember]
+		public string DEP_TANIM { get; set; }
+
+		[DataMember]
+		public string SORUMLU_PERSONEL { get; set; }
+
+		[DataMember]
+		public string ATOLYE_TANIM { get; set; }
+
+		[DataMember]
+		public string LOKASYON_TANIM { get; set; }
+
+	} 
 }

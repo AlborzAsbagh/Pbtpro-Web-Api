@@ -224,5 +224,46 @@ namespace WebApiNew.Controllers
 
         }
 
-    }
+        [Route("api/GetMalzemeModel")]
+        [HttpGet]
+        public Object GetMalzemeModel()
+        {
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=13003";
+            List<Kod> listem = new List<Kod>();
+            try
+            {
+				using (var cnn = klas.baglan())
+				{
+                    listem = cnn.Query<Kod>(query).ToList();
+				}
+                return Json(new { malzeme_model_list = listem });
+			}
+            catch(Exception e)
+            {
+				return Json(new { error = e.Message });
+			}
+
+		}
+
+		[Route("api/GetMalzemeMarka")]
+		[HttpGet]
+		public Object GetMalzemeMarka()
+		{
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=13002";
+			List<Kod> listem = new List<Kod>();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<Kod>(query).ToList();
+				}
+				return Json(new { malzeme_marka_list = listem });
+			}
+			catch (Exception e)
+			{
+				return Json(new { error = e.Message });
+			}
+		}
+
+	}
 }

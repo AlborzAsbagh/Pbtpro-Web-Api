@@ -70,4 +70,59 @@ namespace WebApiNew.Models
         public string DPS_STOK_SINIF { get; set; }
 
     }
+
+    // For Web App
+	public class DepoStokWebApp
+	{
+		[DataMember]
+		public int TB_DEPO_STOK_ID { get; set; }
+
+        [DataMember]
+        public int TB_STOK_ID { get; set; }
+
+        [DataMember]
+        public string STK_KOD { get; set; }
+
+        [DataMember]
+        public string STK_TANIM { get; set; }
+
+        [DataMember]
+        public string STK_TIP { get; set; }
+
+		[DataMember]
+		public string STK_BIRIM { get; set; }
+
+		[DataMember]
+		public string STK_GRUP { get; set; }
+
+		[DataMember]
+		public string STK_LOKASYON { get; set; }
+
+		[DataMember]
+		public string STK_ATOLYE { get; set; }
+
+		[DataMember]
+		public string STK_MARKA { get; set; }
+
+		[DataMember]
+		public string STK_MODEL { get; set; }
+
+		[DataMember]
+		public string STK_SINIF { get; set; }
+
+        [DataMember]
+        public int STK_GIRIS_FIYAT_DEGERI { get; set; }
+
+        [DataMember]
+        public int STK_MALIYET { get; set; }
+
+        [DataMember]
+        public bool STK_STOKSUZ_MALZEME { get; set; }
+
+        [DataMember]
+        public string STK_BARKOD_NO { get; set; }
+
+
+
+	}
 }

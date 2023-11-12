@@ -101,5 +101,26 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public string ARG_OZEL_ALAN_10 { get; set; }
+
+		[DataMember]
+		public string ARG_BELGE { get; set; }
+
+		[DataMember]
+		public string ARG_RESIM { get; set; }
+
+		[DataMember]
+		public string ARG_TIP_TANIM { get; set; }
+
+		[DataMember]
+		public string ARG_BIRIM_TANIM { get; set; }
+
+		[DataMember]
+		public string ARG_YER_TANIM { get; set; }
+
+		[DataMember]
+		public int ARG_STOK { get; set; }
+
+		[DataMember]
+		public int ARG_KULLANILAN { get; set; }
 	}
 }

@@ -77,9 +77,11 @@ namespace WebApiNew.Controllers
         public List<IsTanimKontrol> IsTanimKontrolList(int isTanimID)
         {
             string query = @"SELECT *
-                                    ,(SELECT TB_RESIM_ID FROM orjin.TB_RESIM WHERE RSM_REF_GRUP = 'IS_TANIM_KONTROL' AND RSM_REF_ID = TB_IS_TANIM_KONROLLIST_ID AND RSM_VARSAYILAN=1) ISK_IMAGE_ID 
-                                    ,stuff((SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'IS_TANIM_KONTROL' and R.RSM_REF_ID = TB_IS_TANIM_KONROLLIST_ID FOR XML PATH('')),1,1,'') ISK_IMAGE_IDS_STR
-                                    FROM orjin.TB_IS_TANIM_KONTROLLIST WHERE ISK_IS_TANIM_ID = @ISTNM_ID";
+                            ,(SELECT TB_RESIM_ID FROM orjin.TB_RESIM WHERE RSM_REF_GRUP = 'IS_TANIM_KONTROL' AND RSM_REF_ID = TB_IS_TANIM_KONROLLIST_ID AND RSM_VARSAYILAN=1) ISK_IMAGE_ID
+                            ,(SELECT prs.PRS_ISIM FROM orjin.TB_IS_TANIM ist left join orjin.TB_PERSONEL prs on ist.IST_PERSONEL_ID = prs.TB_PERSONEL_ID
+                            WHERE TB_IS_TANIM_ID = TB_IS_TANIM_KONROLLIST_ID AND PRS_AKTIF = 1) PERSONEL_ISIM
+                            ,stuff((SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'IS_TANIM_KONTROL' and R.RSM_REF_ID = TB_IS_TANIM_KONROLLIST_ID FOR XML PATH('')),1,1,'') ISK_IMAGE_IDS_STR
+                             FROM orjin.TB_IS_TANIM_KONTROLLIST WHERE ISK_IS_TANIM_ID = @ISTNM_ID";
             var util = new Util();
             using (var cnn = util.baglan())
             {

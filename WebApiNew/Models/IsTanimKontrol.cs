@@ -20,7 +20,9 @@ namespace WebApiNew.Models
         public bool ISK_YAPILDI { get; set; }
         [DataMember]
         public string ISK_TANIM { get; set; }
-        [DataMember]
+		[DataMember]
+		public string PERSONEL_ISIM { get; set; }
+		[DataMember]
         public int ISK_OLUSTURAN_ID { get; set; }
         [DataMember]
         public DateTime? ISK_OLUSTURMA_TARIH { get; set; }
