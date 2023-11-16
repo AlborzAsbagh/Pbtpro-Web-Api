@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -13,9 +14,11 @@ namespace WebApiNew.Controllers
     [MyBasicAuthenticationFilter]
     public class DurusController : ApiController
     {
+		Util klas = new Util();
+		string query = "";
+		SqlCommand cmd = null;
 
-
-        [Route("api/DurusListFiltered")]
+		[Route("api/DurusListFiltered")]
         [HttpPost]
         public List<IsEmriDurus> DurusList([FromUri] int kllId, [FromUri] int page, [FromUri] int pageSize, [FromBody] Filtre filtre)
         {
@@ -136,5 +139,30 @@ namespace WebApiNew.Controllers
 
 			return Json(new { durus_nedenleri = listem });
 		}
-    }
+
+		//Add Durus Nedeni
+		[Route("api/AddDurusNedeni")]
+		[HttpGet]
+		public Object AddDurusNedeni([FromUri] string durusNedeni)
+		{
+			try
+			{
+				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 32300 , '{durusNedeni}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
+	}
 }

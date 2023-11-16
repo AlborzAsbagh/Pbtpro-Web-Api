@@ -48,7 +48,7 @@ namespace WebApiNew.Controllers
 			return listem;
 		}
 
-
+		
 		[Route("api/getLokasyonlar")]
 		[HttpGet] 
 		public List<string> getLokasyonlar()
@@ -59,6 +59,43 @@ namespace WebApiNew.Controllers
 			using (var conn = klas.baglan())
 			{
 				listem = conn.Query<string>(query).ToList();
+			}
+			return listem;
+		}
+
+		[Route("api/getLokasyonListPageView")]
+		[HttpGet]
+		public List<Lokasyon> GetLokasyonListPageView([FromUri] int ID, [FromUri] int anaLokasyonId , [FromUri] string searchText)
+		{
+			Util klas = new Util();
+			string query = @"SELECT 
+							TB_LOKASYON.*,
+							CASE 
+								WHEN EXISTS (
+									SELECT 1 
+									FROM orjin.TB_LOKASYON AS sub 
+									WHERE sub.LOK_ANA_LOKASYON_ID = TB_LOKASYON.TB_LOKASYON_ID
+								) THEN 1
+								ELSE 0
+							END AS LOK_HAS_NEXT
+						FROM 
+							orjin.TB_LOKASYON 
+						WHERE 
+							orjin.UDF_LOKASYON_YETKI_KONTROL( TB_LOKASYON_ID , @KUL_ID ) = 1 ";
+
+			List<Lokasyon> listem = new List<Lokasyon>();
+			if(anaLokasyonId > -1 && (searchText == "" || searchText == null))
+			{
+				query += $" and LOK_ANA_LOKASYON_ID = {anaLokasyonId} ";
+			}
+			else
+			{
+				query += $" and ( LOK_TANIM like '%{searchText}%' ) ";
+
+			}
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<Lokasyon>(query , new { @KUL_ID = ID }).ToList();
 			}
 			return listem;
 		}

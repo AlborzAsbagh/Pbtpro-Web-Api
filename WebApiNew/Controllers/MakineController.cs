@@ -20,7 +20,7 @@ namespace WebApiNew.Controllers
         
         [Route("api/Makine")]
         [HttpGet]
-        public object GetViaDapper([FromUri] int ilkDeger, [FromUri] int sonDeger, [FromUri] int ID, [FromUri] int Tip, [FromUri] int kategori, [FromUri] string prm, [FromUri] Boolean b, [FromUri] int lokasyonID, [FromUri]int YakitKullanimi,[FromUri] Boolean otonombakim)
+        public object GetViaDapper([FromUri] int ilkDeger, [FromUri] int sonDeger, [FromUri] int ID, [FromUri] int Tip, [FromUri] int kategori, [FromUri] string prm, [FromUri] Boolean b, [FromUri] int lokasyonID, [FromUri]int YakitKullanimi,[FromUri] Boolean otonombakim , [FromUri] Boolean isComeFromIsTalep)
         {
             var prms = new DynamicParameters();
             string query = @";WITH MTABLE AS(
@@ -67,8 +67,9 @@ namespace WebApiNew.Controllers
                                 LEFT JOIN orjin.TB_PERSONEL OPR ON MKN.MKN_OPERATOR_PERSONEL_ID=OPR.TB_PERSONEL_ID
                                 WHERE
                                 MKN.MKN_AKTIF = 1 AND
-                                orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(MKN_LOKASYON_ID,-1),@KUL_ID) = 1 AND 
-                                orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(MKN_ATOLYE_ID,-1), @KUL_ID ) = 1 ";
+                                orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(MKN_LOKASYON_ID,-1),@KUL_ID) = 1 ";
+
+                                if(!isComeFromIsTalep) query += @" AND  orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(MKN_ATOLYE_ID,-1), @KUL_ID ) = 1 ";
             if (Tip != -1)
             {
                 prms.Add("MKN_TIP_KOD_ID", Tip);

@@ -231,15 +231,15 @@ namespace WebApiNew.Controllers
 			if (stoklu)
 			{
 				parametreler.Clear();
-				string query = @" select ds.TB_DEPO_STOK_ID, s.TB_STOK_ID , s.STK_KOD , s.STK_TANIM , s.STK_TIP , s.STK_BIRIM , s.STK_GRUP , s.STK_LOKASYON , 
+				string query = @" select ds.TB_DEPO_STOK_ID, ds.DPS_DEPO , s.TB_STOK_ID , s.STK_KOD , s.STK_TANIM , s.STK_TIP , s.STK_BIRIM , s.STK_GRUP , s.STK_LOKASYON , 
                             s.STK_ATOLYE , s.STK_MARKA , s.STK_MARKA , s.STK_MODEL , s.STK_SINIF , s.STK_GIRIS_FIYAT_DEGERI,
-                            s.STK_GIRIS_FIYAT_DEGERI AS STK_MALIYET , s.STK_STOKSUZ_MALZEME, b.STB_BARKODNO
+                            s.STK_GIRIS_FIYAT_DEGERI AS STK_MALIYET , s.STK_STOKSUZ_MALZEME, b.STB_BARKODNO 
 
                             from orjin.VW_DEPO_STOK ds 
 	                            left join orjin.VW_STOK s on s.TB_STOK_ID = DPS_STOK_ID 
 	                            left join orjin.TB_STOK_BARKOD b on  b.STB_STOK_ID = s.TB_STOK_ID
 	                            where s.STK_AKTIF = 1 and DPS_MIKTAR > 0  ";
-				if (depoID != -1)
+				if (depoID > 0)
 				{
 					query = query + " and DPS_DEPO_ID = @TB_DEPO_ID ";
 					parametreler.Add(new Prm("TB_DEPO_ID", depoID));
@@ -256,6 +256,7 @@ namespace WebApiNew.Controllers
 					entity.STK_TANIM = Util.getFieldString(dt.Rows[i], "STK_TANIM");
 					entity.STK_TIP = Util.getFieldString(dt.Rows[i], "STK_TIP");
 					entity.STK_BIRIM = Util.getFieldString(dt.Rows[i], "STK_BIRIM");
+					entity.STK_DEPO = Util.getFieldString(dt.Rows[i], "DPS_DEPO");
 					entity.STK_GRUP = Util.getFieldString(dt.Rows[i], "STK_GRUP");
 					entity.STK_LOKASYON = Util.getFieldString(dt.Rows[i], "STK_LOKASYON");
 					entity.STK_ATOLYE = Util.getFieldString(dt.Rows[i], "STK_ATOLYE");
@@ -272,9 +273,9 @@ namespace WebApiNew.Controllers
 			else
 			{
 				parametreler.Clear();
-				string query = @" select ds.TB_DEPO_STOK_ID, s.TB_STOK_ID , s.STK_KOD , s.STK_TANIM , s.STK_TIP , s.STK_BIRIM , s.STK_GRUP , s.STK_LOKASYON , 
+				string query = @" select ds.TB_DEPO_STOK_ID, ds.DPS_DEPO , s.TB_STOK_ID , s.STK_KOD , s.STK_TANIM , s.STK_TIP , s.STK_BIRIM , s.STK_GRUP , s.STK_LOKASYON , 
                             s.STK_ATOLYE , s.STK_MARKA , s.STK_MARKA , s.STK_MODEL , s.STK_SINIF , s.STK_GIRIS_FIYAT_DEGERI,
-                            s.STK_GIRIS_FIYAT_DEGERI AS STK_MALIYET , s.STK_STOKSUZ_MALZEME, b.STB_BARKODNO
+                            s.STK_GIRIS_FIYAT_DEGERI AS STK_MALIYET , s.STK_STOKSUZ_MALZEME, b.STB_BARKODNO 
 
                             from orjin.VW_DEPO_STOK ds 
 	                            left join orjin.VW_STOK s on s.TB_STOK_ID = DPS_STOK_ID 
@@ -292,6 +293,7 @@ namespace WebApiNew.Controllers
 					entity.STK_TANIM = Util.getFieldString(dt.Rows[i], "STK_TANIM");
 					entity.STK_TIP = Util.getFieldString(dt.Rows[i], "STK_TIP");
 					entity.STK_BIRIM = Util.getFieldString(dt.Rows[i], "STK_BIRIM");
+					entity.STK_DEPO = Util.getFieldString(dt.Rows[i], "DPS_DEPO");
 					entity.STK_GRUP = Util.getFieldString(dt.Rows[i], "STK_GRUP");
 					entity.STK_LOKASYON = Util.getFieldString(dt.Rows[i], "STK_LOKASYON");
 					entity.STK_ATOLYE = Util.getFieldString(dt.Rows[i], "STK_ATOLYE");

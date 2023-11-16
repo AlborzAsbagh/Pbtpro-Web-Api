@@ -505,6 +505,31 @@ namespace WebApiNew.Controllers
 
 			return Json(new { is_emri_ozel_alanlar = listem });
 		}
+
+		//Add Ozel Alanlar Content (11,12,13,14,15)
+		[Route("api/AddOzelAlanlarContent")]
+		[HttpGet]
+		public Object AddOzelAlanlarContent([FromUri] string content, [FromUri] int kodGrup)
+		{
+			try
+			{
+				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( {kodGrup} , '{content}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
 	}
 }
 

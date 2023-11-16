@@ -726,6 +726,32 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 
 			return Json(new { birimler = listem });
 		}
+
+		//Add Birim For Web App Version
+
+		[Route("api/AddBirim")]
+		[HttpGet]
+		public Object AddBirim([FromUri] string birim)
+		{
+			try
+			{
+				string query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 32001 , '{birim}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(birim, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
 	}
 
 

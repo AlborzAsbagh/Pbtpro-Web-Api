@@ -74,5 +74,8 @@ namespace WebApiNew.Models
 
         [DataMember]
         public int LOK_TIP_ID { get; set; }
+
+        [DataMember]
+        public bool LOK_HAS_NEXT { get ; set; }
     }
 }

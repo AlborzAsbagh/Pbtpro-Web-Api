@@ -165,6 +165,7 @@ namespace WebApiNew.Controllers
             }
             return listem;
         }
+
         [Route("api/IsTanim/KontrolEkle")]
         [HttpPost]
         public Bildirim IsTanimKontrolEkle([FromBody]IsTanimKontrol entity)

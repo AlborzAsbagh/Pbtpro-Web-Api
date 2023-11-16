@@ -9,6 +9,8 @@ using Dapper;
 using WebApiNew.Models;
 using WebApiNew;
 using WebApiNew.Filters;
+using System.Collections;
+using System.Data.SqlClient;
 
 namespace WebApiNew.Controllers
 {
@@ -18,7 +20,8 @@ namespace WebApiNew.Controllers
     {
         Parametreler prms = new Parametreler();
         Util klas = new Util();
-        public List<Stok> Get([FromUri] int ilkDeger, [FromUri] int sonDeger, [FromUri] int Tip, [FromUri] int Grup, [FromUri] string prm, [FromUri] Boolean b, [FromUri] int modulNo)
+		SqlCommand cmd = null;
+		public List<Stok> Get([FromUri] int ilkDeger, [FromUri] int sonDeger, [FromUri] int Tip, [FromUri] int Grup, [FromUri] string prm, [FromUri] Boolean b, [FromUri] int modulNo)
         {
             var prms = new DynamicParameters();
             prms.Add("MODUL_NO", modulNo);
@@ -245,6 +248,30 @@ namespace WebApiNew.Controllers
 
 		}
 
+		[Route("api/AddMalzemeModel")]
+		[HttpGet]
+		public Object AddMalzemeModel([FromUri] string malzemeModel)
+		{
+			try
+			{
+				string query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 13003 , '{malzemeModel}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
+
 		[Route("api/GetMalzemeMarka")]
 		[HttpGet]
 		public Object GetMalzemeMarka()
@@ -262,6 +289,74 @@ namespace WebApiNew.Controllers
 			catch (Exception e)
 			{
 				return Json(new { error = e.Message });
+			}
+		}
+
+		[Route("api/AddMalzemeMarka")]
+		[HttpGet]
+		public Object AddMalzemeMarka([FromUri] string malzemeMarka)
+		{
+			try
+			{
+				string query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 13002 , '{malzemeMarka}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
+			}
+		}
+
+		[Route("api/GetMalzemeTip")]
+		[HttpGet]
+		public Object GetMalzemeTip()
+		{
+			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=13005";
+			List<Kod> listem = new List<Kod>();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<Kod>(query).ToList();
+				}
+				return Json(new { malzeme_tip_list = listem });
+			}
+			catch (Exception e)
+			{
+				return Json(new { error = e.Message });
+			}
+		}
+
+		[Route("api/AddMalzemeTip")]
+		[HttpGet]
+		public Object AddMalzemeTip([FromUri] string malzemeTip)
+		{
+			try
+			{
+				string query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 13005 , '{malzemeTip}' , 1 , 1 , 1 ,1 ) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { success = "Ekleme başarılı " });
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				return Json(new { error = " Ekleme başarısız " });
 			}
 		}
 

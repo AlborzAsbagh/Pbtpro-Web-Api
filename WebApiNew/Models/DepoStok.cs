@@ -93,6 +93,9 @@ namespace WebApiNew.Models
 		public string STK_BIRIM { get; set; }
 
 		[DataMember]
+		public string STK_DEPO { get; set; }
+
+		[DataMember]
 		public string STK_GRUP { get; set; }
 
 		[DataMember]
