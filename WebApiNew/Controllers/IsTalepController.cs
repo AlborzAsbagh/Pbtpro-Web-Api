@@ -862,7 +862,7 @@ namespace WebApiNew.Controllers
                     prms.Add("@IST_GUNCELLEME_SAATI", saatSifirli);
                     prms.Add("@IST_GUNCELEYEN_ID", entity.IST_GUNCELEYEN_ID);
                     prms.Add("@IST_TALEP_EDEN_ID", entity.IST_TALEP_EDEN_ID);
-                    prms.Add("@IST_IS_TAKIPCISI_ID", entity.IST_IS_TAKIPCISI_ID);
+                    prms.Add("@IST_IS_TAKIPCISI_ID", entity.IST_TALEP_EDEN_ID);
                     prms.Add("@IST_TIP_KOD_ID", entity.IST_TIP_KOD_ID);
                     prms.Add("@IST_KOTEGORI_KODI_ID", entity.IST_KOTEGORI_KODI_ID);
                     prms.Add("@IST_SERVIS_NEDENI_KOD_ID", entity.IST_SERVIS_NEDENI_KOD_ID);
