@@ -143,6 +143,51 @@ namespace WebApiNew.Models
 		public DateTime IS_TALEP_TARIH { get; set; }
 
 		[DataMember]
+		public double ISM_MALIYET_MLZ { get; set; }
+
+		[DataMember]
+		public double ISM_MALIYET_PERSONEL { get; set; }
+
+		[DataMember]
+		public double ISM_MALIYET_DISSERVIS { get; set; }
+
+		[DataMember]
+		public double ISM_MALIYET_DIGER { get; set; }
+
+		[DataMember]
+		public double ISM_MALIYET_INDIRIM { get; set; }
+
+		[DataMember]
+		public double ISM_MALIYET_KDV { get; set; }
+
+		[DataMember]
+		public double ISM_MALIYET_TOPLAM { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_MUDAHALE_LOJISTIK { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_MUDAHALE_SEYAHAT { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_MUDAHALE_ONAY { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_BEKLEME { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_MUDAHALE_DIGER { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_PLAN_MUDAHALE { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_PLAN_CALISMA { get; set; }
+
+		[DataMember]
+		public int ISM_SURE_TOPLAM { get; set; }
+
+		[DataMember]
 		public string OZEL_ALAN_1 { get; set; }
 
 		[DataMember]

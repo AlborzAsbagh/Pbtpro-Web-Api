@@ -317,6 +317,7 @@
     </Compile>
     <Compile Include="Models\AracGerec.cs" />
     <Compile Include="Models\CozumKatalogModel.cs" />
+    <Compile Include="Models\IsEmriAracGerec.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
     <Compile Include="Models\Takvim.cs" />
     <Compile Include="Models\Talimat.cs" />

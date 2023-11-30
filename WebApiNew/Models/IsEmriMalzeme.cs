@@ -75,7 +75,13 @@ namespace WebApiNew.Models
         [DataMember]
         public DateTime? IDM_OLUSTURMA_TARIH { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public DateTime? IDM_GARANTI_BAS_TARIH { get; set; }
+
+		[DataMember]
+		public DateTime? IDM_GARANTI_BIT_TARIH { get; set; }
+
+		[DataMember]
         public int IDM_DEGISTIREN_ID { get; set; }
 
         [DataMember]
@@ -87,5 +93,8 @@ namespace WebApiNew.Models
         [DataMember]
         public string IDM_ISEMRI_NO { get; set; }
 
-    }
+		[DataMember]
+		public bool IDM_STOKSUZ { get; set; }
+
+	}
 }

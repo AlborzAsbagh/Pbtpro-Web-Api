@@ -151,7 +151,16 @@ namespace WebApiNew.Models
         [DataMember]
         public List<IsEmriMalzeme> IsEmriMalzemeList { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public List<IsEmriDurus> IsEmriDurusList { get; set; }
+
+		[DataMember]
+		public List<IsEmriAracGerec> IsEmriAracGerecList { get; set; }
+
+		[DataMember]
+		public List<Olcum> IsEmriOlcumDegeriList { get; set; }
+
+		[DataMember]
         public string ISM_BILDIREN { get; set; }
 
         [DataMember]

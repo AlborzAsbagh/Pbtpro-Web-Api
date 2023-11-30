@@ -88,5 +88,8 @@ namespace WebApiNew.Models
 
         [DataMember]
         public DateTime? IDK_DEGISTIRME_TARIH { get; set; }
+
+        [DataMember]
+        public int IDK_MASRAF_MERKEZI_ID { get; set; }
     }
 }

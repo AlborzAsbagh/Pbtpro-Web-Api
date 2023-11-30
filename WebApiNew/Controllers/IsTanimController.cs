@@ -142,7 +142,10 @@ namespace WebApiNew.Controllers
         {
             prms.Clear();
             prms.Add("ISTNM_ID", isTanimID);
-            string query = @"select *,(select top 1 STK_KOD from orjin.TB_STOK where TB_STOK_ID = ISM_STOK_ID) as ISM_STOK_KOD, orjin.UDF_KOD_TANIM(ISM_BIRIM_KOD_ID) as ISM_BIRIM from orjin.TB_IS_TANIM_MLZ where ISM_IS_TANIM_ID = @ISTNM_ID";
+            string query = @"select mlz.* , stk.STK_KOD as ISM_STOK_KOD , orjin.UDF_KOD_TANIM(ISM_BIRIM_KOD_ID) as ISM_BIRIM  , dp.DEP_TANIM as ISM_DEPO , stk.STK_STOKSUZ_MALZEME as ISM_STOKSUZ from orjin.TB_IS_TANIM_MLZ mlz
+                             left join orjin.VW_STOK stk on stk.TB_STOK_ID = mlz.ISM_STOK_ID
+                             left join orjin.TB_DEPO dp on stk.STK_DEPO_ID = dp.TB_DEPO_ID where ISM_IS_TANIM_ID = @ISTNM_ID";
+
             DataTable dt = klas.GetDataTable(query, prms.PARAMS);
             List<IsEmriMalzeme> listem = new List<IsEmriMalzeme>();
             for (int i = 0; i < dt.Rows.Count; i++)
@@ -156,6 +159,8 @@ namespace WebApiNew.Controllers
                 entity.IDM_STOK_TANIM = Util.getFieldString(dt.Rows[i], "ISM_STOK_TANIM");
                 entity.IDM_BIRIM = Util.getFieldString(dt.Rows[i], "ISM_BIRIM");
                 entity.IDM_STOK_KOD = Util.getFieldString(dt.Rows[i], "ISM_STOK_KOD");
+                entity.IDM_DEPO = Util.getFieldString(dt.Rows[i], "ISM_DEPO");
+                entity.IDM_STOKSUZ = Util.getFieldBool(dt.Rows[i], "ISM_STOKSUZ");
                 entity.IDM_ALTERNATIF_STOK_ID = -1;
                 entity.IDM_DEPO_ID = -1;
                 entity.IDM_REF_ID = -1;

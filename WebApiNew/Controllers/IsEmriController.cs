@@ -492,7 +492,7 @@ namespace WebApiNew.Controllers
         }
 
         // iş emri ekle
-        public async Task<Bildirim> Post([FromBody] IsEmri entity, [FromUri] int ID)
+        public async Task<Bildirim> Post([FromBody] IsEmri entity, [FromUri] int ID , [FromUri] bool isWeb = false)
         {
             Bildirim bildirimEntity = new Bildirim();
             var util = new Util();
@@ -543,6 +543,28 @@ namespace WebApiNew.Controllers
                                       ,ISM_IS_TARIH
                                       ,ISM_IS_SAAT
                                       ,ISM_KAPATILDI
+                                      ,ISM_TAMAMLANMA_ORAN
+                                      ,ISM_FIRMA_ID
+                                      ,ISM_FIRMA_SOZLESME_ID
+                                      ,ISM_NEDEN_KOD_ID
+                                      ,ISM_TALIMAT_ID
+                                      ,ISM_GARANTI_KAPSAMINDA
+                                      ,ISM_EKIPMAN_ID
+                                      ,ISM_MALIYET_MLZ
+                                      ,ISM_MALIYET_PERSONEL
+                                      ,ISM_MALIYET_DISSERVIS
+                                      ,ISM_MALIYET_DIGER
+                                      ,ISM_MALIYET_INDIRIM
+                                      ,ISM_MALIYET_KDV
+                                      ,ISM_MALIYET_TOPLAM
+                                      ,ISM_SURE_MUDAHALE_LOJISTIK
+                                      ,ISM_SURE_MUDAHALE_SEYAHAT
+                                      ,ISM_SURE_MUDAHALE_ONAY
+                                      ,ISM_SURE_BEKLEME
+                                      ,ISM_SURE_MUDAHALE_DIGER
+                                      ,ISM_SURE_PLAN_MUDAHALE
+                                      ,ISM_SURE_PLAN_CALISMA
+                                      ,ISM_SURE_TOPLAM
                                       ,ISM_OZEL_ALAN_1 
                                       ,ISM_OZEL_ALAN_2 
                                       ,ISM_OZEL_ALAN_3 
@@ -598,6 +620,28 @@ namespace WebApiNew.Controllers
                                       ,@ISM_IS_TARIH
                                       ,@ISM_IS_SAAT
                                       ,@ISM_KAPATILDI
+                                      ,@ISM_TAMAMLANMA_ORAN
+                                      ,@ISM_FIRMA_ID
+                                      ,@ISM_FIRMA_SOZLESME_ID
+                                      ,@ISM_NEDEN_KOD_ID
+                                      ,@ISM_TALIMAT_ID
+                                      ,@ISM_GARANTI_KAPSAMINDA
+                                      ,@ISM_EKIPMAN_ID 
+                                      ,@ISM_MALIYET_MLZ 
+                                      ,@ISM_MALIYET_PERSONEL
+                                      ,@ISM_MALIYET_DISSERVIS
+                                      ,@ISM_MALIYET_DIGER
+                                      ,@ISM_MALIYET_INDIRIM
+                                      ,@ISM_MALIYET_KDV
+                                      ,@ISM_MALIYET_TOPLAM
+                                      ,@ISM_SURE_MUDAHALE_LOJISTIK
+                                      ,@ISM_SURE_MUDAHALE_SEYAHAT
+                                      ,@ISM_SURE_MUDAHALE_ONAY
+                                      ,@ISM_SURE_BEKLEME
+                                      ,@ISM_SURE_MUDAHALE_DIGER
+                                      ,@ISM_SURE_PLAN_MUDAHALE
+                                      ,@ISM_SURE_PLAN_CALISMA
+                                      ,@ISM_SURE_TOPLAM
                                       ,@ISM_OZEL_ALAN_1
                                       ,@ISM_OZEL_ALAN_2
                                       ,@ISM_OZEL_ALAN_3
@@ -621,8 +665,8 @@ namespace WebApiNew.Controllers
 )";
 
                         prms.Add("@ISM_ISEMRI_NO", entity.ISM_ISEMRI_NO);
-                        prms.Add("@ISM_DUZENLEME_TARIH", DateTime.Now.ToString("yyyy-MM-dd"));
-                        prms.Add("@ISM_DUZENLEME_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));
+                        prms.Add("@ISM_DUZENLEME_TARIH", entity.ISM_DUZENLEME_TARIH);//DateTime.Now.ToString("yyyy-MM-dd"));
+                        prms.Add("@ISM_DUZENLEME_SAAT", entity.ISM_DUZENLEME_SAAT);//DateTime.Now.ToString(C.DB_TIME_FORMAT));
                         prms.Add("@ISM_BASLAMA_TARIH", entity.ISM_BASLAMA_TARIH);
                         prms.Add("@ISM_BASLAMA_SAAT", string.IsNullOrWhiteSpace(entity.ISM_BASLAMA_SAAT) ? null : entity.ISM_BASLAMA_SAAT);
                         prms.Add("@ISM_BITIS_TARIH", entity.ISM_BITIS_TARIH);
@@ -648,12 +692,34 @@ namespace WebApiNew.Controllers
                         prms.Add("@ISM_DURUM_KOD_ID", entity.ISM_DURUM_KOD_ID);
                         prms.Add("@ISM_SAYAC_DEGER", entity.ISM_SAYAC_DEGER);
                         prms.Add("@ISM_BILDIREN", entity.ISM_BILDIREN != null ? entity.ISM_BILDIREN : "");
-                        prms.Add("@ISM_MAKINE_DURUM_KOD_ID", entity.ISM_MAKINE_DURUM_KOD_ID != 0 ? entity.ISM_MAKINE_DURUM_KOD_ID : -1);
+                        prms.Add("@ISM_MAKINE_DURUM_KOD_ID", entity.ISM_MAKINE_DURUM_KOD_ID != 0 ? entity.ISM_MAKINE_DURUM_KOD_ID : 0);
                         prms.Add("@ISM_MAKINE_GUVENLIK_NOTU", entity.ISM_MAKINE_GUVENLIK_NOTU ?? "");
                         prms.Add("@ISM_ACIKLAMA", entity.ISM_ACIKLAMA ?? "");
                         prms.Add("@ISM_IS_TARIH", entity.ISM_IS_TARIH);
                         prms.Add("@ISM_IS_SAAT", entity.ISM_IS_SAAT ?? "");
                         prms.Add("@ISM_KAPATILDI", false);
+                        prms.Add("@ISM_TAMAMLANMA_ORAN", entity.ISM_TAMAMLANMA_ORAN != 0 ? entity.ISM_TAMAMLANMA_ORAN : 0);
+                        prms.Add("@ISM_FIRMA_ID", entity.ISM_FIRMA_ID != 0 ? entity.ISM_FIRMA_ID : 0);
+                        prms.Add("@ISM_FIRMA_SOZLESME_ID", entity.ISM_FIRMA_SOZLESME_ID != 0 ? entity.ISM_FIRMA_SOZLESME_ID : 0);
+                        prms.Add("@ISM_NEDEN_KOD_ID", entity.ISM_NEDEN_KOD_ID != 0 ? entity.ISM_NEDEN_KOD_ID : 0);
+                        prms.Add("@ISM_TALIMAT_ID", entity.ISM_TALIMAT_ID!= 0 ? entity.ISM_TALIMAT_ID : 0);
+                        prms.Add("@ISM_GARANTI_KAPSAMINDA", entity.ISM_GARANTI_KAPSAMINDA);
+                        prms.Add("@ISM_EKIPMAN_ID", entity.ISM_EKIPMAN_ID != 0 ? entity.ISM_EKIPMAN_ID : 0);
+                        prms.Add("@ISM_MALIYET_MLZ", entity.ISM_MALIYET_MLZ != 0 ? entity.ISM_MALIYET_MLZ : 0);
+                        prms.Add("@ISM_MALIYET_PERSONEL", entity.ISM_MALIYET_PERSONEL != 0 ? entity.ISM_MALIYET_PERSONEL : 0);
+                        prms.Add("@ISM_MALIYET_DISSERVIS", entity.ISM_MALIYET_DISSERVIS != 0 ? entity.ISM_MALIYET_DISSERVIS : 0);
+                        prms.Add("@ISM_MALIYET_DIGER", entity.ISM_MALIYET_DIGER != 0 ? entity.ISM_MALIYET_DIGER : 0);
+                        prms.Add("@ISM_MALIYET_INDIRIM", entity.ISM_MALIYET_INDIRIM != 0 ? entity.ISM_MALIYET_INDIRIM : 0);
+                        prms.Add("@ISM_MALIYET_KDV", entity.ISM_MALIYET_KDV != 0 ? entity.ISM_MALIYET_KDV : 0);
+                        prms.Add("@ISM_MALIYET_TOPLAM", entity.ISM_MALIYET_TOPLAM != 0 ? entity.ISM_MALIYET_TOPLAM : 0);
+                        prms.Add("@ISM_SURE_MUDAHALE_LOJISTIK", entity.ISM_SURE_MUDAHALE_LOJISTIK != 0 ? entity.ISM_SURE_MUDAHALE_LOJISTIK : 0);
+                        prms.Add("@ISM_SURE_MUDAHALE_SEYAHAT", entity.ISM_SURE_MUDAHALE_SEYAHAT != 0 ? entity.ISM_SURE_MUDAHALE_SEYAHAT : 0);
+                        prms.Add("@ISM_SURE_MUDAHALE_ONAY", entity.ISM_SURE_MUDAHALE_ONAY != 0 ? entity.ISM_SURE_MUDAHALE_ONAY : 0);
+                        prms.Add("@ISM_SURE_BEKLEME", entity.ISM_SURE_BEKLEME != 0 ? entity.ISM_SURE_BEKLEME : 0);
+                        prms.Add("@ISM_SURE_MUDAHALE_DIGER", entity.ISM_SURE_MUDAHALE_DIGER != 0 ? entity.ISM_SURE_MUDAHALE_DIGER : 0);
+                        prms.Add("@ISM_SURE_PLAN_MUDAHALE", entity.ISM_SURE_PLAN_MUDAHALE != 0 ? entity.ISM_SURE_PLAN_MUDAHALE : 0);
+                        prms.Add("@ISM_SURE_PLAN_CALISMA", entity.ISM_SURE_PLAN_CALISMA != 0 ? entity.ISM_SURE_PLAN_CALISMA : 0);
+                        prms.Add("@ISM_SURE_TOPLAM", entity.ISM_SURE_TOPLAM != 0 ? entity.ISM_SURE_TOPLAM : 0);
                         prms.Add("ISM_OZEL_ALAN_1", entity.ISM_OZEL_ALAN_1);
                         prms.Add("ISM_OZEL_ALAN_2", entity.ISM_OZEL_ALAN_2);
                         prms.Add("ISM_OZEL_ALAN_3", entity.ISM_OZEL_ALAN_3);
@@ -663,12 +729,12 @@ namespace WebApiNew.Controllers
                         prms.Add("ISM_OZEL_ALAN_7", entity.ISM_OZEL_ALAN_7);
                         prms.Add("ISM_OZEL_ALAN_8", entity.ISM_OZEL_ALAN_8);
                         prms.Add("ISM_OZEL_ALAN_9", entity.ISM_OZEL_ALAN_9);
-                        prms.Add("@ISM_OZEL_ALAN_11_KOD_ID", entity.ISM_OZEL_ALAN_11_KOD_ID);
+						prms.Add("ISM_OZEL_ALAN_10", entity.ISM_OZEL_ALAN_10);
+						prms.Add("@ISM_OZEL_ALAN_11_KOD_ID", entity.ISM_OZEL_ALAN_11_KOD_ID);
                         prms.Add("@ISM_OZEL_ALAN_12_KOD_ID", entity.ISM_OZEL_ALAN_12_KOD_ID);
                         prms.Add("@ISM_OZEL_ALAN_13_KOD_ID", entity.ISM_OZEL_ALAN_13_KOD_ID);
                         prms.Add("@ISM_OZEL_ALAN_14_KOD_ID", entity.ISM_OZEL_ALAN_14_KOD_ID);
                         prms.Add("@ISM_OZEL_ALAN_15_KOD_ID", entity.ISM_OZEL_ALAN_15_KOD_ID);
-                        prms.Add("ISM_OZEL_ALAN_10", entity.ISM_OZEL_ALAN_10);
                         prms.Add("ISM_OZEL_ALAN_16", entity.ISM_OZEL_ALAN_16);
                         prms.Add("ISM_OZEL_ALAN_17", entity.ISM_OZEL_ALAN_17);
                         prms.Add("ISM_OZEL_ALAN_18", entity.ISM_OZEL_ALAN_18);
@@ -698,7 +764,7 @@ namespace WebApiNew.Controllers
 
                                 foreach (var isEmriKontrolList in entity.IsEmriKontrolList)
                                 {
-                                    isEmriKontrolList.DKN_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
+									isEmriKontrolList.DKN_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
                                     KontrolListKaydet(isEmriKontrolList);
                                 }
 
@@ -713,13 +779,9 @@ namespace WebApiNew.Controllers
                                 }
                             }
                         }
-                        //// Personel ekleme.
-                        //for (int i = 0; i < entity.IsEmriPersonelList.Count; i++)
-                        //{
-                        //    PersonelListKaydet(entity.IsEmriPersonelList[i]);
-                        //}
+                      
 
-                        string query = @"INSERT INTO [orjin].[TB_ISEMRI_LOG]
+						string query = @"INSERT INTO [orjin].[TB_ISEMRI_LOG]
                                            (ISL_ISEMRI_ID
                                            ,ISL_KULLANICI_ID
                                            ,ISL_TARIH
@@ -773,37 +835,79 @@ namespace WebApiNew.Controllers
                     bildirimEntity.MsgId = Bildirim.MSG_ISLEM_BASARILI;
                     bildirimEntity.Durum = true;
                     // Bildirim Gönder
-                    try
-                    {
-                        var parametreler=new DynamicParameters();
-                        parametreler.Add("ISM_OLUSTURAN_ID", entity.ISM_OLUSTURAN_ID);
-                        string queryBld =
-                            $@"SELECT * FROM {util.GetMasterDbName()}.orjin.TB_KULLANICI WHERE KLL_ROLBILGISI ='TEKNIK' AND KLL_MOBIL_BILDIRI=1 AND KLL_MOBIL_KULLANICI = 1 AND TB_KULLANICI_ID <> @ISM_OLUSTURAN_ID";
-                        if (entity.ISM_LOKASYON_ID > 0)
-                        {
-                            parametreler.Add("ISM_LOKASYON_ID", entity.ISM_LOKASYON_ID);
-                            queryBld = queryBld +
-                                       " AND orjin.UDF_LOKASYON_YETKI_KONTROL(@ISM_LOKASYON_ID ,TB_KULLANICI_ID) = 1";
-                        }
 
-                        if (entity.ISM_ATOLYE_ID > 0)
-                        {
-                            parametreler.Add("ISM_ATOLYE_ID", entity.ISM_ATOLYE_ID);
-                            queryBld = queryBld + "AND orjin.UDF_ATOLYE_YETKI_KONTROL(@ISM_ATOLYE_ID ,TB_KULLANICI_ID) = 1";
-                        }
-
-                        var cihazIDler = (await cnn.QueryAsync<String>(queryBld, parametreler)).ToArray();
-                        if (cihazIDler.Length > 0)
-                        {
-                            Util.SendNotificationToTopic(entity.ISM_ISEMRI_NO, Localization.YeniIsEmri,
-                                string.Format(Localization.NoluIsemriOlusturuldu, entity.ISM_ISEMRI_NO), Util.isEmri,
-                                cihazIDler);
-                        }
-                    }
-                    catch (Exception e)
+                    // Istek Web'den geliyor ise
+                    if(isWeb)
                     {
-                        _logger.Error(e);
-                    }
+						try
+						{
+							// Personel ekleme
+							if (entity.IsEmriPersonelList.Count > 0)
+							{
+								for (int i = 0; i < entity.IsEmriPersonelList.Count; i++)
+								{
+									Bildirim bildirimPersonel = PersonelListKaydetYeni(entity.IsEmriPersonelList[i], bildirimEntity.Id);
+
+									if (!bildirimPersonel.Durum) return bildirimPersonel;
+								}
+							}
+							// Durus ekleme
+							if (entity.IsEmriDurusList.Count > 0)
+							{
+								for (int i = 0; i < entity.IsEmriDurusList.Count; i++)
+								{
+									Bildirim bildirimDurus = IsEmriDurusKaydet(entity.IsEmriDurusList[i], bildirimEntity.Id);
+
+									if (!bildirimDurus.Durum) return bildirimDurus;
+								}
+							}
+							// Arac Gerec ekleme
+							if (entity.IsEmriAracGerecList.Count > 0)
+							{
+								for (int i = 0; i < entity.IsEmriAracGerecList.Count; i++)
+								{
+									Bildirim bildirimAracGerec = AracGerecListKaydetYeni(entity.IsEmriAracGerecList[i], bildirimEntity.Id);
+
+									if (!bildirimAracGerec.Durum) return bildirimAracGerec;
+								}
+							}
+							// Malzeme ekleme
+							if (entity.IsEmriMalzemeList.Count > 0)
+							{
+								for (int i = 0; i < entity.IsEmriMalzemeList.Count; i++)
+								{
+									Bildirim bildirimMalzeme = MalzemeListKaydet(entity.IsEmriMalzemeList[i], bildirimEntity.Id);
+
+									if (!bildirimMalzeme.Durum) return bildirimMalzeme;
+								}
+							}
+							// Olcum Degeri ekleme
+							if (entity.IsEmriOlcumDegeriList.Count > 0)
+							{
+								for (int i = 0; i < entity.IsEmriOlcumDegeriList.Count; i++)
+								{
+									Bildirim bildirimOlcumDeger = OlcumDegeriListKadetYeni(entity.IsEmriOlcumDegeriList[i], bildirimEntity.Id);
+
+									if (!bildirimOlcumDeger.Durum) return bildirimOlcumDeger;
+								}
+							}
+							// Kontrol List ekleme
+							if (entity.IsEmriKontrolList.Count > 0)
+							{
+								for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
+								{
+									Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], bildirimEntity.Id);
+
+									if (!bildirimKontrolList.Durum) return bildirimKontrolList;
+								}
+							}
+
+						}
+						catch (Exception e)
+						{
+							_logger.Error(e);
+						}
+					}
                 }
                 catch (Exception e)
                 {
@@ -1207,7 +1311,7 @@ namespace WebApiNew.Controllers
 
         [Route("api/IsEmriKontrolListKaydet")]
         [HttpPost]
-        public Bildirim KontrolListKaydet([FromBody] IsEmriKontrolList entity)
+        public Bildirim KontrolListKaydet([FromBody] IsEmriKontrolList entity, long isEmriId = 0)
         {
             string plainText, rtfText;
 
@@ -1235,6 +1339,10 @@ namespace WebApiNew.Controllers
                                ,DKN_TANIM
                                ,DKN_OLUSTURAN_ID
                                ,DKN_OLUSTURMA_TARIH
+                               ,DKN_DEGISTIRME_TARIH
+                               ,DKN_YAPILDI_TARIH
+                               ,DKN_BITIS_TARIH
+                               ,DKN_BITIS_SAAT
                                ,DKN_MALIYET                              
                                ,DKN_YAPILDI_SAAT
                                ,DKN_YAPILDI_PERSONEL_ID
@@ -1249,6 +1357,10 @@ namespace WebApiNew.Controllers
                                ,@DKN_TANIM
                                ,@DKN_OLUSTURAN_ID
                                ,@DKN_OLUSTURMA_TARIH
+                               ,@DKN_DEGISTIRME_TARIH
+                               ,@DKN_YAPILDI_TARIH
+                               ,@DKN_BITIS_TARIH
+                               ,@DKN_BITIS_SAAT
                                ,@DKN_MALIYET                              
                                ,@DKN_YAPILDI_SAAT
                                ,@DKN_YAPILDI_PERSONEL_ID
@@ -1258,14 +1370,19 @@ namespace WebApiNew.Controllers
                                ,@DKN_ACIKLAMA
                                ,@DKN_REF_ID)";
                     prms.Clear();
-                    prms.Add("DKN_ISEMRI_ID", entity.DKN_ISEMRI_ID);
-                    prms.Add("DKN_SIRANO", entity.DKN_SIRANO);
+					if (isEmriId == 0) prms.Add("DKN_ISEMRI_ID", entity.DKN_ISEMRI_ID);
+					else prms.Add("DKN_ISEMRI_ID", isEmriId);
+					prms.Add("DKN_SIRANO", entity.DKN_SIRANO);
                     prms.Add("DKN_YAPILDI", 0);
                     prms.Add("DKN_TANIM", entity.DKN_TANIM);
                     prms.Add("DKN_OLUSTURAN_ID", entity.DKN_OLUSTURAN_ID);
                     prms.Add("DKN_OLUSTURMA_TARIH", DateTime.Now);
+                    prms.Add("DKN_DEGISTIRME_TARIH", DateTime.Now);
+                    prms.Add("DKN_YAPILDI_TARIH", entity.DKN_YAPILDI_TARIH);
+                    prms.Add("DKN_BITIS_TARIH", entity.DKN_BITIS_TARIH);
+                    prms.Add("DKN_BITIS_SAAT", entity.DKN_BITIS_SAAT != null ? entity.DKN_BITIS_SAAT : "");
                     prms.Add("DKN_MALIYET", 0);
-                    prms.Add("DKN_YAPILDI_SAAT", 0);
+                    prms.Add("DKN_YAPILDI_SAAT", entity.DKN_YAPILDI_SAAT != null ? entity.DKN_YAPILDI_SAAT : "");
                     prms.Add("DKN_YAPILDI_PERSONEL_ID", -1);
                     prms.Add("DKN_YAPILDI_MESAI_KOD_ID", -1);
                     prms.Add("DKN_YAPILDI_ATOLYE_ID", -1);
@@ -1388,27 +1505,6 @@ namespace WebApiNew.Controllers
                     bildirimEntity.MsgId = Bildirim.MSG_ISM_PERSONEL_KAYIT_OK;
                     bildirimEntity.Durum = true;
                     // Bildirim Gönder
-                    parametreler.Clear();
-                    parametreler.Add(new Prm("@IDK_ISEMRI_ID", entity.IDK_ISEMRI_ID));
-                    string isEmriNo =
-                        klas.GetDataCell(
-                            "select TOP 1 ISM_ISEMRI_NO FROM orjin.TB_ISEMRI WHERE TB_ISEMRI_ID=@IDK_ISEMRI_ID",
-                            parametreler);
-                    klas.MasterBaglantisi = true;
-                    parametreler.Clear();
-                    parametreler.Add(new Prm("IDK_REF_ID", entity.IDK_REF_ID));
-                    string deviceid =
-                        klas.GetDataCell(
-                            "select KLL_MOBILCIHAZ_ID from orjin.TB_KULLANICI WHERE KLL_MOBIL_BILDIRI = 1 and KLL_MOBIL_KULLANICI = 1 and KLL_PERSONEL_ID=@IDK_REF_ID",
-                            parametreler);
-                    if (deviceid != null && deviceid != "")
-                    {
-                        Util.SendNotificationToTopic(isEmriNo, Localization.YeniIsEmri,
-                            String.Format(Localization.NoluIsemrineAtandiniz, isEmriNo), Util.isEmri,
-                            new string[] { deviceid });
-                    }
-
-                    klas.MasterBaglantisi = false;
                 }
 
                 else
@@ -1475,7 +1571,7 @@ namespace WebApiNew.Controllers
 
         [Route("api/IsemriMalzemeKaydet")]
         [HttpPost]
-        public Bildirim MalzemeListKaydet(IsEmriMalzeme entity)
+        public Bildirim MalzemeListKaydet(IsEmriMalzeme entity , long isEmriId = 0)
         {
             Bildirim bildirimEntity = new Bildirim();
             try
@@ -1499,6 +1595,8 @@ namespace WebApiNew.Controllers
                                                        ,IDM_TUTAR
                                                        ,IDM_OLUSTURAN_ID
                                                        ,IDM_OLUSTURMA_TARIH                                                      
+                                                       ,IDM_GARANTI_BAS_TARIH                                                     
+                                                       ,IDM_GARANTI_BIT_TARIH                                                    
                                                        ,IDM_REF_ID
                                                        ,IDM_STOK_KULLANIM_SEKLI
                                                        ,IDM_MALZEME_STOKTAN
@@ -1518,14 +1616,17 @@ namespace WebApiNew.Controllers
                                                        ,@IDM_TUTAR
                                                        ,@IDM_OLUSTURAN_ID
                                                        ,@IDM_OLUSTURMA_TARIH                                                      
+                                                       ,@IDM_GARANTI_BAS_TARIH                                                      
+                                                       ,@IDM_GARANTI_BIT_TARIH                                                     
                                                        ,@IDM_REF_ID
                                                        ,@IDM_STOK_KULLANIM_SEKLI
                                                        ,@IDM_MALZEME_STOKTAN
                                                        ,-1
                                                        ,-1)";
                     prms.Clear();
-                    prms.Add("@IDM_ISEMRI_ID", entity.IDM_ISEMRI_ID);
-                    prms.Add("@IDM_TARIH", entity.IDM_TARIH);
+                    if(isEmriId == 0 ) prms.Add("@IDM_ISEMRI_ID", isEmriId);
+                    else prms.Add("@IDM_ISEMRI_ID", entity.IDM_ISEMRI_ID);
+					prms.Add("@IDM_TARIH", entity.IDM_TARIH);
                     prms.Add("@IDM_SAAT", entity.IDM_SAAT);
                     prms.Add("@IDM_STOK_ID", entity.IDM_STOK_ID);
                     prms.Add("@IDM_DEPO_ID", entity.IDM_DEPO_ID);
@@ -1538,6 +1639,8 @@ namespace WebApiNew.Controllers
                     prms.Add("@IDM_TUTAR", entity.IDM_TUTAR);
                     prms.Add("@IDM_OLUSTURAN_ID", entity.IDM_OLUSTURAN_ID);
                     prms.Add("@IDM_OLUSTURMA_TARIH", DateTime.Now);
+                    prms.Add("@IDM_GARANTI_BAS_TARIH", entity.IDM_GARANTI_BAS_TARIH);
+                    prms.Add("@IDM_GARANTI_BIT_TARIH", entity.IDM_GARANTI_BIT_TARIH);
                     prms.Add("@IDM_REF_ID", entity.IDM_REF_ID); // iş tanım veya periyodik bakım id
                     GenelListeController gn = new GenelListeController();
                     entity.IDM_STOK_KULLANIM_SEKLI = Convert.ToInt32(gn.ParametreDeger("320112").PRM_DEGER);
@@ -1660,10 +1763,10 @@ namespace WebApiNew.Controllers
 
         [Route("api/IsEmriDurusKaydet")]
         [HttpPost]
-        public Bildirim IsEmriDurusKaydet([FromBody] IsEmriDurus entity)
+        public Bildirim IsEmriDurusKaydet([FromBody] IsEmriDurus entity, long isEmriId=0)
         {
-            Bildirim bldr = new Bildirim();
-            try
+			Bildirim bldr = new Bildirim();
+			try
             {
                 if (entity.TB_MAKINE_DURUS_ID < 1)
                 {
@@ -1683,6 +1786,7 @@ namespace WebApiNew.Controllers
                                    ,MKD_PLANLI
                                    ,MKD_OLUSTURAN_ID
                                    ,MKD_OLUSTURMA_TARIH
+                                   ,MKD_DEGISTIRME_TARIH
                                    ,MKD_PROJE_ID       
                                    ,MKD_LOKASYON_ID    
                                    ,MKD_ACIKLAMA)
@@ -1700,13 +1804,15 @@ namespace WebApiNew.Controllers
                                    ,@MKD_PLANLI
                                    ,@MKD_OLUSTURAN_ID
                                    ,@MKD_OLUSTURMA_TARIH
+                                   ,@MKD_DEGISTIRME_TARIH
                                    ,@MKD_PROJE_ID       
                                    ,@MKD_LOKASYON_ID    
                                    ,@MKD_ACIKLAMA)";
                     prms.Clear();
 
-                    prms.Add("MKD_ISEMRI_ID", entity.MKD_ISEMRI_ID);
-                    prms.Add("MKD_MAKINE_ID", entity.MKD_MAKINE_ID);
+					if (isEmriId == 0) prms.Add("MKD_ISEMRI_ID", entity.MKD_ISEMRI_ID);
+					else prms.Add("MKD_ISEMRI_ID", isEmriId);
+					prms.Add("MKD_MAKINE_ID", entity.MKD_MAKINE_ID);
                     prms.Add("MKD_BASLAMA_TARIH", entity.MKD_BASLAMA_TARIH);
                     prms.Add("MKD_BASLAMA_SAAT", entity.MKD_BASLAMA_SAAT);
                     prms.Add("MKD_BITIS_TARIH", entity.MKD_BITIS_TARIH);
@@ -1717,7 +1823,8 @@ namespace WebApiNew.Controllers
                     prms.Add("MKD_NEDEN_KOD_ID", entity.MKD_NEDEN_KOD_ID);
                     prms.Add("MKD_PLANLI", entity.MKD_PLANLI);
                     prms.Add("MKD_OLUSTURAN_ID", entity.MKD_OLUSTURAN_ID);
-                    prms.Add("MKD_OLUSTURMA_TARIH", entity.MKD_OLUSTURMA_TARIH);
+                    prms.Add("MKD_OLUSTURMA_TARIH", DateTime.Now);
+                    prms.Add("MKD_DEGISTIRME_TARIH", DateTime.Now);
                     prms.Add("MKD_PROJE_ID", entity.MKD_PROJE_ID);
                     prms.Add("MKD_LOKASYON_ID", entity.MKD_LOKASYON_ID);
                     prms.Add("MKD_ACIKLAMA", entity.MKD_ACIKLAMA);
@@ -2644,6 +2751,227 @@ namespace WebApiNew.Controllers
 			{
 				throw;
 			}
+		}
+
+
+		// Add Personel entity to Isemri when new Isemri created ( Web App Version )
+		public Bildirim PersonelListKaydetYeni(IsEmriPersonel entity , long isEmriId)
+		{
+			Bildirim bildirimEntity = new Bildirim();
+			parametreler.Clear();
+			parametreler.Add(new Prm("IDK_ISEMRI_ID", isEmriId));
+			parametreler.Add(new Prm("IDK_REF_ID", entity.IDK_REF_ID));
+			try
+			{			
+				if (entity.TB_ISEMRI_KAYNAK_ID < 1)
+				{
+					#region Kaydet
+
+					string query = @"INSERT INTO orjin.TB_ISEMRI_KAYNAK
+                                    (  IDK_ISEMRI_ID
+                                      ,IDK_REF_ID   
+                                      ,IDK_SURE
+                                      ,IDK_SAAT_UCRETI
+                                      ,IDK_MALIYET
+                                      ,IDK_MASRAF_MERKEZI_ID
+                                      ,IDK_ACIKLAMA
+                                      ,IDK_FAZLA_MESAI_VAR
+                                      ,IDK_FAZLA_MESAI_SURE
+                                      ,IDK_FAZLA_MESAI_SAAT_UCRETI  
+                                      ,IDK_VARDIYA                                   
+                                      ,IDK_OLUSTURAN_ID
+                                      ,IDK_OLUSTURMA_TARIH)
+                                    VALUES (  
+                                       @IDK_ISEMRI_ID
+                                      ,@IDK_REF_ID   
+                                      ,@IDK_SURE
+                                      ,@IDK_SAAT_UCRETI
+                                      ,@IDK_MALIYET
+                                      ,@IDK_MASRAF_MERKEZI_ID
+                                      ,@IDK_ACIKLAMA
+                                      ,@IDK_FAZLA_MESAI_VAR
+                                      ,@IDK_FAZLA_MESAI_SURE
+                                      ,@IDK_FAZLA_MESAI_SAAT_UCRETI 
+                                      ,@IDK_VARDIYA                                    
+                                      ,@IDK_OLUSTURAN_ID
+                                      ,@IDK_OLUSTURMA_TARIH)";
+					prms.Clear();
+					prms.Add("@IDK_ISEMRI_ID", isEmriId);
+					prms.Add("@IDK_REF_ID", entity.IDK_REF_ID);
+					prms.Add("@IDK_SURE", entity.IDK_SURE);
+					prms.Add("@IDK_SAAT_UCRETI", entity.IDK_SAAT_UCRETI);
+					prms.Add("@IDK_MALIYET", entity.IDK_MALIYET);
+					prms.Add("@IDK_OLUSTURAN_ID", entity.IDK_OLUSTURAN_ID);
+					prms.Add("@IDK_VARDIYA", entity.IDK_VARDIYA);
+					prms.Add("@IDK_OLUSTURMA_TARIH", DateTime.Now);
+					prms.Add("@IDK_MASRAF_MERKEZI_ID", entity.IDK_MASRAF_MERKEZI_ID);
+					prms.Add("@IDK_ACIKLAMA", entity.IDK_ACIKLAMA);
+					prms.Add("@IDK_FAZLA_MESAI_VAR", entity.IDK_FAZLA_MESAI_VAR);
+					prms.Add("@IDK_FAZLA_MESAI_SURE", entity.IDK_FAZLA_MESAI_SURE);
+					prms.Add("@IDK_FAZLA_MESAI_SAAT_UCRETI", entity.IDK_FAZLA_MESAI_SAAT_UCRETI);
+					klas.cmd(query, prms.PARAMS);
+
+					#endregion
+
+					string qu =
+						"UPDATE orjin.TB_ISEMRI SET ISM_MALIYET_PERSONEL = ISM_MALIYET_PERSONEL + Cast(@Maliyet AS FLOAT), ISM_MALIYET_TOPLAM =ISM_MALIYET_TOPLAM +  Cast(@Maliyet AS FLOAT) where TB_ISEMRI_ID = @IDK_ISEMRI_ID";
+					prms.Clear();
+					prms.Add("@Maliyet", entity.IDK_MALIYET);
+					prms.Add("@IDK_ISEMRI_ID", isEmriId);
+					klas.cmd(qu, prms.PARAMS);
+					bildirimEntity.Id =
+						Convert.ToInt32(klas.GetDataCell("select max(TB_ISEMRI_KAYNAK_ID) from orjin.TB_ISEMRI_KAYNAK",
+							new List<Prm>()));
+					bildirimEntity.Aciklama = "İş emri personel kaydı başarılı bir şekilde gerçekleşti.";
+					bildirimEntity.MsgId = Bildirim.MSG_ISM_PERSONEL_KAYIT_OK;
+					bildirimEntity.Durum = true;
+					// Bildirim Gönder
+				}
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				bildirimEntity.Aciklama =
+					String.Format(Localization.errorFormatted, e.Message);
+				bildirimEntity.MsgId = Bildirim.MSG_ISLEM_HATA;
+				bildirimEntity.HasExtra = true;
+				bildirimEntity.Durum = false;
+			}
+
+			return bildirimEntity;
+		}
+
+		// Add AracGerec entity to Isemri when new Isemri created ( Web App Version )
+		public Bildirim AracGerecListKaydetYeni(IsEmriAracGerec entity , long isEmriId)
+        {
+            Bildirim bldr = new Bildirim();
+            string query = "";
+            try
+            {
+				#region Kaydet
+				query = @" insert into orjin.TB_ISEMRI_ARAC_GEREC 
+                           (IAG_ISEMRI_ID , 
+                            IAG_ARAC_GEREC_ID , 
+                            IAG_OLUSTURAN_ID , 
+                            IAG_OLUSTURMA_TARIH , 
+                            IAG_DEGISTIREN_ID , 
+                            IAG_DEGISTIRME_TARIH ) 
+                            values (
+                                @IAG_ISEMRI_ID ,
+                                @IAG_ARAC_GEREC_ID , 
+                                @IAG_OLUSTURAN_ID , 
+                                @IAG_OLUSTURMA_TARIH , 
+                                @IAG_DEGISTIREN_ID , 
+                                @IAG_DEGISTIRME_TARIH) ";
+                prms.Clear();
+                prms.Add("@IAG_ISEMRI_ID",isEmriId);
+                prms.Add("@IAG_ARAC_GEREC_ID",entity.IAG_ARAC_GEREC_ID);
+                prms.Add("@IAG_OLUSTURAN_ID",entity.IAG_OLUSTURAN_ID);
+                prms.Add("@IAG_OLUSTURMA_TARIH",DateTime.Now);
+                prms.Add("@IAG_DEGISTIREN_ID",entity.IAG_DEGISTIREN_ID);
+                prms.Add("@IAG_DEGISTIRME_TARIH",DateTime.Now);
+				#endregion
+				klas.baglan();
+                klas.cmd(query, prms.PARAMS);
+				bldr.MsgId = Bildirim.MSG_ISM_PERSONEL_KAYIT_OK;
+				bldr.Durum = true;
+			}
+            catch (Exception e)
+            {
+				klas.kapat();
+				bldr.Aciklama =
+					String.Format(Localization.errorFormatted, e.Message);
+				bldr.MsgId = Bildirim.MSG_ISLEM_HATA;
+				bldr.HasExtra = true;
+				bldr.Durum = false;
+			}
+            return bldr;
+        }
+
+		//Add Olcum Degeri entity to Isemri when new Isemri created ( Web App Version )
+        public Bildirim OlcumDegeriListKadetYeni(Olcum entity , long isEmriId)
+        {
+            Bildirim bldr = new Bildirim();
+            string query = "";
+			try
+			{
+				#region Kaydet
+				query = @" insert into orjin.TB_ISEMRI_OLCUM 
+                           (IDO_SIRANO , 
+                            IDO_ISEMRI_ID , 
+                            IDO_TANIM , 
+                            IDO_BIRIM_KOD_ID,
+                            IDO_FORMAT,
+                            IDO_HEDEF_DEGER,
+                            IDO_MIN_MAX_DEGER,
+                            IDO_MIN_DEGER,
+                            IDO_MAX_DEGER,
+                            IDO_OLCUM_DEGER,
+                            IDO_FARK,
+                            IDO_DURUM,
+                            IDO_TARIH,
+                            IDO_SAAT,
+                            IDO_OLUSTURAN_ID,
+                            IDO_OLUSTURMA_TARIH,
+                            IDO_DEGISTIREN_ID,
+                            IDO_DEGISTIRME_TARIH,
+                            IDO_REF_ID
+                            ) 
+                            values (
+                                @IDO_SIRANO , 
+                                @IDO_ISEMRI_ID , 
+                                @IDO_TANIM , 
+                                @IDO_BIRIM_KOD_ID, 
+                                @IDO_FORMAT, 
+                                @IDO_HEDEF_DEGER, 
+                                @IDO_MIN_MAX_DEGER, 
+                                @IDO_MIN_DEGER, 
+                                @IDO_MAX_DEGER, 
+                                @IDO_OLCUM_DEGER, 
+                                @IDO_FARK,  
+                                @IDO_DURUM, 
+                                @IDO_TARIH, 
+                                @IDO_SAAT, 
+                                @IDO_OLUSTURAN_ID, 
+                                @IDO_OLUSTURMA_TARIH, 
+                                @IDO_DEGISTIREN_ID, 
+                                @IDO_DEGISTIRME_TARIH, 
+                                @IDO_REF_ID) ";
+				prms.Clear();
+				prms.Add("@IDO_SIRANO", entity.IDO_SIRANO);
+				prms.Add("@IDO_ISEMRI_ID", isEmriId);
+				prms.Add("@IDO_TANIM", entity.IDO_TANIM);
+				prms.Add("@IDO_BIRIM_KOD_ID", entity.IDO_BIRIM_KOD_ID);
+				prms.Add("@IDO_FORMAT", entity.IDO_FORMAT);
+				prms.Add("@IDO_HEDEF_DEGER", entity.IDO_HEDEF_DEGER);
+				prms.Add("@IDO_MIN_MAX_DEGER", entity.IDO_MIN_MAX_DEGER);
+				prms.Add("@IDO_MIN_DEGER", entity.IDO_MIN_DEGER);
+				prms.Add("@IDO_MAX_DEGER", entity.IDO_MAX_DEGER);
+				prms.Add("@IDO_OLCUM_DEGER", entity.IDO_OLCUM_DEGER);
+				prms.Add("@IDO_FARK", entity.IDO_FARK);
+				prms.Add("@IDO_DURUM", entity.IDO_DURUM);
+				prms.Add("@IDO_TARIH", entity.IDO_TARIH);
+				prms.Add("@IDO_SAAT", entity.IDO_SAAT);
+				prms.Add("@IDO_OLUSTURAN_ID", entity.IDO_OLUSTURAN_ID);
+				prms.Add("@IDO_OLUSTURMA_TARIH", DateTime.Now);
+				prms.Add("@IDO_DEGISTIREN_ID", entity.IDO_DEGISTIREN_ID);
+				prms.Add("@IDO_DEGISTIRME_TARIH", DateTime.Now);
+				prms.Add("@IDO_REF_ID", -1);
+				#endregion
+				klas.baglan();
+				klas.cmd(query, prms.PARAMS);
+				bldr.Durum = true;
+			}
+			catch (Exception e)
+			{
+				klas.kapat();
+				bldr.Aciklama =
+					String.Format(Localization.errorFormatted, e.Message);
+				bldr.MsgId = Bildirim.MSG_ISLEM_HATA;
+				bldr.HasExtra = true;
+				bldr.Durum = false;
+			}
+			return bldr;
 		}
 	}
 }
