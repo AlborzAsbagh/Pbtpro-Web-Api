@@ -102,6 +102,18 @@ namespace WebApiNew.Models
 		public string STK_LOKASYON { get; set; }
 
 		[DataMember]
+		public int STK_BIRIM_KOD_ID { get; set; }
+
+		[DataMember]
+		public int STK_MARKA_KOD_ID { get; set; }
+
+		[DataMember]
+		public int STK_MODEL_KOD_ID { get; set; }
+
+		[DataMember]
+		public int STK_ATOLYE_ID { get; set; }
+
+		[DataMember]
 		public string STK_ATOLYE { get; set; }
 
 		[DataMember]
