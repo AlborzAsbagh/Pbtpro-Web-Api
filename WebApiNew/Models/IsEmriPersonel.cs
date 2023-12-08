@@ -81,6 +81,9 @@ namespace WebApiNew.Models
         public string IDK_ISIM { get; set; }
 
         [DataMember]
+        public string IDK_MASRAF_MERKEZI { get; set; }
+
+        [DataMember]
         public Boolean IDK_SILINDI { get; set; }
 
         [DataMember]

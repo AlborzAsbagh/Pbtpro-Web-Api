@@ -213,19 +213,43 @@ namespace WebApiNew.Controllers
 					entity.PERSONEL = dt.Rows[i]["ISM_PERSONEL"] != DBNull.Value ? (int)dt.Rows[i]["ISM_PERSONEL"] : 0;
 					entity.DURUS = dt.Rows[i]["ISM_DURUS"] != DBNull.Value ? (int)dt.Rows[i]["ISM_DURUS"] : 0;
 					entity.OUTER_NOT = dt.Rows[i]["ISM_DISARIDAKI_NOT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_DISARIDAKI_NOT"] : "";
-					entity.DUZENLEME_TARIH = dt.Rows[i]["ISM_DUZENLEME_TARIH"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_DUZENLEME_TARIH"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_DUZENLEME_TARIH"] != DBNull.Value)
+						entity.DUZENLEME_TARIH = (DateTime)dt.Rows[i]["ISM_DUZENLEME_TARIH"];
+					else
+						entity.DUZENLEME_TARIH = null;
+
 					entity.DUZENLEME_SAAT = dt.Rows[i]["ISM_DUZENLEME_SAAT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_DUZENLEME_SAAT"] : "";
 					entity.KONU = dt.Rows[i]["ISM_KONU"] != DBNull.Value ? (string)dt.Rows[i]["ISM_KONU"] : "";
 					entity.ISEMRI_TIP = dt.Rows[i]["ISM_IS_EMRI_TIPI"] != DBNull.Value ? (string)dt.Rows[i]["ISM_IS_EMRI_TIPI"] : "";
 					entity.DURUM = dt.Rows[i]["ISM_DURUM"] != DBNull.Value ? (string)dt.Rows[i]["ISM_DURUM"] : "";
 					entity.LOKASYON = dt.Rows[i]["ISM_LOKASYON"] != DBNull.Value ? (string)dt.Rows[i]["ISM_LOKASYON"] : "";
-					entity.PLAN_BASLAMA_TARIH = dt.Rows[i]["ISM_PLAN_BASLAMA_TARIH"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_PLAN_BASLAMA_TARIH"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_PLAN_BASLAMA_TARIH"] != DBNull.Value)
+						entity.PLAN_BASLAMA_TARIH = (DateTime)dt.Rows[i]["ISM_PLAN_BASLAMA_TARIH"];
+					else
+						entity.PLAN_BASLAMA_TARIH = null;
 					entity.PLAN_BASLAMA_SAAT = dt.Rows[i]["ISM_PLAN_BASLAMA_SAAT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_PLAN_BASLAMA_SAAT"] : "";
-					entity.PLAN_BITIS_TARIH = dt.Rows[i]["ISM_PLAN_BITIS_TARIH"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_PLAN_BITIS_TARIH"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_PLAN_BITIS_TARIH"] != DBNull.Value)
+						entity.PLAN_BITIS_TARIH = (DateTime)dt.Rows[i]["ISM_PLAN_BITIS_TARIH"];
+					else
+						entity.PLAN_BITIS_TARIH = null;
+
 					entity.PLAN_BITIS_SAAT = dt.Rows[i]["ISM_PLAN_BITIS_SAAT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_PLAN_BITIS_SAAT"] : "";
-					entity.BASLAMA_TARIH = dt.Rows[i]["ISM_BASLAMA_TARIH"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_BASLAMA_TARIH"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_BASLAMA_TARIH"] != DBNull.Value)
+						entity.BASLAMA_TARIH = (DateTime)dt.Rows[i]["ISM_BASLAMA_TARIH"];
+					else
+						entity.BASLAMA_TARIH = null;
+
 					entity.BASLAMA_SAAT = dt.Rows[i]["ISM_BASLAMA_SAAT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_BASLAMA_SAAT"] : "";
-					entity.ISM_BITIS_TARIH = dt.Rows[i]["ISM_BITIS_TARIH"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_BITIS_TARIH"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_BITIS_TARIH"] != DBNull.Value)
+						entity.ISM_BITIS_TARIH = (DateTime)dt.Rows[i]["ISM_BITIS_TARIH"];
+					else
+						entity.ISM_BITIS_TARIH = null;
+
 					entity.ISM_BITIS_SAAT = dt.Rows[i]["ISM_BITIS_SAAT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_BITIS_SAAT"] : "";
 					entity.IS_SURESI = dt.Rows[i]["ISM_IS_SURESI"] != DBNull.Value ? (int)dt.Rows[i]["ISM_IS_SURESI"] : 0;
 					entity.TAMAMLANMA = dt.Rows[i]["ISM_TAMAMLANMA"] != DBNull.Value ? (int)dt.Rows[i]["ISM_TAMAMLANMA"] : 0;
@@ -240,14 +264,24 @@ namespace WebApiNew.Controllers
 					entity.IS_NEDENI = dt.Rows[i]["ISM_IS_NEDENI"] != DBNull.Value ? (string)dt.Rows[i]["ISM_IS_NEDENI"] : "";
 					entity.ATOLYE = dt.Rows[i]["ISM_ATOLYE"] != DBNull.Value ? (string)dt.Rows[i]["ISM_ATOLYE"] : "";
 					entity.TALIMAT = dt.Rows[i]["ISM_TALIMAT"] != DBNull.Value ? (string)dt.Rows[i]["ISM_TALIMAT"] : "";
-					entity.KAPANIS_TARIHI = dt.Rows[i]["ISM_KAPANIS_TARIHI"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_KAPANIS_TARIHI"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_KAPANIS_TARIHI"] != DBNull.Value)
+						entity.KAPANIS_TARIHI = (DateTime)dt.Rows[i]["ISM_KAPANIS_TARIHI"];
+					else
+						entity.KAPANIS_TARIHI = null;
+
 					entity.KAPANIS_SAATI = dt.Rows[i]["ISM_KAPANIS_SAATI"] != DBNull.Value ? (string)dt.Rows[i]["ISM_KAPANIS_SAATI"] : "";
 					entity.TAKVIM = dt.Rows[i]["ISM_TAKVIM"] != DBNull.Value ? (string)dt.Rows[i]["ISM_TAKVIM"] : "";
 					entity.MASRAF_MERKEZI = dt.Rows[i]["ISM_MASRAF_MERKEZI"] != DBNull.Value ? (string)dt.Rows[i]["ISM_MASRAF_MERKEZI"] : "";
 					entity.FRIMA = dt.Rows[i]["ISM_FIRMA"] != DBNull.Value ? (string)dt.Rows[i]["ISM_FIRMA"] : "";
 					entity.IS_TALEP_NO = dt.Rows[i]["ISM_IS_TALEP_KOD"] != DBNull.Value ? (string)dt.Rows[i]["ISM_IS_TALEP_KOD"] : "";
 					entity.IS_TALEP_EDEN = dt.Rows[i]["ISM_IS_TALEP_EDEN"] != DBNull.Value ? (string)dt.Rows[i]["ISM_IS_TALEP_EDEN"] : "";
-					entity.IS_TALEP_TARIH = dt.Rows[i]["ISM_IS_TALEP_TARIH"] != DBNull.Value ? (DateTime)dt.Rows[i]["ISM_IS_TALEP_TARIH"] : DateTime.MinValue;
+
+					if (dt.Rows[i]["ISM_IS_TALEP_TARIH"] != DBNull.Value)
+							entity.IS_TALEP_TARIH = (DateTime)dt.Rows[i]["ISM_IS_TALEP_TARIH"];
+					else
+							entity.IS_TALEP_TARIH = null;
+
 					entity.ISM_MALIYET_MLZ = dt.Rows[i]["ISM_MALIYET_MLZ"] != DBNull.Value ? (double)dt.Rows[i]["ISM_MALIYET_MLZ"] : 0.0;
 					entity.ISM_MALIYET_PERSONEL = dt.Rows[i]["ISM_MALIYET_PERSONEL"] != DBNull.Value ? (double)dt.Rows[i]["ISM_MALIYET_PERSONEL"] : 0;
 					entity.ISM_MALIYET_DISSERVIS = dt.Rows[i]["ISM_MALIYET_DISSERVIS"] != DBNull.Value ? (double)dt.Rows[i]["ISM_MALIYET_DISSERVIS"] : 0;
@@ -263,6 +297,48 @@ namespace WebApiNew.Controllers
 					entity.ISM_SURE_PLAN_MUDAHALE = dt.Rows[i]["ISM_SURE_PLAN_MUDAHALE"] != DBNull.Value ? (int)dt.Rows[i]["ISM_SURE_PLAN_MUDAHALE"] : 0;
 					entity.ISM_SURE_PLAN_CALISMA = dt.Rows[i]["ISM_SURE_PLAN_CALISMA"] != DBNull.Value ? (int)dt.Rows[i]["ISM_SURE_PLAN_CALISMA"] : 0;
 					entity.ISM_SURE_TOPLAM = dt.Rows[i]["ISM_SURE_TOPLAM"] != DBNull.Value ? (int)dt.Rows[i]["ISM_SURE_TOPLAM"] : 0;
+					entity.ISM_TIP_ID = dt.Rows[i]["ISM_TIP_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_TIP_ID"] : 0;
+					entity.ISM_DURUM_KOD_ID = dt.Rows[i]["ISM_DURUM_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_DURUM_KOD_ID"] : 0;
+					entity.ISM_BAGLI_ISEMRI_ID = dt.Rows[i]["ISM_BAGLI_ISEMRI_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_BAGLI_ISEMRI_ID"] : 0;
+					entity.ISM_LOKASYON_ID = dt.Rows[i]["ISM_LOKASYON_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_LOKASYON_ID"] : 0;
+					entity.ISM_MAKINE_ID = dt.Rows[i]["ISM_MAKINE_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_MAKINE_ID"] : 0;
+					entity.ISM_EKIPMAN_ID = dt.Rows[i]["ISM_EKIPMAN_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_EKIPMAN_ID"] : 0;
+					entity.ISM_MAKINE_DURUM_KOD_ID = dt.Rows[i]["ISM_MAKINE_DURUM_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_MAKINE_DURUM_KOD_ID"] : 0;
+					entity.ISM_REF_ID = dt.Rows[i]["ISM_REF_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_REF_ID"] : 0;
+					entity.ISM_TIP_KOD_ID = dt.Rows[i]["ISM_TIP_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_TIP_KOD_ID"] : 0;
+					entity.ISM_NEDEN_KOD_ID = dt.Rows[i]["ISM_NEDEN_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_NEDEN_KOD_ID"] : 0;
+					entity.ISM_ONCELIK_ID = dt.Rows[i]["ISM_ONCELIK_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_ONCELIK_ID"] : 0;
+					entity.ISM_ATOLYE_ID = dt.Rows[i]["ISM_ATOLYE_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_ATOLYE_ID"] : 0;
+					entity.ISM_TAKVIM_ID = dt.Rows[i]["ISM_TAKVIM_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_TAKVIM_ID"] : 0;
+					entity.ISM_TALIMAT_ID = dt.Rows[i]["ISM_TALIMAT_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_TALIMAT_ID"] : 0;
+					entity.ISM_MASRAF_MERKEZ_ID = dt.Rows[i]["ISM_MASRAF_MERKEZ_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_MASRAF_MERKEZ_ID"] : 0;
+					entity.ISM_PROJE_ID = dt.Rows[i]["ISM_PROJE_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_PROJE_ID"] : 0;
+					entity.ISM_FIRMA_ID = dt.Rows[i]["ISM_FIRMA_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_FIRMA_ID"] : 0;
+					entity.ISM_FIRMA_SOZLESME_ID = dt.Rows[i]["ISM_FIRMA_SOZLESME_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_FIRMA_SOZLESME_ID"] : 0;
+					entity.ISM_OZEL_ALAN_11_KOD_ID = dt.Rows[i]["ISM_OZEL_ALAN_11_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_OZEL_ALAN_11_KOD_ID"] : 0;
+					entity.ISM_OZEL_ALAN_12_KOD_ID = dt.Rows[i]["ISM_OZEL_ALAN_12_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_OZEL_ALAN_12_KOD_ID"] : 0;
+					entity.ISM_OZEL_ALAN_13_KOD_ID = dt.Rows[i]["ISM_OZEL_ALAN_13_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_OZEL_ALAN_13_KOD_ID"] : 0;
+					entity.ISM_OZEL_ALAN_14_KOD_ID = dt.Rows[i]["ISM_OZEL_ALAN_14_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_OZEL_ALAN_14_KOD_ID"] : 0;
+					entity.ISM_OZEL_ALAN_15_KOD_ID = dt.Rows[i]["ISM_OZEL_ALAN_15_KOD_ID"] != DBNull.Value ? (int)dt.Rows[i]["ISM_OZEL_ALAN_15_KOD_ID"] : 0;
+					entity.ISM_SOZLESME_TANIM = dt.Rows[i]["ISM_SOZLESME_TANIM"] != DBNull.Value ? (string)dt.Rows[i]["ISM_SOZLESME_TANIM"] : "";
+					entity.ISM_PROJE_KOD = dt.Rows[i]["ISM_PROJE_KOD"] != DBNull.Value ? (string)dt.Rows[i]["ISM_PROJE_KOD"] : "";
+					entity.ISM_ATOLYE_KOD = dt.Rows[i]["ISM_ATOLYE_KOD"] != DBNull.Value ? (string)dt.Rows[i]["ISM_ATOLYE_KOD"] : "";
+					entity.ISM_PROSEDUR_KOD = dt.Rows[i]["ISM_PROSEDUR_KOD"] != DBNull.Value ? (string)dt.Rows[i]["ISM_PROSEDUR_KOD"] : "";
+
+					if (dt.Rows[i]["ISM_GARANTI_BITIS"] != DBNull.Value)
+						entity.ISM_GARANTI_BITIS = (DateTime)dt.Rows[i]["ISM_GARANTI_BITIS"];
+					else
+						entity.ISM_GARANTI_BITIS = null;
+
+					entity.ISM_BAGLI_ISEMRI_NO = dt.Rows[i]["ISM_BAGLI_ISEMRI_NO"] != DBNull.Value ? (string)dt.Rows[i]["ISM_BAGLI_ISEMRI_NO"] : "";
+					entity.ISM_EVRAK_NO = dt.Rows[i]["ISM_EVRAK_NO"] != DBNull.Value ? (string)dt.Rows[i]["ISM_EVRAK_NO"] : "";
+
+					if (dt.Rows[i]["ISM_EVRAK_TARIHI"] != DBNull.Value)
+						entity.ISM_EVRAK_TARIHI = (DateTime)dt.Rows[i]["ISM_EVRAK_TARIHI"];
+					else
+						entity.ISM_EVRAK_TARIHI = null;
+
+					entity.ISM_REFERANS_NO = dt.Rows[i]["ISM_REFERANS_NO"] != DBNull.Value ? (string)dt.Rows[i]["ISM_REFERANS_NO"] : "";
 					entity.OZEL_ALAN_1 = dt.Rows[i]["ISM_OZEL_ALAN_1"] != DBNull.Value ? (string)dt.Rows[i]["ISM_OZEL_ALAN_1"] : "";
 					entity.OZEL_ALAN_2 = dt.Rows[i]["ISM_OZEL_ALAN_2"] != DBNull.Value ? (string)dt.Rows[i]["ISM_OZEL_ALAN_2"] : "";
 					entity.OZEL_ALAN_3 = dt.Rows[i]["ISM_OZEL_ALAN_3"] != DBNull.Value ? (string)dt.Rows[i]["ISM_OZEL_ALAN_3"] : "";

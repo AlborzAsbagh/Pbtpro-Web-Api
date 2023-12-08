@@ -56,25 +56,25 @@ namespace WebApiNew.Models
 		public string LOKASYON { get; set; }
 
 		[DataMember]
-		public DateTime PLAN_BASLAMA_TARIH { get; set; }
+		public DateTime? PLAN_BASLAMA_TARIH { get; set; }
 
 		[DataMember]
 		public string PLAN_BASLAMA_SAAT { get; set; }
 
 		[DataMember]
-		public DateTime PLAN_BITIS_TARIH { get; set; }
+		public DateTime? PLAN_BITIS_TARIH { get; set; }
 
 		[DataMember]
 		public string PLAN_BITIS_SAAT { get; set; }
 
 		[DataMember]
-		public DateTime BASLAMA_TARIH { get; set; }
+		public DateTime? BASLAMA_TARIH { get; set; }
 
 		[DataMember]
 		public string BASLAMA_SAAT { get; set; }
 
 		[DataMember]
-		public DateTime ISM_BITIS_TARIH { get; set; }
+		public DateTime? ISM_BITIS_TARIH { get; set; }
 
 		[DataMember]
 		public string ISM_BITIS_SAAT { get; set; }
@@ -119,7 +119,7 @@ namespace WebApiNew.Models
 		public string TALIMAT { get; set; }
 
 		[DataMember]
-		public DateTime KAPANIS_TARIHI { get; set; }
+		public DateTime? KAPANIS_TARIHI { get; set; }
 
 		[DataMember]
 		public string KAPANIS_SAATI { get; set; }
@@ -140,7 +140,7 @@ namespace WebApiNew.Models
 		public string IS_TALEP_EDEN { get; set; }
 
 		[DataMember]
-		public DateTime IS_TALEP_TARIH { get; set; }
+		public DateTime? IS_TALEP_TARIH { get; set; }
 
 		[DataMember]
 		public double ISM_MALIYET_MLZ { get; set; }
@@ -186,6 +186,102 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public int ISM_SURE_TOPLAM { get; set; }
+
+		[DataMember]
+		public int ISM_TIP_ID { get; set; }
+
+		[DataMember]
+		public int ISM_DURUM_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_BAGLI_ISEMRI_ID { get; set; }
+
+		[DataMember]
+		public int ISM_LOKASYON_ID { get; set; }
+
+		[DataMember]
+		public int ISM_MAKINE_ID { get; set; }
+
+		[DataMember]
+		public int ISM_EKIPMAN_ID { get; set; }
+
+		[DataMember]
+		public int ISM_MAKINE_DURUM_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_REF_ID { get; set; }
+
+		[DataMember]
+		public int ISM_TIP_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_NEDEN_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_ONCELIK_ID { get; set; }
+
+		[DataMember]
+		public int ISM_ATOLYE_ID { get; set; }
+
+		[DataMember]
+		public int ISM_TAKVIM_ID { get; set; }
+
+		[DataMember]
+		public int ISM_TALIMAT_ID { get; set; }
+
+		[DataMember]
+		public int ISM_MASRAF_MERKEZ_ID { get; set; }
+
+		[DataMember]
+		public int ISM_PROJE_ID { get; set; }
+
+		[DataMember]
+		public int ISM_FIRMA_ID { get; set; }
+
+		[DataMember]
+		public int ISM_FIRMA_SOZLESME_ID { get; set; }
+
+		[DataMember]
+		public int ISM_OZEL_ALAN_11_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_OZEL_ALAN_12_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_OZEL_ALAN_13_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_OZEL_ALAN_14_KOD_ID { get; set; }
+
+		[DataMember]
+		public int ISM_OZEL_ALAN_15_KOD_ID { get; set; }
+
+		[DataMember]
+		public string ISM_SOZLESME_TANIM { get; set; }
+
+		[DataMember]
+		public string ISM_PROJE_KOD { get; set; }
+
+		[DataMember]
+		public string ISM_ATOLYE_KOD { get; set; }
+
+		[DataMember]
+		public string ISM_PROSEDUR_KOD { get; set; }
+
+		[DataMember]
+		public DateTime? ISM_GARANTI_BITIS { get; set; }
+
+		[DataMember]
+		public string ISM_BAGLI_ISEMRI_NO { get; set; }
+
+		[DataMember]
+		public string ISM_EVRAK_NO { get; set; }
+
+		[DataMember]
+		public DateTime? ISM_EVRAK_TARIHI { get; set; }
+
+		[DataMember]
+		public string ISM_REFERANS_NO { get; set; }
 
 		[DataMember]
 		public string OZEL_ALAN_1 { get; set; }

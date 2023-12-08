@@ -20,6 +20,8 @@ namespace WebApiNew.Models
 
          [DataMember] public string DKN_ACIKLAMA { get; set; }
 
+         [DataMember] public string DKN_PERSONEL_ISIM { get; set; }
+
          [DataMember] public DateTime? DKN_YAPILDI_TARIH { get; set; }
 
          [DataMember] public string DKN_YAPILDI_SAAT { get; set; }
