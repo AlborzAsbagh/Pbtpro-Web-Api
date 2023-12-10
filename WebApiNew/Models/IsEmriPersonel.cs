@@ -80,7 +80,10 @@ namespace WebApiNew.Models
         [DataMember]
         public string IDK_ISIM { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public int IDK_PERSONEL_ID { get; set; }
+
+		[DataMember]
         public string IDK_MASRAF_MERKEZI { get; set; }
 
         [DataMember]

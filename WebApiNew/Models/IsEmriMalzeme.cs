@@ -60,10 +60,19 @@ namespace WebApiNew.Models
         [DataMember]
         public int IDM_MARKA_KOD_ID { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public int IDM_MODEL_KOD_ID { get; set; }
+
+		[DataMember]
+		public int IDM_FIRMA_ID { get; set; }
+
+		[DataMember]
         public string IDM_BIRIM { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public string IDM_MALZEMETIP { get; set; }
+
+		[DataMember]
         public string IDM_STOK_KOD { get; set; }
 
         [DataMember]
@@ -95,6 +104,27 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public bool IDM_STOKSUZ { get; set; }
+
+		[DataMember]
+		public string IDM_MARKA_TANIM { get; set; }
+
+		[DataMember]
+		public string IDM_MODEL_TANIM { get; set; }
+
+		[DataMember]
+		public string IDM_FIRMA_TANIM { get; set; }
+
+        [DataMember]
+        public int IDM_MASRAF_MERKEZI_ID { get; set; }
+
+        [DataMember]
+        public string IDM_MASRAF_MERKEZ { get; set; }
+
+		[DataMember]
+		public int IDM_BARKOD_ID { get; set; }
+
+		[DataMember]
+		public string IDM_BARKOD_NO { get; set; }
 
 	}
 }

@@ -565,6 +565,7 @@ namespace WebApiNew.Controllers
                                       ,ISM_SURE_PLAN_MUDAHALE
                                       ,ISM_SURE_PLAN_CALISMA
                                       ,ISM_SURE_TOPLAM
+                                      ,ISM_BAGLI_ISEMRI_ID
                                       ,ISM_OZEL_ALAN_1 
                                       ,ISM_OZEL_ALAN_2 
                                       ,ISM_OZEL_ALAN_3 
@@ -642,6 +643,7 @@ namespace WebApiNew.Controllers
                                       ,@ISM_SURE_PLAN_MUDAHALE
                                       ,@ISM_SURE_PLAN_CALISMA
                                       ,@ISM_SURE_TOPLAM
+                                      ,@ISM_BAGLI_ISEMRI_ID
                                       ,@ISM_OZEL_ALAN_1
                                       ,@ISM_OZEL_ALAN_2
                                       ,@ISM_OZEL_ALAN_3
@@ -720,6 +722,7 @@ namespace WebApiNew.Controllers
                         prms.Add("@ISM_SURE_PLAN_MUDAHALE", entity.ISM_SURE_PLAN_MUDAHALE != 0 ? entity.ISM_SURE_PLAN_MUDAHALE : 0);
                         prms.Add("@ISM_SURE_PLAN_CALISMA", entity.ISM_SURE_PLAN_CALISMA != 0 ? entity.ISM_SURE_PLAN_CALISMA : 0);
                         prms.Add("@ISM_SURE_TOPLAM", entity.ISM_SURE_TOPLAM != 0 ? entity.ISM_SURE_TOPLAM : 0);
+                        prms.Add("@ISM_BAGLI_ISEMRI_ID", entity.ISM_BAGLI_ISEMRI_ID != 0 ? entity.ISM_BAGLI_ISEMRI_ID : 0);
                         prms.Add("ISM_OZEL_ALAN_1", entity.ISM_OZEL_ALAN_1);
                         prms.Add("ISM_OZEL_ALAN_2", entity.ISM_OZEL_ALAN_2);
                         prms.Add("ISM_OZEL_ALAN_3", entity.ISM_OZEL_ALAN_3);
@@ -762,10 +765,10 @@ namespace WebApiNew.Controllers
                                     entity.IsEmriMalzemeList = tanim.IsTanimMazleme(entity.ISM_REF_ID);
                                 }
 
-                                foreach (var isEmriKontrolList in entity.IsEmriKontrolList)
+                                foreach (var IsEmriKontrolList in entity.IsEmriKontrolList)
                                 {
-									isEmriKontrolList.DKN_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
-                                    KontrolListKaydet(isEmriKontrolList);
+                                    IsEmriKontrolList.DKN_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
+                                    KontrolListKaydet(IsEmriKontrolList);
                                 }
 
                                 foreach (var isEmriMalzeme in entity.IsEmriMalzemeList)
@@ -820,13 +823,6 @@ namespace WebApiNew.Controllers
 
                         #endregion
 
-                    }
-                    else
-                    {
-                        bildirimEntity.Id = entity.TB_ISEMRI_ID;
-                        bildirimEntity.Durum = false;
-                        bildirimEntity.MsgId = Bildirim.MSG_ISLEM_HATA;
-                        bildirimEntity.Aciklama = Localization.IsemriMevcut;
                     }
 
 
@@ -892,11 +888,11 @@ namespace WebApiNew.Controllers
 								}
 							}
 							// Kontrol List ekleme
-							if (entity.IsEmriKontrolList.Count > 0)
+							if (entity.IsEmriKontrolListesi.Count > 0)
 							{
-								for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
+								for (int i = 0; i < entity.IsEmriKontrolListesi.Count; i++)
 								{
-									Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], bildirimEntity.Id);
+									Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolListesi[i], bildirimEntity.Id);
 
 									if (!bildirimKontrolList.Durum) return bildirimKontrolList;
 								}
@@ -1318,7 +1314,7 @@ namespace WebApiNew.Controllers
             Bildirim bldr = new Bildirim();
             try
             {
-                if(entity.DKN_ACIKLAMA.StartsWith(@"{\rtf"))
+                if(entity.DKN_ACIKLAMA != null && entity.DKN_ACIKLAMA.StartsWith(@"{\rtf"))
                 {
 
                     System.Windows.Forms.RichTextBox rtBox = new System.Windows.Forms.RichTextBox();
@@ -2128,6 +2124,7 @@ namespace WebApiNew.Controllers
                     ? dt.Rows[i]["PRS_PERSONEL_KOD"].ToString()
                     : "";
                 entity.IDK_ISIM = dt.Rows[i]["PRS_ISIM"] != DBNull.Value ? dt.Rows[i]["PRS_ISIM"].ToString() : "";
+                entity.IDK_PERSONEL_ID = Util.getFieldInt(dt.Rows[i], "TB_PERSONEL_ID");
                 entity.TB_ISEMRI_KAYNAK_ID = Util.getFieldInt(dt.Rows[i], "TB_ISEMRI_KAYNAK_ID");
                 entity.IDK_ISEMRI_ID = Util.getFieldInt(dt.Rows[i], "IDK_ISEMRI_ID");
                 entity.IDK_REF_ID = Util.getFieldInt(dt.Rows[i], "IDK_REF_ID");
@@ -2170,7 +2167,9 @@ namespace WebApiNew.Controllers
                 entity.TB_ISEMRI_MLZ_ID = Util.getFieldInt(dt.Rows[i], "TB_ISEMRI_MLZ_ID");
                 entity.IDM_ISEMRI_ID = Util.getFieldInt(dt.Rows[i], "IDM_ISEMRI_ID");
                 entity.IDM_STOK_ID = Util.getFieldInt(dt.Rows[i], "IDM_STOK_ID");
-                entity.IDM_DEPO_ID = Util.getFieldInt(dt.Rows[i], "IDM_DEPO_ID");
+                entity.IDM_STOK_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "IDM_STOK_TIP_KOD_ID");
+				entity.IDM_MALZEMETIP = Util.getFieldString(dt.Rows[i], "IDM_MALZEMETIP");
+				entity.IDM_DEPO_ID = Util.getFieldInt(dt.Rows[i], "IDM_DEPO_ID");
                 entity.IDM_BIRIM_KOD_ID = Util.getFieldInt(dt.Rows[i], "IDM_BIRIM_KOD_ID");
                 entity.IDM_STOK_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "IDM_STOK_TIP_KOD_ID");
                 entity.IDM_BIRIM_FIYAT = Util.getFieldDouble(dt.Rows[i], "IDM_BIRIM_FIYAT");
@@ -2181,11 +2180,19 @@ namespace WebApiNew.Controllers
                 entity.IDM_TARIH = Util.getFieldDateTime(dt.Rows[i], "IDM_TARIH");
                 entity.IDM_SAAT = Util.getFieldString(dt.Rows[i], "IDM_SAAT");
                 entity.IDM_MALZEME_STOKTAN = Util.getFieldString(dt.Rows[i], "IDM_MALZEME_STOKTAN");
-
-
-                entity.IDM_STOK_KULLANIM_SEKLI = Util.getFieldInt(dt.Rows[i], "IDM_STOK_KULLANIM_SEKLI");
+				entity.IDM_MARKA_TANIM = Util.getFieldString(dt.Rows[i], "IDM_MARKA_TANIM");
+				entity.IDM_MARKA_KOD_ID = Util.getFieldInt(dt.Rows[i], "IDM_MARKA_KOD_ID");
+				entity.IDM_MODEL_TANIM = Util.getFieldString(dt.Rows[i], "IDM_MODEL_TANIM");
+				entity.IDM_MODEL_KOD_ID = Util.getFieldInt(dt.Rows[i], "IDM_MODEL_KOD_ID");
+				entity.IDM_FIRMA_TANIM = Util.getFieldString(dt.Rows[i], "IDM_FIRMA_TANIM");
+				entity.IDM_FIRMA_ID = Util.getFieldInt(dt.Rows[i], "IDM_FIRMA_ID");
+				entity.IDM_STOK_KULLANIM_SEKLI = Util.getFieldInt(dt.Rows[i], "IDM_STOK_KULLANIM_SEKLI");
                 entity.IDM_BIRIM = Util.getFieldString(dt.Rows[i], "IDM_BIRIM");
-                listem.Add(entity);
+				entity.IDM_MASRAF_MERKEZI_ID = Util.getFieldInt(dt.Rows[i], "IDM_MASRAF_MERKEZI_ID");
+				entity.IDM_MASRAF_MERKEZ = Util.getFieldString(dt.Rows[i], "IDM_MASRAF_MERKEZ");
+				entity.IDM_BARKOD_ID = Util.getFieldInt(dt.Rows[i], "IDM_BARKOD_ID");
+				entity.IDM_BARKOD_NO = Util.getFieldString(dt.Rows[i], "IDM_BARKOD_NO");
+				listem.Add(entity);
             }
 
             return listem;
@@ -3249,6 +3256,8 @@ namespace WebApiNew.Controllers
                                       ,ISM_MAKINE_ID = @ISM_MAKINE_ID                                      
                                       ,ISM_BASLAMA_TARIH = @ISM_BASLAMA_TARIH
                                       ,ISM_BASLAMA_SAAT = @ISM_BASLAMA_SAAT
+                                      ,ISM_DUZENLEME_TARIH = @ISM_DUZENLEME_TARIH
+                                      ,ISM_DUZENLEME_SAAT = @ISM_DUZENLEME_SAAT
                                       ,ISM_BITIS_TARIH = @ISM_BITIS_TARIH
                                       ,ISM_BITIS_SAAT = @ISM_BITIS_SAAT                             
                                       ,ISM_PLAN_BASLAMA_TARIH   = @ISM_PLAN_BASLAMA_TARIH
@@ -3299,6 +3308,7 @@ namespace WebApiNew.Controllers
                                       ,ISM_SURE_PLAN_MUDAHALE = @ISM_SURE_PLAN_MUDAHALE
                                       ,ISM_SURE_PLAN_CALISMA = @ISM_SURE_PLAN_CALISMA
                                       ,ISM_SURE_TOPLAM = @ISM_SURE_TOPLAM
+                                      ,ISM_BAGLI_ISEMRI_ID = @ISM_BAGLI_ISEMRI_ID
                                       ,ISM_OZEL_ALAN_1  =@ISM_OZEL_ALAN_1
                                       ,ISM_OZEL_ALAN_2  =@ISM_OZEL_ALAN_2
                                       ,ISM_OZEL_ALAN_3  =@ISM_OZEL_ALAN_3
@@ -3331,6 +3341,8 @@ namespace WebApiNew.Controllers
 						prms.Add("@ISM_PLAN_BASLAMA_SAAT", entity.ISM_PLAN_BASLAMA_SAAT);
 						prms.Add("@ISM_PLAN_BITIS_TARIH", entity.ISM_PLAN_BITIS_TARIH);
 						prms.Add("@ISM_PLAN_BITIS_SAAT", entity.ISM_PLAN_BITIS_SAAT);
+						prms.Add("@ISM_DUZENLEME_TARIH", entity.ISM_DUZENLEME_TARIH);
+						prms.Add("@ISM_DUZENLEME_SAAT", entity.ISM_DUZENLEME_SAAT);
 						prms.Add("@ISM_KONU", entity.ISM_KONU);
 						prms.Add("@ISM_ACIKLAMA", entity.ISM_ACIKLAMA);
 						prms.Add("@ISM_MAKINE_ID", entity.ISM_MAKINE_ID);
@@ -3376,6 +3388,7 @@ namespace WebApiNew.Controllers
 						prms.Add("@ISM_SURE_PLAN_MUDAHALE", entity.ISM_SURE_PLAN_MUDAHALE);
 						prms.Add("@ISM_SURE_PLAN_CALISMA", entity.ISM_SURE_PLAN_CALISMA);
 						prms.Add("@ISM_SURE_TOPLAM", entity.ISM_SURE_TOPLAM);
+						prms.Add("@ISM_BAGLI_ISEMRI_ID", entity.ISM_BAGLI_ISEMRI_ID);
 						prms.Add("@ISM_OZEL_ALAN_1", entity.ISM_OZEL_ALAN_1);
 						prms.Add("@ISM_OZEL_ALAN_2", entity.ISM_OZEL_ALAN_2);
 						prms.Add("@ISM_OZEL_ALAN_3", entity.ISM_OZEL_ALAN_3);
@@ -3450,11 +3463,11 @@ namespace WebApiNew.Controllers
 							}
 						}
 						// Kontrol List Guncelle
-						if (entity.IsEmriKontrolList.Count > 0)
+						if (entity.IsEmriKontrolListesi.Count > 0)
 						{
-							for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
+							for (int i = 0; i < entity.IsEmriKontrolListesi.Count; i++)
 							{
-								Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], entity.TB_ISEMRI_ID);
+								Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolListesi[i], entity.TB_ISEMRI_ID);
 
 								if (!bildirimKontrolList.Durum) return bildirimKontrolList;
 							}
