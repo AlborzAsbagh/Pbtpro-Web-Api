@@ -45,19 +45,19 @@ namespace WebApiNew.Controllers
 			List<WebVersionMakineModel> listem = new List<WebVersionMakineModel>();
 			try
 			{
-				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_MAKINE_ID DESC) AS subRow FROM dbo.VW_WEB_VERSION_MAKINE where 1=1";
-				toplamMakineSayisiQuery = @"select count(*) from (select * from dbo.VW_WEB_VERSION_MAKINE where 1=1" ;
+				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_MAKINE_ID DESC) AS subRow FROM orjin.VW_MAKINE where 1=1";
+				toplamMakineSayisiQuery = @"select count(*) from (select * from orjin.VW_MAKINE where 1=1" ;
 
 				if (!string.IsNullOrEmpty(parametre))
 				{
 					query += $" and ( MKN_KOD like '%{parametre}%' or "; toplamMakineSayisiQuery += $" and ( MKN_KOD like '%{parametre}%' or ";
 					query += $" MKN_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_TANIM like '%{parametre}%' or ";
-					query += $" MAKINE_LOKASYON like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_LOKASYON like '%{parametre}%' or ";
-					query += $" MAKINE_TIP like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_TIP like '%{parametre}%' or ";
-					query += $" MAKINE_KATEGORI like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_KATEGORI like '%{parametre}%' or ";
-					query += $" MAKINE_MARKA like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_MARKA like '%{parametre}%' or ";
-					query += $" MAKINE_MODEL like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MAKINE_MODEL like '%{parametre}%' or ";
-					query += $" MAKINE_SERI_NO like '%{parametre}%' ) "; toplamMakineSayisiQuery += $" MAKINE_SERI_NO like '%{parametre}%' ) ";
+					query += $" MKN_LOKASYON like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_LOKASYON like '%{parametre}%' or ";
+					query += $" MKN_TIP like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_TIP like '%{parametre}%' or ";
+					query += $" MKN_KATEGORI like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_KATEGORI like '%{parametre}%' or ";
+					query += $" MKN_MARKA like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_MARKA like '%{parametre}%' or ";
+					query += $" MKN_MODEL like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_MODEL like '%{parametre}%' or ";
+					query += $" MKN_SERI_NO like '%{parametre}%' ) "; toplamMakineSayisiQuery += $" MKN_SERI_NO like '%{parametre}%' ) ";
 				}
 				if((filters["customfilters"] as JObject) != null && (filters["customfilters"] as JObject).Count > 0)
 				{
@@ -80,8 +80,8 @@ namespace WebApiNew.Controllers
 				}
 				if (lokasyonId > 0 && lokasyonId != null)
 				{
-					query += $" and MAKINE_LOKASYON_ID = {lokasyonId} ";
-					toplamMakineSayisiQuery += $" and MAKINE_LOKASYON_ID = {lokasyonId} ";
+					query += $" and MKN_LOKASYON_ID = {lokasyonId} ";
+					toplamMakineSayisiQuery += $" and MKN_LOKASYON_ID = {lokasyonId} ";
 				}
 				query+= $" ) RowIndex WHERE RowIndex.subRow >= {pagingIlkDeger} AND RowIndex.subRow < {pagingSonDeger}";
 				toplamMakineSayisiQuery += ") as TotalMakineSayisi";
