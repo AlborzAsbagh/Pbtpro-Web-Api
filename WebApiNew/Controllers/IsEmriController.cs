@@ -566,6 +566,10 @@ namespace WebApiNew.Controllers
                                       ,ISM_SURE_PLAN_CALISMA
                                       ,ISM_SURE_TOPLAM
                                       ,ISM_BAGLI_ISEMRI_ID
+                                      ,ISM_EVRAK_NO
+                                      ,ISM_EVRAK_TARIHI
+                                      ,ISM_REFERANS_NO
+                                      ,ISM_TAKVIM_ID
                                       ,ISM_OZEL_ALAN_1 
                                       ,ISM_OZEL_ALAN_2 
                                       ,ISM_OZEL_ALAN_3 
@@ -644,6 +648,10 @@ namespace WebApiNew.Controllers
                                       ,@ISM_SURE_PLAN_CALISMA
                                       ,@ISM_SURE_TOPLAM
                                       ,@ISM_BAGLI_ISEMRI_ID
+                                      ,@ISM_EVRAK_NO
+                                      ,@ISM_EVRAK_TARIHI
+                                      ,@ISM_REFERANS_NO
+                                      ,@ISM_TAKVIM_ID
                                       ,@ISM_OZEL_ALAN_1
                                       ,@ISM_OZEL_ALAN_2
                                       ,@ISM_OZEL_ALAN_3
@@ -723,6 +731,10 @@ namespace WebApiNew.Controllers
                         prms.Add("@ISM_SURE_PLAN_CALISMA", entity.ISM_SURE_PLAN_CALISMA != 0 ? entity.ISM_SURE_PLAN_CALISMA : 0);
                         prms.Add("@ISM_SURE_TOPLAM", entity.ISM_SURE_TOPLAM != 0 ? entity.ISM_SURE_TOPLAM : 0);
                         prms.Add("@ISM_BAGLI_ISEMRI_ID", entity.ISM_BAGLI_ISEMRI_ID != 0 ? entity.ISM_BAGLI_ISEMRI_ID : 0);
+                        prms.Add("@ISM_EVRAK_NO", entity.ISM_EVRAK_NO != null? entity.ISM_EVRAK_NO : "");
+                        prms.Add("@ISM_EVRAK_TARIHI", entity.ISM_EVRAK_TARIHI != null? entity.ISM_EVRAK_TARIHI : null );
+                        prms.Add("@ISM_REFERANS_NO", entity.ISM_REFERANS_NO != null? entity.ISM_REFERANS_NO : "");
+                        prms.Add("@ISM_TAKVIM_ID", entity.ISM_TAKVIM_ID != 0 ? entity.ISM_TAKVIM_ID : 0);
                         prms.Add("ISM_OZEL_ALAN_1", entity.ISM_OZEL_ALAN_1);
                         prms.Add("ISM_OZEL_ALAN_2", entity.ISM_OZEL_ALAN_2);
                         prms.Add("ISM_OZEL_ALAN_3", entity.ISM_OZEL_ALAN_3);
@@ -3309,6 +3321,10 @@ namespace WebApiNew.Controllers
                                       ,ISM_SURE_PLAN_CALISMA = @ISM_SURE_PLAN_CALISMA
                                       ,ISM_SURE_TOPLAM = @ISM_SURE_TOPLAM
                                       ,ISM_BAGLI_ISEMRI_ID = @ISM_BAGLI_ISEMRI_ID
+                                      ,ISM_EVRAK_NO = @ISM_EVRAK_NO
+                                      ,ISM_EVRAK_TARIHI = @ISM_EVRAK_TARIHI
+                                      ,ISM_REFERANS_NO = @ISM_REFERANS_NO
+                                      ,ISM_TAKVIM_ID = @ISM_TAKVIM_ID
                                       ,ISM_OZEL_ALAN_1  =@ISM_OZEL_ALAN_1
                                       ,ISM_OZEL_ALAN_2  =@ISM_OZEL_ALAN_2
                                       ,ISM_OZEL_ALAN_3  =@ISM_OZEL_ALAN_3
@@ -3389,6 +3405,10 @@ namespace WebApiNew.Controllers
 						prms.Add("@ISM_SURE_PLAN_CALISMA", entity.ISM_SURE_PLAN_CALISMA);
 						prms.Add("@ISM_SURE_TOPLAM", entity.ISM_SURE_TOPLAM);
 						prms.Add("@ISM_BAGLI_ISEMRI_ID", entity.ISM_BAGLI_ISEMRI_ID);
+						prms.Add("@ISM_EVRAK_NO", entity.ISM_EVRAK_NO);
+						prms.Add("@ISM_EVRAK_TARIHI", entity.ISM_EVRAK_TARIHI);
+						prms.Add("@ISM_REFERANS_NO", entity.ISM_REFERANS_NO);
+						prms.Add("@ISM_TAKVIM_ID", entity.ISM_TAKVIM_ID);
 						prms.Add("@ISM_OZEL_ALAN_1", entity.ISM_OZEL_ALAN_1);
 						prms.Add("@ISM_OZEL_ALAN_2", entity.ISM_OZEL_ALAN_2);
 						prms.Add("@ISM_OZEL_ALAN_3", entity.ISM_OZEL_ALAN_3);
@@ -3463,7 +3483,7 @@ namespace WebApiNew.Controllers
 							}
 						}
 						// Kontrol List Guncelle
-						if (entity.IsEmriKontrolListesi.Count > 0)
+						if (entity.IsEmriKontrolList.Count > 0)
 						{
 							for (int i = 0; i < entity.IsEmriKontrolListesi.Count; i++)
 							{
