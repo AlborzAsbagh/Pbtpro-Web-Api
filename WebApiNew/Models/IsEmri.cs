@@ -146,10 +146,7 @@ namespace WebApiNew.Models
         public List<IsEmriPersonel> IsEmriPersonelList { get; set; }
 
         [DataMember]
-        public List<IsEmriKontrolList> IsEmriKontrolList { get; set; } // Mobil için kullanilan dizi
-
-		[DataMember]
-		public List<IsEmriKontrolList> IsEmriKontrolListesi { get; set; } // Belirsiz bir hata'dan dolayı Web App için farklı dizi tanımlandı
+        public List<IsEmriKontrolList> IsEmriKontrolList { get; set; } 
 
 		[DataMember]
         public List<IsEmriMalzeme> IsEmriMalzemeList { get; set; }

@@ -762,39 +762,42 @@ namespace WebApiNew.Controllers
                         // kontol listesi ekleme.
                         if (drSonIsEmri != null)
                         {
-                            if (entity.ISM_REF_ID != -1)
+                            if(!isWeb)
                             {
-                                if (entity.ISM_TIP == "PERİYODİK BAKIM")
-                                {
-                                    PeriyodikBakimController pBakim = new PeriyodikBakimController();
-                                    entity.IsEmriKontrolList = pBakim.PBakimKontrolList(entity.ISM_REF_ID);
-                                    entity.IsEmriMalzemeList = pBakim.PBakimMazleme(entity.ISM_REF_ID);
-                                }
-                                else
-                                {
-                                    IsTanimController tanim = new IsTanimController(_logger);
-                                    entity.IsEmriKontrolList = tanim.IsTanimIsmKontrolList(entity.ISM_REF_ID);
-                                    entity.IsEmriMalzemeList = tanim.IsTanimMazleme(entity.ISM_REF_ID);
-                                }
+								if (entity.ISM_REF_ID != -1)
+								{
+									if (entity.ISM_TIP == "PERİYODİK BAKIM")
+									{
+										PeriyodikBakimController pBakim = new PeriyodikBakimController();
+										entity.IsEmriKontrolList = pBakim.PBakimKontrolList(entity.ISM_REF_ID);
+										entity.IsEmriMalzemeList = pBakim.PBakimMazleme(entity.ISM_REF_ID);
+									}
+									else
+									{
+										IsTanimController tanim = new IsTanimController(_logger);
+										entity.IsEmriKontrolList = tanim.IsTanimIsmKontrolList(entity.ISM_REF_ID);
+										entity.IsEmriMalzemeList = tanim.IsTanimMazleme(entity.ISM_REF_ID);
+									}
 
-                                foreach (var IsEmriKontrolList in entity.IsEmriKontrolList)
-                                {
-                                    IsEmriKontrolList.DKN_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
-                                    KontrolListKaydet(IsEmriKontrolList);
-                                }
+									foreach (var IsEmriKontrolList in entity.IsEmriKontrolList)
+									{
+										IsEmriKontrolList.DKN_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
+										KontrolListKaydet(IsEmriKontrolList);
+									}
 
-                                foreach (var isEmriMalzeme in entity.IsEmriMalzemeList)
-                                {
-                                    isEmriMalzeme.IDM_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
-                                    isEmriMalzeme.IDM_TARIH = DateTime.Now;
-                                    isEmriMalzeme.IDM_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT);
-                                    isEmriMalzeme.IDM_OLUSTURMA_TARIH = DateTime.Now;
-                                    isEmriMalzeme.IDM_OLUSTURAN_ID = ID;
-                                    MalzemeListKaydet(isEmriMalzeme);
-                                }
-                            }
+									foreach (var isEmriMalzeme in entity.IsEmriMalzemeList)
+									{
+										isEmriMalzeme.IDM_ISEMRI_ID = drSonIsEmri.TB_ISEMRI_ID;
+										isEmriMalzeme.IDM_TARIH = DateTime.Now;
+										isEmriMalzeme.IDM_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT);
+										isEmriMalzeme.IDM_OLUSTURMA_TARIH = DateTime.Now;
+										isEmriMalzeme.IDM_OLUSTURAN_ID = ID;
+										MalzemeListKaydet(isEmriMalzeme);
+									}
+								}
+							}
                         }
-                      
+
 
 						string query = @"INSERT INTO [orjin].[TB_ISEMRI_LOG]
                                            (ISL_ISEMRI_ID
@@ -900,11 +903,11 @@ namespace WebApiNew.Controllers
 								}
 							}
 							// Kontrol List ekleme
-							if (entity.IsEmriKontrolListesi.Count > 0)
+							if (entity.IsEmriKontrolList.Count > 0)
 							{
-								for (int i = 0; i < entity.IsEmriKontrolListesi.Count; i++)
+								for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
 								{
-									Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolListesi[i], bildirimEntity.Id);
+									Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], bildirimEntity.Id);
 
 									if (!bildirimKontrolList.Durum) return bildirimKontrolList;
 								}
@@ -1631,8 +1634,8 @@ namespace WebApiNew.Controllers
                                                        ,-1
                                                        ,-1)";
                     prms.Clear();
-                    if(isEmriId == 0 ) prms.Add("@IDM_ISEMRI_ID", isEmriId);
-                    else prms.Add("@IDM_ISEMRI_ID", entity.IDM_ISEMRI_ID);
+                    if(isEmriId == 0 ) prms.Add("@IDM_ISEMRI_ID", entity.IDM_ISEMRI_ID);
+                    else prms.Add("@IDM_ISEMRI_ID", isEmriId);
 					prms.Add("@IDM_TARIH", entity.IDM_TARIH);
                     prms.Add("@IDM_SAAT", entity.IDM_SAAT);
                     prms.Add("@IDM_STOK_ID", entity.IDM_STOK_ID);
@@ -3485,9 +3488,9 @@ namespace WebApiNew.Controllers
 						// Kontrol List Guncelle
 						if (entity.IsEmriKontrolList.Count > 0)
 						{
-							for (int i = 0; i < entity.IsEmriKontrolListesi.Count; i++)
+							for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
 							{
-								Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolListesi[i], entity.TB_ISEMRI_ID);
+								Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], entity.TB_ISEMRI_ID);
 
 								if (!bildirimKontrolList.Durum) return bildirimKontrolList;
 							}
