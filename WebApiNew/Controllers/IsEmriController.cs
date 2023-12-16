@@ -1409,8 +1409,7 @@ namespace WebApiNew.Controllers
                 {
                     // Güncelle
                     string query = @"UPDATE orjin.TB_ISEMRI_KONTROLLIST SET
-                                DKN_ISEMRI_ID = @DKN_ISEMRI_ID
-                               ,DKN_SIRANO = @DKN_SIRANO
+                                DKN_SIRANO = @DKN_SIRANO
                                ,DKN_YAPILDI=@DKN_YAPILDI
                                ,DKN_TANIM = @DKN_TANIM
                                ,DKN_DEGISTIREN_ID = @DKN_DEGISTIREN_ID
@@ -1420,7 +1419,6 @@ namespace WebApiNew.Controllers
                                ,DKN_REF_ID = @DKN_REF_ID WHERE TB_ISEMRI_KONTROLLIST_ID = @TB_ISEMRI_KONTROLLIST_ID";
                     prms.Clear();
                     prms.Add("TB_ISEMRI_KONTROLLIST_ID", entity.TB_ISEMRI_KONTROLLIST_ID);
-                    prms.Add("DKN_ISEMRI_ID", entity.DKN_ISEMRI_ID);
                     prms.Add("DKN_YAPILDI", entity.DKN_YAPILDI);
                     prms.Add("DKN_SIRANO", entity.DKN_SIRANO);
                     prms.Add("DKN_TANIM", entity.DKN_TANIM);
@@ -1688,8 +1686,7 @@ namespace WebApiNew.Controllers
                         "select coalesce(IDM_TUTAR,0) from orjin.TB_ISEMRI_MLZ WHERE TB_ISEMRI_MLZ_ID=@TB_ISEMRI_MLZ_ID",
                         parametreler));
                     string qu3 = @"UPDATE orjin.TB_ISEMRI_MLZ SET
-                                                        IDM_ISEMRI_ID                     = @IDM_ISEMRI_ID
-                                                       ,IDM_TARIH                         = @IDM_TARIH
+                                                        IDM_TARIH                         = @IDM_TARIH
                                                        ,IDM_SAAT                          = @IDM_SAAT
                                                        ,IDM_STOK_ID                       = @IDM_STOK_ID
                                                        ,IDM_DEPO_ID                       = @IDM_DEPO_ID
@@ -1707,7 +1704,6 @@ namespace WebApiNew.Controllers
                                                        ,IDM_MALZEME_STOKTAN               = @IDM_MALZEME_STOKTAN WHERE TB_ISEMRI_MLZ_ID = @TB_ISEMRI_MLZ_ID";
                     prms.Clear();
 
-                    prms.Add("@IDM_ISEMRI_ID", entity.IDM_ISEMRI_ID);
                     prms.Add("@IDM_TARIH", entity.IDM_TARIH);
                     prms.Add("@IDM_SAAT", entity.IDM_SAAT);
                     prms.Add("@IDM_STOK_ID", entity.IDM_STOK_ID);
@@ -1849,8 +1845,7 @@ namespace WebApiNew.Controllers
                     #region Güncelle
 
                     string query = @"UPDATE orjin.TB_MAKINE_DURUS SET
-                                    MKD_ISEMRI_ID                   =@MKD_ISEMRI_ID
-                                   ,MKD_MAKINE_ID                   =@MKD_MAKINE_ID
+                                    MKD_MAKINE_ID                   =@MKD_MAKINE_ID
                                    ,MKD_BASLAMA_TARIH               =@MKD_BASLAMA_TARIH
                                    ,MKD_BASLAMA_SAAT                =@MKD_BASLAMA_SAAT
                                    ,MKD_BITIS_TARIH                 =@MKD_BITIS_TARIH
@@ -1866,7 +1861,6 @@ namespace WebApiNew.Controllers
                                    ,MKD_LOKASYON_ID                 =@MKD_LOKASYON_ID 
                                    ,MKD_ACIKLAMA                    =@MKD_ACIKLAMA WHERE TB_MAKINE_DURUS_ID = @TB_MAKINE_DURUS_ID";
                     prms.Clear();
-                    prms.Add("MKD_ISEMRI_ID", entity.MKD_ISEMRI_ID);
                     prms.Add("MKD_MAKINE_ID", entity.MKD_MAKINE_ID);
                     prms.Add("MKD_BASLAMA_TARIH", entity.MKD_BASLAMA_TARIH);
                     prms.Add("MKD_BASLAMA_SAAT", entity.MKD_BASLAMA_SAAT);
