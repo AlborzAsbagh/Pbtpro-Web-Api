@@ -29,9 +29,9 @@ namespace WebApiNew.Controllers
 		Util klas = new Util();
 		string query = "";
 		SqlCommand cmd = null;
+		Parametreler prms = new Parametreler();
 
 
-		//Get Makine Full List For Web App Version
 		[Route("api/GetMakineFullList")]
 		[HttpPost]
 		public object GetMakineFullList([FromUri] int? lokasyonId, [FromUri] string parametre , [FromBody] JObject filters , [FromUri] int pagingDeger = 1) 
@@ -104,7 +104,6 @@ namespace WebApiNew.Controllers
 
 	
 
-		//Get Makine Durum For Web App Version
 		[Route("api/GetMakineDurum")]
 		[HttpGet]
 		public Object GetMakineDurum()
@@ -120,7 +119,6 @@ namespace WebApiNew.Controllers
 		}
 
 
-		//Add Makine Durum Web App Version
 		[Route ("api/AddMakineDurum")]
 		[HttpPost]
 		public Object AddMakineDurum([FromUri] string yeniDurum) 
@@ -144,7 +142,245 @@ namespace WebApiNew.Controllers
 			}
 		}
 
+		[Route("api/AddMakineTip")]
+		[HttpPost]
 
-		
+		public Object AddMakineTip([FromUri] string yeniTip)
+		{
+			try
+			{
+				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 32501 , '{yeniTip}' , 1 , 1 , 1 ,1) ";
+
+				using( var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con); 
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { status_code = 201 , status = "Added Successfully" });
+
+			}
+			catch(Exception ex)
+			{
+				klas.kapat();
+				return Json(new { status_code = 201, status = ex.Message });
+			}
+		}
+
+		[Route("api/AddMakineKategori")]
+		[HttpPost]
+
+		public Object AddMakineKategori([FromUri] string yeniKategori)
+		{
+			try
+			{
+				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( 32502 , '{yeniKategori}' , 1 , 1 , 1 ,1) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { has_error = false ,status_code = 201, status = "Added Successfully" });
+
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true , status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/GetMakineModels")]
+		[HttpGet]
+		public Object GetMakineModelFullList()
+		{
+			try
+			{
+				query = "select * from orjin.TB_MODEL";
+				List<Model> list = new List<Model>();
+				using(var con = klas.baglan())
+				{
+					list = con.Query<Model>(query).ToList();
+					klas.kapat();
+					return Json(new {Makine_Model_List = list});
+				}
+			}
+			catch(Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/GetMakineModelByMarkaId")]
+		[HttpGet]
+		public Object GetMakineModelByMarkaId([FromUri] int markaId)
+		{
+			try
+			{
+				query = $"select * from orjin.TB_MODEL where MDL_MARKA_ID = {markaId}";
+				List<Model> list = new List<Model>();
+				using (var con = klas.baglan())
+				{
+					list = con.Query<Model>(query).ToList();
+					klas.kapat();
+					return Json(new { Makine_Model_List = list });
+				}
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/GetMakineMarks")]
+		[HttpGet]
+		public Object GetMakineMarkaFullList()
+		{
+			try
+			{
+				query = "select * from orjin.TB_MARKA";
+				List<Marka> list = new List<Marka>();
+				using (var con = klas.baglan())
+				{
+					list = con.Query<Marka>(query).ToList();
+					klas.kapat();
+					return Json(new { Makine_Marka_List = list });
+				}
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+
+		[Route("api/AddMakineModel")]
+		[HttpPost]
+		public Object AddMakineModel([FromBody] Model entity)
+		{
+			try
+			{
+				query = @" insert into orjin.TB_MODEL 
+							( MDL_MARKA_ID,	
+							  MDL_MODEL,	
+							  MDL_OLUSTURAN_ID,	
+							  MDL_OLUSTURMA_TARIH,	
+							  MDL_DEGISTIREN_ID,	
+							  MDL_DEGISTIRME_TARIH ) values
+							(
+							  @MDL_MARKA_ID,
+							  @MDL_MODEL,
+							  @MDL_OLUSTURAN_ID,
+							  @MDL_OLUSTURMA_TARIH,
+							  @MDL_DEGISTIREN_ID,
+							  @MDL_DEGISTIRME_TARIH, )
+							";
+				prms.Clear();
+				prms.Add("@MDL_MARKA_ID",entity.MDL_MARKA_ID);
+				prms.Add("@MDL_MODEL",entity.MDL_MODEL);
+				prms.Add("@MDL_OLUSTURAN_ID",entity.MDL_OLUSTURAN_ID);
+				prms.Add("@MDL_OLUSTURMA_TARIH",DateTime.Now);
+				prms.Add("@MDL_DEGISTIREN_ID",0);
+				prms.Add("@MDL_DEGISTIRME_TARIH",null);
+				klas.baglan();
+				klas.cmd(query, prms.PARAMS);
+				klas.kapat();
+				return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+			}
+			catch(Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+
+		[Route("api/AddMakineMarka")]
+		[HttpPost]
+		public Object AddMakineMarka([FromBody] Marka entity)
+		{
+			try
+			{
+				query = @" insert into orjin.TB_MARKA 
+							( MRK_MARKA,	
+							  MRK_OLUSTURAN_ID,	
+							  MRK_OLUSTURMA_TARIH,	
+							  MRK_DEGISTIREN_ID,	
+							  MRK_DEGISTIRME_TARIH ) values
+							(
+							  @MRK_MARKA,
+							  @MRK_OLUSTURAN_ID,
+							  @MRK_OLUSTURMA_TARIH,
+							  @MRK_DEGISTIREN_ID,
+							  @MRK_DEGISTIRME_TARIH, )
+							";
+				prms.Clear();
+				prms.Add("@MRK_MARKA", entity.MRK_MARKA);
+				prms.Add("@MRK_OLUSTURAN_ID", entity.MRK_OLUSTURAN_ID);
+				prms.Add("@MRK_OLUSTURMA_TARIH", DateTime.Now);
+				prms.Add("@MRK_DEGISTIREN_ID", 0);
+				prms.Add("@MRK_DEGISTIRME_TARIH", null);
+				klas.baglan();
+				klas.cmd(query, prms.PARAMS);
+				klas.kapat();
+				return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+
+		[Route("api/GetMakineOperators")]
+		[HttpGet]
+		public Object GetMakineOperators()
+		{
+			try
+			{
+				query = @"SELECT 
+						   TB_MAKINE_OPERATOR_ID
+						  ,MKO_MAKINE_ID
+						  ,MKO_TARIH
+						  ,MKO_SAAT
+						  ,MKO_KAYNAK_OPERATOR_ID
+						  ,MKO_HEDEF_OPERATOR_ID
+						  ,MKO_ACIKLAMA
+						  ,MKO_OLUSTURAN_ID
+						  ,MKO_OLUSTURMA_TARIH
+						  ,MKO_DEGISTIREN_ID
+						  ,MKO_DEGISTIRME_TARIH
+						  ,MKO_SAYAC_BIRIMI
+						  ,MKO_GUNCEL_SAYAC_DEGERI
+						  , PRS_HEDEF_KOD.PRS_ISIM as MKO_HEDEF_OPERATOR_KOD
+						  , PRS_KAYNAK_KOD.PRS_ISIM as MKO_KAYNAK_OPERATOR_KOD
+					  FROM orjin.TB_MAKINE_OPERATOR MKO 
+					  left join orjin.TB_PERSONEL PRS_HEDEF_KOD ON MKO.MKO_HEDEF_OPERATOR_ID = PRS_HEDEF_KOD.TB_PERSONEL_ID
+					  left join orjin.TB_PERSONEL PRS_KAYNAK_KOD ON MKO.MKO_KAYNAK_OPERATOR_ID = PRS_KAYNAK_KOD.TB_PERSONEL_ID";
+				List<MakineOperator> list = new List<MakineOperator>();
+				using (var cnn = klas.baglan())
+				{
+					list = cnn.Query<MakineOperator>(query).ToList();
+					klas.kapat();
+					return Json(new { Makine_Operator_List = list });
+
+				}
+
+			}
+
+			catch(Exception ex)
+			{
+				klas.kapat();
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
 	}
 }

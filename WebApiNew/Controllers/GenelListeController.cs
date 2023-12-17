@@ -548,6 +548,7 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
                 {
                     listem = cnn.Query<Takvim>(query).ToList();
                 }
+                klas.kapat();
                 return Json(new { Takvim_Liste = listem });
             }
             catch(Exception ex) 

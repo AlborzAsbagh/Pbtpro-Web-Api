@@ -212,7 +212,6 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		//Get Is Emri Durum List For Web App Version
 		[Route("api/GetIsEmriDurum")]
 		[HttpGet]
 		public Object GetIsEmriDurum()
@@ -230,7 +229,6 @@ namespace WebApiNew.Controllers
 
 
 
-		//Add Is Emri Durum Web For App Version
 		[Route("api/AddIsEmriDurum")]
 		[HttpPost]
 		public Object AddIsEmriDurum([FromUri] string yeniDurum)
@@ -256,7 +254,6 @@ namespace WebApiNew.Controllers
 		}
 
 
-		//Is Emri Durum Varsayilan Yap
 		[Route("api/IsEmriDurumVarsayilanYap")]
 		[HttpGet]
 		public Object IsEmriDurumVarsayilanYap([FromUri] int kodId,[FromUri] bool isVarsayilan)
@@ -282,7 +279,6 @@ namespace WebApiNew.Controllers
 
 		}
 
-		//Add Is Emri Durum Degisikligi Web App Version
 		[Route("api/AddIsEmriDurumDegisikligi")]
 		[HttpPost]
 		public Object AddIsEmriDurumDegisikligi([FromBody] IsEmriLog entity)
@@ -329,7 +325,6 @@ namespace WebApiNew.Controllers
 		}
 
 
-		//Get Is Tipi
 		[Route("api/GetIsTipi")]
 		[HttpGet]
 		public Object GetIsTipi()
@@ -345,7 +340,6 @@ namespace WebApiNew.Controllers
 			return Json(new { is_tipi = listem });
 		}
 
-		//Add Is Tipi
 		[Route("api/AddIsTipi")]
 		[HttpGet]
 		public Object AddIsTipi([FromUri] string isTipi)
@@ -370,7 +364,6 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		//Get Is Emri Nedeni
 		[Route("api/GetIsEmriNedeni")]
 		[HttpGet]
 		public Object GetIsEmriNedeni()
@@ -386,7 +379,6 @@ namespace WebApiNew.Controllers
 			return Json(new { is_emri_nedeni = listem });
 		}
 
-		//Add Is Emri Nedeni
 		[Route("api/AddIsEmriNedeni")]
 		[HttpGet]
 		public Object AddIsEmriNedeni([FromUri] string isNedeni)
@@ -411,7 +403,6 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		//Get Is Emri Ozel Alanlar Content (11,12,13,14,15)
 		[Route("api/GetIsEmriOzelAlanlar")]
 		[HttpGet]
 		public Object GetIsEmriOzelAlanlar([FromUri] int KodGrup)
@@ -427,7 +418,6 @@ namespace WebApiNew.Controllers
 			return Json(new { is_emri_ozel_alanlar = listem });
 		}
 
-		//Add Ozel Alanlar Content (11,12,13,14,15)
 		[Route("api/AddOzelAlanlarContent")]
 		[HttpGet]
 		public Object AddOzelAlanlarContent([FromUri] string content, [FromUri] int kodGrup)
