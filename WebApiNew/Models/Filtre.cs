@@ -10,7 +10,10 @@ namespace WebApiNew.Models
         public int MakineID { get; set; }
         [DataMember]
         public int MasterMakineID { get; set; }
+
         [DataMember]
+        public int isEmriDurumId { get; set; }
+		[DataMember]
         public int IlgiliKisiId { get; set; }
         [DataMember]
         public int LokasyonID { get; set; }

@@ -79,7 +79,13 @@ namespace WebApiNew.Controllers
                     where += " AND ISM_TIP_ID = @IS_EMRI_TIP_ID";
                 }
 
-                if (filtre.ProjeID > 0)
+				if (filtre.isEmriDurumId > -1)
+				{
+					prms.Add("ISM_DURUM_KOD_ID", filtre.isEmriDurumId);
+					where += " AND ISM_DURUM_KOD_ID = @ISM_DURUM_KOD_ID";
+				}
+
+				if (filtre.ProjeID > 0)
                 {
                     prms.Add("ISM_PROJE_KOD_ID", filtre.ProjeID);
                     where += " AND ISM_PROJE_KOD_ID = @ISM_PROJE_KOD_ID";
