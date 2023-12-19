@@ -344,10 +344,10 @@ namespace WebApiNew.Models
 		public double OZEL_ALAN_20 { get; set; } 
 
 		[DataMember]
-		public int BILDIRILEN_KAT { get; set; } 
+		public string BILDIRILEN_KAT { get; set; } 
 
 		[DataMember]
-		public int BILDIRILEN_BINA { get; set; } 
+		public string BILDIRILEN_BINA { get; set; } 
 
 		[DataMember]
 		public string PERSONEL_ADI { get; set; } 

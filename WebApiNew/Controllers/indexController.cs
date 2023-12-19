@@ -48,7 +48,7 @@ namespace WebApiNew.Controllers
                                           FROM {0}.orjin.TB_KULLANICI_YETKI 
                                           LEFT JOIN {0}.orjin.TB_YETKI YTK ON KYT_YETKI_KOD = YTK.YTK_KOD 
                                           WHERE KYT_KULLANICI_ID = (SELECT (CASE WHEN K.KLL_ROL_ID > 0 THEN K.KLL_ROL_ID ELSE K.TB_KULLANICI_ID END) 
-                                          FROM {0}.orjin.TB_KULLANICI K WHERE K.TB_KULLANICI_ID=@USER_ID) AND KYT_YETKI_KOD IN (1001,4001,10001,2003,5001,6005,1004,4006,5008,2011,3002,9001,1016,1017,2001,1021);";
+                                          FROM {0}.orjin.TB_KULLANICI K WHERE K.TB_KULLANICI_ID=@USER_ID) AND KYT_YETKI_KOD IN (1001,4001,10001,2003,5001,6005,1004,4006,5008,2011,3002,9001,1016,1017,2001,1021,1510,11002);";
 
                 string prsquery = @"SELECT * FROM orjin.VW_PERSONEL WHERE TB_PERSONEL_ID = (SELECT KLL_PERSONEL_ID FROM {0}.orjin.TB_KULLANICI WHERE TB_KULLANICI_ID=@USER_ID);";
                 string ytkLokQuery = @"SELECT KLT_LOKASYON_ID from {0}.orjin.TB_KULLANICI_LOKASYON where KLT_KULLANICI_ID=@USER_ID and KLT_GOR=1;"; 
