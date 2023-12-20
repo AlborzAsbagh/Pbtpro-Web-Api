@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
+using Dapper.Contrib.Extensions;
+using FastReport.Utils.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -102,7 +106,72 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-	
+		//Makine Ekle 
+		[Route("api/AddMakine")]
+		[HttpPost]
+		public async Task<Object> Post([FromBody] JObject entity , [FromUri] int ID)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					//bool makineExists = await cnn.QueryFirstOrDefaultAsync<int>($"SELECT COUNT(*) FROM orjin.TB_MAKINE WHERE MKN_KOD = {entity.GetValue("TB_MAKINE_ID")}") > 0;
+					if(entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_MAKINE ( ";
+						foreach (var item in entity)
+						{
+							if (item.Key.Equals("MakineSayacList") ||
+									item.Key.Equals("MakineOtonomBakimList") ||
+										item.Key.Equals("MakinePeriyodikBakimList")) continue;
+
+							if (count < entity.Count-4) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count ++;
+						}
+
+						query += " ) values ( ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (item.Key.Equals("MakineSayacList") || 
+									item.Key.Equals("MakineOtonomBakimList") || 
+										item.Key.Equals("MakinePeriyodikBakimList")) continue;
+
+							if (count < entity.Count - 4) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+						int makineId = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_MAKINE_ID) FROM orjin.TB_MAKINE");
+
+
+						if (entity["MakineSayacList"] is JArray makineSayacList && makineSayacList.Count > 0)
+						{
+							Bildirim bldr = new Bildirim();
+
+							for(int i = 0; i < makineSayacList.Count; i++) 
+							{
+								Sayac sayac = JsonConvert.DeserializeObject<Sayac>(makineSayacList[i].ToString());
+								bldr = YeniSayacEkle(sayac, makineId);
+								if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
+							}
+							
+						}
+						
+					}
+				}
+				 return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+			}
+			catch (Exception e) {
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
 
 		[Route("api/GetMakineDurum")]
 		[HttpGet]
@@ -380,6 +449,183 @@ namespace WebApiNew.Controllers
 			{
 				klas.kapat();
 				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+
+		//Yeni Sayaca Ekle
+		[Route("api/AddSayac")]
+		[HttpPost]
+		public Bildirim YeniSayacEkle([FromBody] Sayac entity , long makineId = 0)
+		{
+			Bildirim bildirim = new Bildirim();
+			try
+			{
+				if(entity.TB_SAYAC_ID < 1)
+				{
+					#region Insertion
+					query = @" insert into orjin.TB_SAYAC 
+								(
+								 MES_TANIM
+								,MES_BIRIM_KOD_ID
+								,MES_TIP_KOD_ID
+								,MES_GUNCEL_DEGER
+								,MES_VARSAYILAN
+								,MES_SANAL_SAYAC
+								,MES_SANAL_SAYAC_ARTIS
+								,MES_SANAL_SAYAC_BASLANGIC_TARIH
+								,MES_GUNCELLEME_SEKLI
+								,MES_OZEL_ALAN_1
+								,MES_OZEL_ALAN_2
+								,MES_OZEL_ALAN_3
+								,MES_OZEL_ALAN_4
+								,MES_OZEL_ALAN_5
+								,MES_OZEL_ALAN_6
+								,MES_OZEL_ALAN_7
+								,MES_OZEL_ALAN_8
+								,MES_OZEL_ALAN_9
+								,MES_OZEL_ALAN_10
+								,MES_ACIKLAMA
+								,MES_REF_ID
+								,MES_REF_GRUP
+								,MES_OLUSTURAN_ID
+								,MES_OLUSTURMA_TARIH
+								,MES_MAKINE_ID
+								) 
+								values 
+								(  
+								 @MES_TANIM
+								,@MES_BIRIM_KOD_ID
+								,@MES_TIP_KOD_ID
+								,@MES_GUNCEL_DEGER
+								,@MES_VARSAYILAN
+								,@MES_SANAL_SAYAC
+								,@MES_SANAL_SAYAC_ARTIS
+								,@MES_SANAL_SAYAC_BASLANGIC_TARIH
+								,@MES_GUNCELLEME_SEKLI
+								,@MES_OZEL_ALAN_1
+								,@MES_OZEL_ALAN_2
+								,@MES_OZEL_ALAN_3
+								,@MES_OZEL_ALAN_4
+								,@MES_OZEL_ALAN_5
+								,@MES_OZEL_ALAN_6
+								,@MES_OZEL_ALAN_7
+								,@MES_OZEL_ALAN_8
+								,@MES_OZEL_ALAN_9
+								,@MES_OZEL_ALAN_10
+								,@MES_ACIKLAMA
+								,@MES_REF_ID
+								,@MES_REF_GRUP
+								,@MES_OLUSTURAN_ID
+								,@MES_OLUSTURMA_TARIH
+								,@MES_MAKINE_ID ) ";
+
+					prms.Clear();
+					if (makineId == 0) prms.Add("@MES_MAKINE_ID", entity.MES_MAKINE_ID);
+					else prms.Add("@MES_MAKINE_ID", makineId);
+					prms.Add("@MES_TANIM",entity.MES_TANIM);
+					prms.Add("@MES_BIRIM_KOD_ID",entity.MES_BIRIM_KOD_ID);
+					prms.Add("@MES_TIP_KOD_ID",entity.MES_TIP_KOD_ID);
+					prms.Add("@MES_GUNCEL_DEGER",entity.MES_GUNCEL_DEGER);
+					prms.Add("@MES_VARSAYILAN",entity.MES_VARSAYILAN);
+					prms.Add("@MES_SANAL_SAYAC",entity.MES_SANAL_SAYAC);
+					prms.Add("@MES_SANAL_SAYAC_ARTIS",entity.MES_SANAL_SAYAC_ARTIS);
+					prms.Add("@MES_SANAL_SAYAC_BASLANGIC_TARIH",entity.MES_SANAL_SAYAC_BASLANGIC_TARIH);
+					prms.Add("@MES_GUNCELLEME_SEKLI",entity.MES_GUNCELLEME_SEKLI);
+					prms.Add("@MES_OZEL_ALAN_1",entity.MES_OZEL_ALAN_1);
+					prms.Add("@MES_OZEL_ALAN_2",entity.MES_OZEL_ALAN_2);
+					prms.Add("@MES_OZEL_ALAN_3",entity.MES_OZEL_ALAN_3);
+					prms.Add("@MES_OZEL_ALAN_4",entity.MES_OZEL_ALAN_4);
+					prms.Add("@MES_OZEL_ALAN_5",entity.MES_OZEL_ALAN_5);
+					prms.Add("@MES_OZEL_ALAN_6",entity.MES_OZEL_ALAN_6);
+					prms.Add("@MES_OZEL_ALAN_7",entity.MES_OZEL_ALAN_7);
+					prms.Add("@MES_OZEL_ALAN_8",entity.MES_OZEL_ALAN_8);
+					prms.Add("@MES_OZEL_ALAN_9",entity.MES_OZEL_ALAN_9);
+					prms.Add("@MES_OZEL_ALAN_10",entity.MES_OZEL_ALAN_10);
+					prms.Add("@MES_ACIKLAMA",entity.MES_ACIKLAMA);
+					prms.Add("@MES_REF_ID",entity.MES_REF_ID);
+					prms.Add("@MES_REF_GRUP",entity.MES_REF_GRUP);
+					prms.Add("@MES_OLUSTURAN_ID",entity.MES_OLUSTURAN_ID);
+					prms.Add("@MES_OLUSTURMA_TARIH",DateTime.Now);
+					klas.baglan();
+					klas.cmd(query, prms.PARAMS);
+					bildirim.Aciklama = "Added Successfully";
+					bildirim.Durum = true;
+					return bildirim;
+					#endregion 
+				}
+				else
+				{
+					#region Update
+					query = @" update orjin.TB_SAYAC set
+								 MES_TANIM = @MES_TANIM
+								,MES_BIRIM_KOD_ID = @MES_BIRIM_KOD_ID
+								,MES_TIP_KOD_ID = @MES_TIP_KOD_ID
+								,MES_GUNCEL_DEGER = @MES_GUNCEL_DEGER
+								,MES_VARSAYILAN = @MES_VARSAYILAN
+								,MES_SANAL_SAYAC = @MES_SANAL_SAYAC
+								,MES_SANAL_SAYAC_ARTIS = @MES_SANAL_SAYAC_ARTIS 
+								,MES_SANAL_SAYAC_BASLANGIC_TARIH = @MES_SANAL_SAYAC_BASLANGIC_TARIH
+								,MES_GUNCELLEME_SEKLI = @MES_GUNCELLEME_SEKLI
+								,MES_OZEL_ALAN_1 = @MES_OZEL_ALAN_1
+								,MES_OZEL_ALAN_2 = @MES_OZEL_ALAN_2
+								,MES_OZEL_ALAN_3 = @MES_OZEL_ALAN_3
+								,MES_OZEL_ALAN_4 = @MES_OZEL_ALAN_4
+								,MES_OZEL_ALAN_5 = @MES_OZEL_ALAN_5
+								,MES_OZEL_ALAN_6 = @MES_OZEL_ALAN_6
+								,MES_OZEL_ALAN_7 = @MES_OZEL_ALAN_7
+								,MES_OZEL_ALAN_8 = @MES_OZEL_ALAN_8
+								,MES_OZEL_ALAN_9 = @MES_OZEL_ALAN_9
+								,MES_OZEL_ALAN_10 = @MES_OZEL_ALAN_10
+								,MES_ACIKLAMA = @MES_ACIKLAMA
+								,MES_REF_ID = @MES_REF_ID
+								,MES_REF_GRUP = @MES_REF_GRUP
+								,MES_OLUSTURAN_ID = @MES_OLUSTURAN_ID
+								,MES_OLUSTURMA_TARIH = @MES_OLUSTURMA_TARIH 
+								,MES_MAKINE_ID  = @MES_MAKINE_ID where TB_SAYAC_ID = @TB_SAYAC_ID";
+
+					prms.Clear();
+					if (makineId == 0) prms.Add("@MES_MAKINE_ID", entity.MES_MAKINE_ID);
+					else prms.Add("@MES_MAKINE_ID", makineId);
+					prms.Add("@TB_SAYAC_ID", entity.TB_SAYAC_ID);
+					prms.Add("@MES_TANIM", entity.MES_TANIM);
+					prms.Add("@MES_BIRIM_KOD_ID", entity.MES_BIRIM_KOD_ID);
+					prms.Add("@MES_TIP_KOD_ID", entity.MES_TIP_KOD_ID);
+					prms.Add("@MES_GUNCEL_DEGER", entity.MES_GUNCEL_DEGER);
+					prms.Add("@MES_VARSAYILAN", entity.MES_VARSAYILAN);
+					prms.Add("@MES_SANAL_SAYAC", entity.MES_SANAL_SAYAC);
+					prms.Add("@MES_SANAL_SAYAC_ARTIS", entity.MES_SANAL_SAYAC_ARTIS);
+					prms.Add("@MES_SANAL_SAYAC_BASLANGIC_TARIH", entity.MES_SANAL_SAYAC_BASLANGIC_TARIH);
+					prms.Add("@MES_GUNCELLEME_SEKLI", entity.MES_GUNCELLEME_SEKLI);
+					prms.Add("@MES_OZEL_ALAN_1", entity.MES_OZEL_ALAN_1);
+					prms.Add("@MES_OZEL_ALAN_2", entity.MES_OZEL_ALAN_2);
+					prms.Add("@MES_OZEL_ALAN_3", entity.MES_OZEL_ALAN_3);
+					prms.Add("@MES_OZEL_ALAN_4", entity.MES_OZEL_ALAN_4);
+					prms.Add("@MES_OZEL_ALAN_5", entity.MES_OZEL_ALAN_5);
+					prms.Add("@MES_OZEL_ALAN_6", entity.MES_OZEL_ALAN_6);
+					prms.Add("@MES_OZEL_ALAN_7", entity.MES_OZEL_ALAN_7);
+					prms.Add("@MES_OZEL_ALAN_8", entity.MES_OZEL_ALAN_8);
+					prms.Add("@MES_OZEL_ALAN_9", entity.MES_OZEL_ALAN_9);
+					prms.Add("@MES_OZEL_ALAN_10", entity.MES_OZEL_ALAN_10);
+					prms.Add("@MES_ACIKLAMA", entity.MES_ACIKLAMA);
+					prms.Add("@MES_REF_ID", entity.MES_REF_ID);
+					prms.Add("@MES_REF_GRUP", entity.MES_REF_GRUP);
+					prms.Add("@MES_OLUSTURAN_ID", entity.MES_OLUSTURAN_ID);
+					prms.Add("@MES_OLUSTURMA_TARIH", DateTime.Now);
+					klas.baglan();
+					klas.cmd(query, prms.PARAMS);
+					bildirim.Aciklama = "Updated Successfully";
+					bildirim.Durum = true;
+					return bildirim;
+					#endregion
+
+				}
+			}
+			catch (Exception e) 
+			{
+				bildirim.Aciklama = e.Message;
+				bildirim.Durum = false;
+				return bildirim;
 			}
 		}
 	}

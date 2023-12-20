@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Web.Http;
 using Dapper;
 using WebApiNew.Filters;
@@ -12,7 +14,10 @@ namespace WebApiNew.Controllers
     {
         Util klas = new Util();
         Parametreler prms = new Parametreler();
-        [Route("api/KodList")]
+		string query = "";
+		SqlCommand cmd = null;
+
+		[Route("api/KodList")]
         [HttpGet]
         public List<Kod> KodList(string grup)
         {
@@ -48,5 +53,32 @@ namespace WebApiNew.Controllers
             
             return listem;
         }
-    }
+
+
+		[Route("api/AddKodList")]
+		[HttpPost]
+
+		public Object AddKodList([FromUri] string entity, [FromUri] string grup)
+		{
+			try
+			{
+				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+				query += $" values ( '{grup}' , '{entity}' , 1 , 1 , 1 ,1) ";
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { status_code = 201, status = "Added Successfully" });
+
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { status_code = 201, status = ex.Message });
+			}
+		}
+	}
 }
