@@ -116,7 +116,6 @@ namespace WebApiNew.Controllers
 			{
 				using (var cnn = klas.baglan())
 				{
-					//bool makineExists = await cnn.QueryFirstOrDefaultAsync<int>($"SELECT COUNT(*) FROM orjin.TB_MAKINE WHERE MKN_KOD = {entity.GetValue("TB_MAKINE_ID")}") > 0;
 					if(entity != null && entity.Count > 0)
 					{
 						query = " insert into orjin.TB_MAKINE ( ";
@@ -167,6 +166,64 @@ namespace WebApiNew.Controllers
 				 return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
 			}
 			catch (Exception e) {
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+
+		//Makine Guncelle 
+		[Route("api/UpdateMakine")]
+		[HttpPost]
+		public async Task<Object> MakineGuncelle([FromBody] JObject entity, [FromUri] int ID)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_MAKINE_ID")) >= 1)
+					{
+						query = " update orjin.TB_MAKINE set ";
+						foreach (var item in entity)
+						{
+							if (item.Key.Equals("MakineSayacList") ||
+									item.Key.Equals("MakineOtonomBakimList") ||
+										item.Key.Equals("MakinePeriyodikBakimList") || 
+													item.Key.Equals("TB_MAKINE_ID")) continue;
+
+							if (count < entity.Count - 5) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" where TB_MAKINE_ID = {Convert.ToInt32(entity.GetValue("TB_MAKINE_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+						int makineId = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_MAKINE_ID) FROM orjin.TB_MAKINE");
+
+
+						if (entity["MakineSayacList"] is JArray makineSayacList && makineSayacList.Count > 0)
+						{
+							Bildirim bldr = new Bildirim();
+
+							for (int i = 0; i < makineSayacList.Count; i++)
+							{
+								Sayac sayac = JsonConvert.DeserializeObject<Sayac>(makineSayacList[i].ToString());
+								bldr = YeniSayacEkle(sayac, makineId);
+								if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
+							}
+
+						}
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
 
 				return Json(new { has_error = true, status_code = 500, status = e.Message });
 			}
@@ -580,8 +637,8 @@ namespace WebApiNew.Controllers
 								,MES_ACIKLAMA = @MES_ACIKLAMA
 								,MES_REF_ID = @MES_REF_ID
 								,MES_REF_GRUP = @MES_REF_GRUP
-								,MES_OLUSTURAN_ID = @MES_OLUSTURAN_ID
-								,MES_OLUSTURMA_TARIH = @MES_OLUSTURMA_TARIH 
+								,MES_DEGISTIREN_ID = @MES_DEGISTIREN_ID
+								,MES_DEGISTIRME_TARIH = @MES_DEGISTIRME_TARIH
 								,MES_MAKINE_ID  = @MES_MAKINE_ID where TB_SAYAC_ID = @TB_SAYAC_ID";
 
 					prms.Clear();
@@ -610,8 +667,8 @@ namespace WebApiNew.Controllers
 					prms.Add("@MES_ACIKLAMA", entity.MES_ACIKLAMA);
 					prms.Add("@MES_REF_ID", entity.MES_REF_ID);
 					prms.Add("@MES_REF_GRUP", entity.MES_REF_GRUP);
-					prms.Add("@MES_OLUSTURAN_ID", entity.MES_OLUSTURAN_ID);
-					prms.Add("@MES_OLUSTURMA_TARIH", DateTime.Now);
+					prms.Add("@MES_DEGISTIREN_ID", entity.MES_DEGISTIREN_ID);
+					prms.Add("@MES_DEGISTIRME_TARIH", DateTime.Now);
 					klas.baglan();
 					klas.cmd(query, prms.PARAMS);
 					bildirim.Aciklama = "Updated Successfully";
