@@ -43,8 +43,8 @@ namespace WebApiNew.Controllers
                                 ,(SELECT COUNT(TB_IS_TALEP_ID) FROM orjin.TB_IS_TALEBI WHERE IST_MAKINE_ID= TB_MAKINE_ID AND IST_DURUM_ID NOT IN (0,1)) MKN_KAPALI_ISTALEP_SAYISI 
                                 ,MKN_DURUM_KOD_ID				
                                 ,DRM.KOD_TANIM MKN_DURUM 					
-                                ,MRK.KOD_TANIM MKN_MARKA 					
-                                ,MDL.KOD_TANIM MKN_MODEL 					
+                                ,MRK.MRK_MARKA MKN_MARKA 					
+                                ,MDL.MDL_MODEL MKN_MODEL 					
                                 ,MKN_LOKASYON_ID 			
                                 ,MKN_URETIM_YILI 			
                                 ,MKN_SERI_NO 				
@@ -56,8 +56,8 @@ namespace WebApiNew.Controllers
                                 ,ROW_NUMBER() OVER (ORDER BY MKN.TB_MAKINE_ID) AS RowNum 	
                                 FROM orjin.TB_MAKINE MKN
                                 LEFT JOIN orjin.TB_LOKASYON LOK on MKN.MKN_LOKASYON_ID = LOK.TB_LOKASYON_ID
-                                LEFT JOIN orjin.TB_KOD MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_KOD_ID
-                                LEFT JOIN orjin.TB_KOD MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_KOD_ID
+                                LEFT JOIN orjin.TB_MARKA MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_MARKA_ID
+                                LEFT JOIN orjin.TB_MODEL MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_MODEL_ID
                                 LEFT JOIN orjin.TB_KOD KTG ON MKN.MKN_KATEGORI_KOD_ID=KTG.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD DRM ON MKN.MKN_DURUM_KOD_ID=DRM.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD TIP ON MKN.MKN_TIP_KOD_ID=TIP.TB_KOD_ID
@@ -109,7 +109,8 @@ namespace WebApiNew.Controllers
                     ARC.ARC_PLAKA   LIKE '%'+@KELIME+'%' OR 
                     LOK.LOK_TANIM   LIKE '%'+@KELIME+'%' OR 
                     MKN_TANIM       LIKE '%'+@KELIME+'%' OR 
-                    MRK.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                    MRK.MRK_MARKA   LIKE '%'+@KELIME+'%' OR 
+                    MDL.MDL_MODEL   LIKE '%'+@KELIME+'%' OR 
                     KTG.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
                     DRM.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
                     '*' = @KELIME)";
@@ -162,8 +163,8 @@ namespace WebApiNew.Controllers
                                 ,(SELECT COUNT(TB_IS_TALEP_ID) FROM orjin.TB_IS_TALEBI WHERE IST_MAKINE_ID= TB_MAKINE_ID AND IST_DURUM_ID NOT IN (0,1)) MKN_KAPALI_ISTALEP_SAYISI 
                                 ,MKN_DURUM_KOD_ID				
                                 ,DRM.KOD_TANIM MKN_DURUM 					
-                                ,MRK.KOD_TANIM MKN_MARKA 					
-                                ,MDL.KOD_TANIM MKN_MODEL 					
+                                ,MRK.MRK_MARKA MKN_MARKA 					
+                                ,MDL.MDL_MODEL MKN_MODEL					
                                 ,MKN_LOKASYON_ID 			
                                 ,MKN_URETIM_YILI 			
                                 ,MKN_SERI_NO 				
@@ -175,8 +176,8 @@ namespace WebApiNew.Controllers
                                 ,ROW_NUMBER() OVER (ORDER BY MKN.TB_MAKINE_ID) AS RowNum 	
                                 FROM orjin.TB_MAKINE MKN
                                 LEFT JOIN orjin.TB_LOKASYON LOK on MKN.MKN_LOKASYON_ID = LOK.TB_LOKASYON_ID
-                                LEFT JOIN orjin.TB_KOD MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_KOD_ID
-                                LEFT JOIN orjin.TB_KOD MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_KOD_ID
+                                LEFT JOIN orjin.TB_MARKA MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_MARKA_ID
+                                LEFT JOIN orjin.TB_MODEL MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_MODEL_ID
                                 LEFT JOIN orjin.TB_KOD KTG ON MKN.MKN_KATEGORI_KOD_ID=KTG.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD DRM ON MKN.MKN_DURUM_KOD_ID=DRM.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD TIP ON MKN.MKN_TIP_KOD_ID=TIP.TB_KOD_ID
@@ -231,7 +232,8 @@ namespace WebApiNew.Controllers
                     ARC.ARC_PLAKA   LIKE '%'+@KELIME+'%' OR 
                     LOK.LOK_TANIM   LIKE '%'+@KELIME+'%' OR 
                     MKN_TANIM       LIKE '%'+@KELIME+'%' OR 
-                    MRK.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                    MRK.MRK_MARKA   LIKE '%'+@KELIME+'%' OR 
+                    MDL.MDL_MODEL   LIKE '%'+@KELIME+'%' OR 
                     KTG.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
                     DRM.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
                     '*' = @KELIME)";
@@ -286,8 +288,8 @@ namespace WebApiNew.Controllers
                                 ,(SELECT COUNT(TB_IS_TALEP_ID) FROM orjin.TB_IS_TALEBI WHERE IST_MAKINE_ID= TB_MAKINE_ID AND IST_DURUM_ID NOT IN (0,1)) MKN_KAPALI_ISTALEP_SAYISI 
                                 ,MKN_DURUM_KOD_ID				
                                 ,DRM.KOD_TANIM MKN_DURUM 					
-                                ,MRK.KOD_TANIM MKN_MARKA 					
-                                ,MDL.KOD_TANIM MKN_MODEL 					
+                                ,MRK.MRK_MARKA MKN_MARKA 					
+                                ,MDL.MDL_MODEL MKN_MODEL 					
                                 ,MKN_LOKASYON_ID 			
                                 ,MKN_URETIM_YILI 			
                                 ,MKN_SERI_NO 				
@@ -299,8 +301,8 @@ namespace WebApiNew.Controllers
                                 ,ROW_NUMBER() OVER (ORDER BY MKN.TB_MAKINE_ID) AS RowNum 	
                                 FROM orjin.TB_MAKINE MKN
                                 LEFT JOIN orjin.TB_LOKASYON LOK on MKN.MKN_LOKASYON_ID = LOK.TB_LOKASYON_ID
-                                LEFT JOIN orjin.TB_KOD MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_KOD_ID
-                                LEFT JOIN orjin.TB_KOD MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_KOD_ID
+                                LEFT JOIN orjin.TB_MARKA MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_MARKA_ID
+                                LEFT JOIN orjin.TB_MODEL MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_MODEL_ID
                                 LEFT JOIN orjin.TB_KOD KTG ON MKN.MKN_KATEGORI_KOD_ID=KTG.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD DRM ON MKN.MKN_DURUM_KOD_ID=DRM.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD TIP ON MKN.MKN_TIP_KOD_ID=TIP.TB_KOD_ID
@@ -327,7 +329,8 @@ namespace WebApiNew.Controllers
                 ARC.ARC_PLAKA   LIKE '%'+@KELIME+'%' OR 
                 LOK.LOK_TANIM   LIKE '%'+@KELIME+'%' OR 
                 MKN_TANIM       LIKE '%'+@KELIME+'%' OR 
-                MRK.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                MRK.MRK_MARKA   LIKE '%'+@KELIME+'%' OR 
+                MDL.MDL_MODEL   LIKE '%'+@KELIME+'%' OR 
                 KTG.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
                 DRM.KOD_TANIM   LIKE '%'+@KELIME+'%')";
                 
@@ -342,8 +345,8 @@ namespace WebApiNew.Controllers
             query += $@"SELECT COUNT(*)	
                                 FROM orjin.TB_MAKINE MKN
                                 LEFT JOIN orjin.TB_LOKASYON LOK on MKN.MKN_LOKASYON_ID = LOK.TB_LOKASYON_ID
-                                LEFT JOIN orjin.TB_KOD MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_KOD_ID
-                                LEFT JOIN orjin.TB_KOD MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_KOD_ID
+                                LEFT JOIN orjin.TB_MARKA MRK ON MKN.MKN_MARKA_KOD_ID=MRK.TB_MARKA_ID
+                                LEFT JOIN orjin.TB_MODEL MDL ON MKN.MKN_MODEL_KOD_ID=MDL.TB_MODEL_ID
                                 LEFT JOIN orjin.TB_KOD KTG ON MKN.MKN_KATEGORI_KOD_ID=KTG.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD DRM ON MKN.MKN_DURUM_KOD_ID=DRM.TB_KOD_ID
                                 LEFT JOIN orjin.TB_KOD TIP ON MKN.MKN_TIP_KOD_ID=TIP.TB_KOD_ID

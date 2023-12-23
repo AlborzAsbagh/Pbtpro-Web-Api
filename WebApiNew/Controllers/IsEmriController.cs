@@ -1388,7 +1388,7 @@ namespace WebApiNew.Controllers
 					if (isEmriId == 0) prms.Add("DKN_ISEMRI_ID", entity.DKN_ISEMRI_ID);
 					else prms.Add("DKN_ISEMRI_ID", isEmriId);
 					prms.Add("DKN_SIRANO", entity.DKN_SIRANO);
-                    prms.Add("DKN_YAPILDI", 0);
+                    prms.Add("DKN_YAPILDI", entity.DKN_YAPILDI);
                     prms.Add("DKN_TANIM", entity.DKN_TANIM);
                     prms.Add("DKN_OLUSTURAN_ID", entity.DKN_OLUSTURAN_ID);
                     prms.Add("DKN_OLUSTURMA_TARIH", DateTime.Now);
@@ -1397,10 +1397,10 @@ namespace WebApiNew.Controllers
                     prms.Add("DKN_BITIS_SAAT", entity.DKN_BITIS_SAAT != null ? entity.DKN_BITIS_SAAT : "");
                     prms.Add("DKN_MALIYET", 0);
                     prms.Add("DKN_YAPILDI_SAAT", entity.DKN_YAPILDI_SAAT != null ? entity.DKN_YAPILDI_SAAT : "");
-                    prms.Add("DKN_YAPILDI_PERSONEL_ID", -1);
-                    prms.Add("DKN_YAPILDI_MESAI_KOD_ID", -1);
-                    prms.Add("DKN_YAPILDI_ATOLYE_ID", -1);
-                    prms.Add("DKN_YAPILDI_SURE", 0);
+                    prms.Add("DKN_YAPILDI_PERSONEL_ID", entity.DKN_YAPILDI_PERSONEL_ID);
+                    prms.Add("DKN_YAPILDI_MESAI_KOD_ID", entity.DKN_YAPILDI_MESAI_KOD_ID);
+                    prms.Add("DKN_YAPILDI_ATOLYE_ID", entity.DKN_YAPILDI_ATOLYE_ID);
+                    prms.Add("DKN_YAPILDI_SURE", entity.DKN_YAPILDI_SURE);
                     prms.Add("DKN_ACIKLAMA", plainText);
                     prms.Add("DKN_REF_ID", entity.DKN_REF_ID);
                     klas.cmd(query, prms.PARAMS);
@@ -1422,6 +1422,9 @@ namespace WebApiNew.Controllers
                                ,DKN_DEGISTIRME_TARIH = @DKN_DEGISTIRME_TARIH 
                                ,DKN_ACIKLAMA = @DKN_ACIKLAMA
                                ,DKN_YAPILDI_MESAI_KOD_ID = @DKN_YAPILDI_MESAI_KOD_ID
+                               ,DKN_YAPILDI_PERSONEL_ID = @DKN_YAPILDI_PERSONEL_ID
+                               ,DKN_YAPILDI_ATOLYE_ID = @DKN_YAPILDI_ATOLYE_ID
+                               ,DKN_YAPILDI_SURE = @DKN_YAPILDI_SURE
                                ,DKN_REF_ID = @DKN_REF_ID WHERE TB_ISEMRI_KONTROLLIST_ID = @TB_ISEMRI_KONTROLLIST_ID";
                     prms.Clear();
                     prms.Add("TB_ISEMRI_KONTROLLIST_ID", entity.TB_ISEMRI_KONTROLLIST_ID);
@@ -1432,6 +1435,9 @@ namespace WebApiNew.Controllers
                     prms.Add("DKN_DEGISTIRME_TARIH", DateTime.Now);
                     prms.Add("DKN_ACIKLAMA", plainText);
                     prms.Add("DKN_YAPILDI_MESAI_KOD_ID", entity.DKN_YAPILDI_MESAI_KOD_ID);
+                    prms.Add("DKN_YAPILDI_PERSONEL_ID", entity.DKN_YAPILDI_PERSONEL_ID);
+                    prms.Add("DKN_YAPILDI_ATOLYE_ID", entity.DKN_YAPILDI_ATOLYE_ID);
+                    prms.Add("DKN_YAPILDI_SURE", entity.DKN_YAPILDI_SURE);
                     prms.Add("DKN_REF_ID", entity.DKN_REF_ID);
                     klas.cmd(query, prms.PARAMS);
                     bldr.Aciklama = "İş emri kontrol listesi başarılı bir şekilde güncellendi.";
@@ -3140,8 +3146,14 @@ namespace WebApiNew.Controllers
 				else
 					entity.DKN_YAPILDI_TARIH = null;
 
+				if (dt.Rows[i]["DKN_BITIS_TARIH"] != DBNull.Value)
+					entity.DKN_BITIS_TARIH = (DateTime)dt.Rows[i]["DKN_BITIS_TARIH"];
+				else
+					entity.DKN_BITIS_TARIH = null;
+
 				entity.DKN_YAPILDI_SAAT = dt.Rows[i]["DKN_YAPILDI_SAAT"] != DBNull.Value ? dt.Rows[i]["DKN_YAPILDI_SAAT"].ToString() : "";
                 entity.DKN_PERSONEL_ISIM = dt.Rows[i]["DKN_PERSONEL_ISIM"] != DBNull.Value ? dt.Rows[i]["DKN_PERSONEL_ISIM"].ToString() : "";
+                entity.DKN_BITIS_SAAT = dt.Rows[i]["DKN_BITIS_SAAT"] != DBNull.Value ? dt.Rows[i]["DKN_BITIS_SAAT"].ToString() : "";
 
 				if (dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value && dt.Rows[i]["DKN_ACIKLAMA"].ToString().StartsWith(@"{\rtf"))
 				{
