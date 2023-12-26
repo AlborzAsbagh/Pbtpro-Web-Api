@@ -191,7 +191,7 @@ namespace WebApiNew.Controllers
                                 WHERE
                                 orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(MKN_LOKASYON_ID,-1), @KUL_ID) = 1 AND 
                                 orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(MKN_ATOLYE_ID,-1), @KUL_ID) = 1 
-								AND IST_PERSONEL_ID = @IST_PERSONEL_ID ";
+								/*AND IST_PERSONEL_ID = @IST_PERSONEL_ID*/ ";
            
             if (Tip != -1)
             {

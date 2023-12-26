@@ -681,8 +681,8 @@ namespace WebApiNew.Controllers
 )";
 
                         prms.Add("@ISM_ISEMRI_NO", entity.ISM_ISEMRI_NO);
-                        prms.Add("@ISM_DUZENLEME_TARIH", entity.ISM_DUZENLEME_TARIH);//DateTime.Now.ToString("yyyy-MM-dd"));
-                        prms.Add("@ISM_DUZENLEME_SAAT", entity.ISM_DUZENLEME_SAAT);//DateTime.Now.ToString(C.DB_TIME_FORMAT));
+                        prms.Add("@ISM_DUZENLEME_TARIH", DateTime.Now.ToString("yyyy-MM-dd"));//DateTime.Now.ToString("yyyy-MM-dd"));
+                        prms.Add("@ISM_DUZENLEME_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));//DateTime.Now.ToString(C.DB_TIME_FORMAT));
                         prms.Add("@ISM_BASLAMA_TARIH", entity.ISM_BASLAMA_TARIH);
                         prms.Add("@ISM_BASLAMA_SAAT", string.IsNullOrWhiteSpace(entity.ISM_BASLAMA_SAAT) ? null : entity.ISM_BASLAMA_SAAT);
                         prms.Add("@ISM_BITIS_TARIH", entity.ISM_BITIS_TARIH);

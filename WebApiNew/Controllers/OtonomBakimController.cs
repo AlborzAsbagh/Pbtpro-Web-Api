@@ -94,7 +94,7 @@ namespace WebApiNew.Controllers
        FROM orjin.TB_MAKINE_BAKIM MB
       INNER JOIN orjin.TB_MAKINE M ON M.TB_MAKINE_ID=MB.MAB_MAKINE_ID
       INNER JOIN orjin.TB_IS_TANIM IT ON IT.TB_IS_TANIM_ID=MB.MAB_BAKIM_ID " // WHERE CONDITION body starts
-      + $" WHERE MB.MAB_MAKINE_ID=@MKN_ID AND orjin.UDF_LOKASYON_YETKI_KONTROL(M.MKN_LOKASYON_ID,@KLL_ID) = 1 AND IST_PERSONEL_ID = {prsId} ";
+      + $" WHERE MB.MAB_MAKINE_ID=@MKN_ID AND orjin.UDF_LOKASYON_YETKI_KONTROL(M.MKN_LOKASYON_ID,@KLL_ID) = 1 /* AND IST_PERSONEL_ID = {prsId} */ ";
             #endregion
             var util = new Util();
             using (var cnn = util.baglan())
