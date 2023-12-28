@@ -119,11 +119,11 @@ namespace WebApiNew.Controllers
 						query = " insert into orjin.TB_MAKINE ( ";
 						foreach (var item in entity)
 						{
-							if (item.Key.Equals("MakineSayacList") ||
-									item.Key.Equals("MakineOtonomBakimList") ||
-										item.Key.Equals("MakinePeriyodikBakimList")) continue;
+							//if (item.Key.Equals("MakineSayacList") ||
+							//		item.Key.Equals("MakineOtonomBakimList") ||
+							//			item.Key.Equals("MakinePeriyodikBakimList")) continue;
 
-							if (count < entity.Count-4) query += $" {item.Key} , ";
+							if (count < entity.Count-1) query += $" {item.Key} , ";
 							else query += $" {item.Key} ";
 							count ++;
 						}
@@ -133,11 +133,11 @@ namespace WebApiNew.Controllers
 
 						foreach (var item in entity)
 						{
-							if (item.Key.Equals("MakineSayacList") || 
-									item.Key.Equals("MakineOtonomBakimList") || 
-										item.Key.Equals("MakinePeriyodikBakimList")) continue;
+							//if (item.Key.Equals("MakineSayacList") || 
+							//		item.Key.Equals("MakineOtonomBakimList") || 
+							//			item.Key.Equals("MakinePeriyodikBakimList")) continue;
 
-							if (count < entity.Count - 4) query += $" '{item.Value}' , ";
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
 							else query += $" '{item.Value}' ";
 							count++;
 						}

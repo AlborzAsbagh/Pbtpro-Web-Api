@@ -104,7 +104,7 @@ namespace WebApiNew.Models
 		[DataMember]
 		public string MKN_OZEL_ALAN_9 { get; set; }
 		[DataMember]
-		public int MKN_OZEL_ALAN_10 { get; set; }
+		public string MKN_OZEL_ALAN_10 { get; set; }
 		[DataMember]
 		public int MKN_OZEL_ALAN_11_KOD_ID { get; set; }
 		[DataMember]
@@ -116,15 +116,15 @@ namespace WebApiNew.Models
 		[DataMember]
 		public int MKN_OZEL_ALAN_15_KOD_ID { get; set; }
 		[DataMember]
-		public string MKN_OZEL_ALAN_16 { get; set; }
+		public float MKN_OZEL_ALAN_16 { get; set; }
 		[DataMember]
-		public string MKN_OZEL_ALAN_17 { get; set; }
+		public float MKN_OZEL_ALAN_17 { get; set; }
 		[DataMember]
-		public string MKN_OZEL_ALAN_18 { get; set; }
+		public float MKN_OZEL_ALAN_18 { get; set; }
 		[DataMember]
-		public string MKN_OZEL_ALAN_19 { get; set; }
+		public float MKN_OZEL_ALAN_19 { get; set; }
 		[DataMember]
-		public string MKN_OZEL_ALAN_20 { get; set; }
+		public float MKN_OZEL_ALAN_20 { get; set; }
 
 		[DataMember]
 		public string MKN_SERI_NO { get; set; }
