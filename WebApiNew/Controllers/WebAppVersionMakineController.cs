@@ -404,7 +404,7 @@ namespace WebApiNew.Controllers
 							  @MDL_OLUSTURAN_ID,
 							  @MDL_OLUSTURMA_TARIH,
 							  @MDL_DEGISTIREN_ID,
-							  @MDL_DEGISTIRME_TARIH, )
+							  @MDL_DEGISTIRME_TARIH )
 							";
 				prms.Clear();
 				prms.Add("@MDL_MARKA_ID",entity.MDL_MARKA_ID);
@@ -443,7 +443,7 @@ namespace WebApiNew.Controllers
 							  @MRK_OLUSTURAN_ID,
 							  @MRK_OLUSTURMA_TARIH,
 							  @MRK_DEGISTIREN_ID,
-							  @MRK_DEGISTIRME_TARIH, )
+							  @MRK_DEGISTIRME_TARIH )
 							";
 				prms.Clear();
 				prms.Add("@MRK_MARKA", entity.MRK_MARKA);
@@ -471,21 +471,21 @@ namespace WebApiNew.Controllers
 			try
 			{
 				query = @"SELECT 
-						   TB_MAKINE_OPERATOR_ID
-						  ,MKO_MAKINE_ID
-						  ,MKO_TARIH
-						  ,MKO_SAAT
-						  ,MKO_KAYNAK_OPERATOR_ID
-						  ,MKO_HEDEF_OPERATOR_ID
-						  ,MKO_ACIKLAMA
-						  ,MKO_OLUSTURAN_ID
-						  ,MKO_OLUSTURMA_TARIH
-						  ,MKO_DEGISTIREN_ID
-						  ,MKO_DEGISTIRME_TARIH
-						  ,MKO_SAYAC_BIRIMI
-						  ,MKO_GUNCEL_SAYAC_DEGERI
-						  , PRS_HEDEF_KOD.PRS_ISIM as MKO_HEDEF_OPERATOR_KOD
-						  , PRS_KAYNAK_KOD.PRS_ISIM as MKO_KAYNAK_OPERATOR_KOD
+						   [TB_MAKINE_OPERATOR_ID]
+						  ,[MKO_MAKINE_ID]
+						  ,[MKO_TARIH]
+						  ,[MKO_SAAT]
+						  ,[MKO_KAYNAK_OPERATOR_ID]
+						  ,[MKO_HEDEF_OPERATOR_ID]
+						  ,[MKO_ACIKLAMA]
+						  ,[MKO_OLUSTURAN_ID]
+						  ,[MKO_OLUSTURMA_TARIH]
+						  ,[MKO_DEGISTIREN_ID]
+						  ,[MKO_DEGISTIRME_TARIH]
+						  ,[MKO_SAYAC_BIRIMI]
+						  ,[MKO_GUNCEL_SAYAC_DEGERI]
+						  ,PRS_HEDEF_KOD.PRS_ISIM as MKO_HEDEF_OPERATOR_KOD
+						  ,PRS_KAYNAK_KOD.PRS_ISIM as MKO_KAYNAK_OPERATOR_KOD
 					  FROM orjin.TB_MAKINE_OPERATOR MKO 
 					  left join orjin.TB_PERSONEL PRS_HEDEF_KOD ON MKO.MKO_HEDEF_OPERATOR_ID = PRS_HEDEF_KOD.TB_PERSONEL_ID
 					  left join orjin.TB_PERSONEL PRS_KAYNAK_KOD ON MKO.MKO_KAYNAK_OPERATOR_ID = PRS_KAYNAK_KOD.TB_PERSONEL_ID";
