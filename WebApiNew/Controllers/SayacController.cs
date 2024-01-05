@@ -35,7 +35,13 @@ namespace WebApiNew.Controllers
                 entity.MES_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "MES_TIP_KOD_ID");
                 entity.TB_SAYAC_ID = Util.getFieldInt(dt.Rows[i], "TB_SAYAC_ID");
                 entity.MES_VARSAYILAN = Util.getFieldBool(dt.Rows[i], "MES_VARSAYILAN");
-                listem.Add(entity);
+                entity.MES_SANAL_SAYAC = Util.getFieldBool(dt.Rows[i], "MES_SANAL_SAYAC");
+				entity.MES_ACIKLAMA = Util.getFieldString(dt.Rows[i], "MES_ACIKLAMA");
+				entity.MES_BASLANGIC_TARIH = Util.getFieldDateTime(dt.Rows[i], "MES_BASLANGIC_TARIH");
+				entity.MES_BASLANGIC_DEGER = Util.getFieldInt(dt.Rows[i], "MES_BASLANGIC_DEGER");
+				entity.MES_TAHMINI_ARTIS_DEGER = Util.getFieldInt(dt.Rows[i], "MES_TAHMINI_ARTIS_DEGER");
+				entity.MES_SANAL_SAYAC_ARTIS = Util.getFieldInt(dt.Rows[i], "MES_SANAL_SAYAC_ARTIS");
+				listem.Add(entity);
             }
             return listem;
         }

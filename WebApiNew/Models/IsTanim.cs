@@ -18,9 +18,13 @@ namespace WebApiNew.Models
         public bool IST_AKTIF { get; set; }
         [DataMember]
         public int IST_TIP_KOD_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_TIP { get; set; }
+		[DataMember]
         public int IST_GRUP_KOD_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_GRUP { get; set; }
+		[DataMember]
         public int IST_ATOLYE_ID { get; set; }
         [DataMember]
         public double IST_CALISMA_SURE { get; set; }

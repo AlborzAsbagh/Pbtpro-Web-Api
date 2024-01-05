@@ -333,13 +333,13 @@ namespace WebApiNew.Models
 		public int MKN_ALIS_FIRMA_ID { get; set; }
 
 		[DataMember]
-		public int MKN_SATIS_FIRMA_ID { get; set; }
+		public int MKN_KIRA_FIRMA_ID { get; set; }
 
 		[DataMember]
 		public string MKN_ALIS_FIRMA { get; set; }
 
 		[DataMember]
-		public string MKN_SATIS_FIRMA { get; set; }
+		public string MKN_KIRA_FIRMA { get; set; }
 
 		[DataMember]
 		public bool MKN_SATIS { get; set; }

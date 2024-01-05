@@ -46,7 +46,10 @@ namespace WebApiNew.Models
         [DataMember]
         public string ISM_KONU { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public string ISM_OLUSTURAN { get; set; }
+
+		[DataMember]
         public int ISM_ATOLYE_ID { get; set; }
 
         [DataMember]

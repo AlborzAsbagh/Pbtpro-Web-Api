@@ -186,33 +186,33 @@ namespace WebApiNew.Controllers
 						query = " update orjin.TB_MAKINE set ";
 						foreach (var item in entity)
 						{
-							if (item.Key.Equals("MakineSayacList") ||
-									item.Key.Equals("MakineOtonomBakimList") ||
-										item.Key.Equals("MakinePeriyodikBakimList") || 
-													item.Key.Equals("TB_MAKINE_ID")) continue;
+							//if (item.Key.Equals("MakineSayacList") ||
+							//		item.Key.Equals("MakineOtonomBakimList") ||
+							//			item.Key.Equals("MakinePeriyodikBakimList") || 
+													if(item.Key.Equals("TB_MAKINE_ID")) continue;
 
-							if (count < entity.Count - 5) query += $" {item.Key} = '{item.Value}', ";
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
 						query += $" where TB_MAKINE_ID = {Convert.ToInt32(entity.GetValue("TB_MAKINE_ID"))}";
 
 						await cnn.ExecuteAsync(query);
-						int makineId = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_MAKINE_ID) FROM orjin.TB_MAKINE");
+						//int makineId = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_MAKINE_ID) FROM orjin.TB_MAKINE");
 
 
-						if (entity["MakineSayacList"] is JArray makineSayacList && makineSayacList.Count > 0)
-						{
-							Bildirim bldr = new Bildirim();
+						//if (entity["MakineSayacList"] is JArray makineSayacList && makineSayacList.Count > 0)
+						//{
+						//	Bildirim bldr = new Bildirim();
 
-							for (int i = 0; i < makineSayacList.Count; i++)
-							{
-								Sayac sayac = JsonConvert.DeserializeObject<Sayac>(makineSayacList[i].ToString());
-								bldr = YeniSayacEkle(sayac, makineId);
-								if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
-							}
+						//	for (int i = 0; i < makineSayacList.Count; i++)
+						//	{
+						//		Sayac sayac = JsonConvert.DeserializeObject<Sayac>(makineSayacList[i].ToString());
+						//		bldr = YeniSayacEkle(sayac, makineId);
+						//		if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
+						//	}
 
-						}
+						//}
 
 					}
 					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });

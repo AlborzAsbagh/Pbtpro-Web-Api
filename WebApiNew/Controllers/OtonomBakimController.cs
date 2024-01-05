@@ -25,7 +25,7 @@ namespace WebApiNew.Controllers
 
         [HttpGet]
         [Route("api/MakineBakim/GetByMakine")]
-        public List<MakineBakim> GetMakineBakims([FromUri] int kllId, [FromUri] int makineId ,[FromUri] int prsId)
+        public List<MakineBakim> GetMakineBakims([FromUri] int kllId, [FromUri] int makineId ,[FromUri] int? prsId=0)
         {
             #region sql
             var sql = @"SELECT TB_MAKINE_BAKIM_ID
@@ -91,10 +91,12 @@ namespace WebApiNew.Controllers
       ,IST_OTONOM_BAKIM
       ,IST_UYARI_PERIYOT
       ,(SELECT COUNT(*) FROM orjin.TB_IS_TANIM_KONTROLLIST WHERE ISK_IS_TANIM_ID = TB_IS_TANIM_ID) AS IST_KONTROL_SAYI
+      ,(SELECT KOD_TANIM FROM orjin.TB_KOD WHERE TB_KOD_ID = IST_GRUP_KOD_ID) AS IST_GRUP
+	  ,(SELECT KOD_TANIM FROM orjin.TB_KOD WHERE TB_KOD_ID = IST_TIP_KOD_ID) AS IST_TIP
        FROM orjin.TB_MAKINE_BAKIM MB
       INNER JOIN orjin.TB_MAKINE M ON M.TB_MAKINE_ID=MB.MAB_MAKINE_ID
       INNER JOIN orjin.TB_IS_TANIM IT ON IT.TB_IS_TANIM_ID=MB.MAB_BAKIM_ID " // WHERE CONDITION body starts
-      + $" WHERE MB.MAB_MAKINE_ID=@MKN_ID AND orjin.UDF_LOKASYON_YETKI_KONTROL(M.MKN_LOKASYON_ID,@KLL_ID) = 1 /* AND IST_PERSONEL_ID = {prsId} */ ";
+	  + $" WHERE MB.MAB_MAKINE_ID=@MKN_ID AND orjin.UDF_LOKASYON_YETKI_KONTROL(M.MKN_LOKASYON_ID,@KLL_ID) = 1 /* AND IST_PERSONEL_ID = {prsId} */ ";
             #endregion
             var util = new Util();
             using (var cnn = util.baglan())

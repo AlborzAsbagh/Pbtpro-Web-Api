@@ -95,5 +95,56 @@ namespace WebApiNew.Controllers
             }
             return listem;
         }
-    }
+
+        // For Web App Version
+
+		[Route("api/PeriyodikBakimByMakine")]
+		[HttpGet]
+		public List<PeriyodikBakim> PeriyodikBakimByMakine(int makineID)
+		{
+			prms.Clear();
+			prms.Add("MAK_ID", makineID);
+			string query = @"select TB_PERIYODIK_BAKIM_ID , PBK_KOD , PBK_TANIM  ,  ism.ISM_ISEMRI_NO as PBK_ISEMRI_NO ,
+
+                    pbm.PBM_SON_UYGULAMA_TARIH as PBK_SON_UYGULAMA_TARIH ,
+                    pbm.PBM_HEDEF_TARIH as PBK_HEDEF_UYGULAMA_TARIH ,
+                    pbm.PBM_HEDEF_SAYAC as PBK_HEDEF_SAYAC ,
+					pbm.PBM_SON_UYGULAMA_SAYAC as PBK_SON_UYGULAMA_SAYAC ,
+					pbm.PBM_HATIRLAT_SAYAC as PBK_HATIRLAT_SAYAC ,
+					pbm.PBM_HATIRLAT_TARIH as PBK_HATIRLAT_TARIH ,
+					(select MES_TANIM from  orjin.TB_SAYAC where pbm.PBM_SAYAC_ID = TB_SAYAC_ID) as PBK_SAYAC_TANIM ,
+
+			    (select MES_GUNCEL_DEGER from  orjin.TB_SAYAC where pbm.PBM_SAYAC_ID = TB_SAYAC_ID) as PBK_GUNCEL_SAYAC
+
+                from orjin.TB_PERIYODIK_BAKIM pbk 
+                                    left join orjin.TB_PERIYODIK_BAKIM_MAKINE pbm on pbm.PBM_PERIYODIK_BAKIM_ID = pbk.TB_PERIYODIK_BAKIM_ID and  pbm.PBM_MAKINE_ID = @MAK_ID
+                left join orjin.TB_ISEMRI ism on ism.ISM_REF_ID = TB_PERIYODIK_BAKIM_ID and ISM_MAKINE_ID = @MAK_ID and ISM_KAPATILDI=0 and ISM_REF_GRUP='PERİYODİK BAKIM'
+                                    where 
+                TB_PERIYODIK_BAKIM_ID 
+                IN (SELECT PBM_PERIYODIK_BAKIM_ID FROM orjin.TB_PERIYODIK_BAKIM_MAKINE WHERE PBM_MAKINE_ID = @MAK_ID)";
+
+			DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+			List<PeriyodikBakim> listem = new List<PeriyodikBakim>();
+			for (int i = 0; i < dt.Rows.Count; i++)
+			{
+				PeriyodikBakim entity = new PeriyodikBakim();
+				entity.TB_PERIYODIK_BAKIM_ID = (int)dt.Rows[i]["TB_PERIYODIK_BAKIM_ID"];
+				entity.PBK_KOD = Util.getFieldString(dt.Rows[i], "PBK_KOD");
+				entity.PBK_TANIM = Util.getFieldString(dt.Rows[i], "PBK_TANIM");
+                entity.PBK_ISEMRI_NO = Util.getFieldString(dt.Rows[i], "PBK_ISEMRI_NO");
+                entity.PBK_SON_UYGULAMA_TARIH = Util.getFieldDateTime(dt.Rows[i], "PBK_SON_UYGULAMA_TARIH");
+                entity.PBK_HEDEF_UYGULAMA_TARIH = Util.getFieldDateTime(dt.Rows[i], "PBK_HEDEF_UYGULAMA_TARIH");
+                entity.PBK_HEDEF_SAYAC = Util.getFieldInt(dt.Rows[i], "PBK_HEDEF_SAYAC");
+                entity.PBK_SON_UYGULAMA_SAYAC = Util.getFieldInt(dt.Rows[i], "PBK_SON_UYGULAMA_SAYAC");
+                entity.PBK_HATIRLAT_SAYAC = Util.getFieldInt(dt.Rows[i], "PBK_HATIRLAT_SAYAC");
+                entity.PBK_HATIRLAT_TARIH = Util.getFieldInt(dt.Rows[i], "PBK_HATIRLAT_TARIH");
+				entity.PBK_SAYAC_TANIM = Util.getFieldString(dt.Rows[i], "PBK_SAYAC_TANIM");
+				entity.PBK_GUNCEL_SAYAC = Util.getFieldString(dt.Rows[i], "PBK_GUNCEL_SAYAC");
+
+
+				listem.Add(entity);
+			}
+			return listem;
+		}
+	}
 }
