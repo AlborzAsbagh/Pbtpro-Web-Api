@@ -583,9 +583,13 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 
 		[Route("api/GetProjeList")]
 		[HttpGet]
-		public Object GetProjeList()
+		public Object GetProjeList([FromUri] int? lokasyonId = 0)
 		{
-			string query = "select * from orjin.VW_PROJE";
+            string query = "";
+
+			if (lokasyonId > 0 && lokasyonId != null) query = $" select * from orjin.VW_PROJE where PRJ_LOKASYON_ID = {lokasyonId}";
+			else query = " select * from orjin.VW_PROJE ";
+
 			List<ProjeListWebApp> listem = new List<ProjeListWebApp>();
 			try
 			{

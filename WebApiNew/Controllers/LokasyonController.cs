@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
+using Newtonsoft.Json.Linq;
 using WebApiNew.Filters;
 using WebApiNew.Models;
 
@@ -10,6 +14,8 @@ namespace WebApiNew.Controllers
 	[MyBasicAuthenticationFilter]
 	public class LokasyonController : ApiController
 	{
+		Util klas = new Util();
+		string query = "";
 		public List<Lokasyon> Get([FromUri] int ID)
 		{
 			Util klas = new Util();
@@ -100,5 +106,203 @@ namespace WebApiNew.Controllers
 			return listem;
 		}
 
+		// Lokasyon Ekle Web App
+		[Route("api/addLokasyon")]
+		[HttpPost]
+		public async Task<object> AddLokasyon([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using(var cnn = klas.baglan())
+				{
+					if(entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_LOKASYON  ( LOK_OLUSTURMA_TARIH , ";
+						foreach(var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now}' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch(Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		// Lokasyon Guncelle Web App 
+		[Route("api/UpdateLokasyon")]
+		[HttpPost]
+		public async Task<Object> LokasyonGuncelle([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_LOKASYON_ID")) >= 1)
+					{
+						query = " update orjin.TB_LOKASYON set ";
+						foreach (var item in entity)
+						{
+							
+							if (item.Key.Equals("TB_LOKASYON_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , LOK_DEGISTIRME_TARIH = '{DateTime.Now}' ";
+						query += $" where TB_LOKASYON_ID = {Convert.ToInt32(entity.GetValue("TB_LOKASYON_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+		//Get Lokasyon List For Web App ( Lokasyon Sayfasi Icin )
+		[Route("api/GetLokasyonList")]
+		[HttpGet]
+		public object GetLokasyonList([FromUri] int ID)
+		{
+			Util klas = new Util();
+			List<LokasyonWebAppModel> listem = new List<LokasyonWebAppModel>();
+			string query = @"select * from orjin.VW_LOKASYON where orjin.UDF_LOKASYON_YETKI_KONTROL(TB_LOKASYON_ID,@KUL_ID) = 1";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<LokasyonWebAppModel>(query, new { @KUL_ID = ID }).ToList();
+			}
+			return listem;
+		}
+
+		[Route("api/GetLokasyonTipleri")]
+		[HttpGet]
+		public object GetLokasyonTipleri()
+		{
+			Util klas = new Util();
+			List<LokasyonTip> listem = new List<LokasyonTip>();
+			string query = @"select * from orjin.TB_LOKASYON_TIP";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<LokasyonTip>(query).ToList();
+			}
+			return listem;
+		}
+
+
+		// Lokasyon Tip Ekle Web App
+		[Route("api/AddLokasyonTip")]
+		[HttpPost]
+		public async Task<object> AddLokasyonTip([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_LOKASYON_TIP  ( LOT_OLUSTURMA_TARIH , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now}' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+
+		// Lokasyon Guncelle Web App 
+		[Route("api/UpdateLokasyonTip")]
+		[HttpPost]
+		public async Task<Object> UpdateLokasyonTip([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_LOKASYON_TIP_ID")) >= 1)
+					{
+						query = " update orjin.TB_LOKASYON_TIP set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_LOKASYON_TIP_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , LOT_DEGISTIRME_TARIH = '{DateTime.Now}' ";
+						query += $" where TB_LOKASYON_TIP_ID = {Convert.ToInt32(entity.GetValue("TB_LOKASYON_TIP_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
 	}
 }

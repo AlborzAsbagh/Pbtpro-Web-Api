@@ -36,7 +36,7 @@ namespace WebApiNew.Controllers
 
 		[Route("api/GetMakineFullList")]
 		[HttpPost]
-		public object GetMakineFullList([FromUri] int? lokasyonId, [FromUri] string parametre , [FromBody] JObject filters , [FromUri] int pagingDeger = 1) 
+		public object GetMakineFullList([FromUri] string parametre , [FromBody] JObject filters , [FromUri] int pagingDeger = 1 , [FromUri] int? lokasyonId = 0) 
 		{
 			int pagingIlkDeger = pagingDeger == 1 ? 1 : ((pagingDeger * 10) - 10);
 			int pagingSonDeger = pagingIlkDeger == 1 ? 10 : ((pagingDeger * 10));

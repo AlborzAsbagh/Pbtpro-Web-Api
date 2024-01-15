@@ -13,7 +13,7 @@ namespace WebApiNew.Controllers
     {
         Util klas = new Util();
 
-        public List<Personel> Get()
+        public List<Personel> Get([FromUri] int? lokasyonId = 0)
         {
             List<Personel> listem = new List<Personel>();
             string query = @"SELECT *
@@ -23,6 +23,9 @@ namespace WebApiNew.Controllers
 ,(SELECT COALESCE(TB_RESIM_ID,-1) FROM orjin.TB_RESIM WHERE RSM_VARSAYILAN = 1 AND RSM_REF_GRUP = 'PERSONEL' AND RSM_REF_ID = TB_PERSONEL_ID ) AS PRS_RESIM_ID
 ,STUFF((SELECT ';' + CONVERT(VARCHAR(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'PERSONEL' AND R.RSM_REF_ID = TB_PERSONEL_ID FOR XML PATH('')), 1, 1, '') AS PRS_RESIM_IDLERI
 FROM orjin.VW_PERSONEL WHERE PRS_AKTIF = 1";
+
+            if (lokasyonId != null && lokasyonId > 0) query += $" and PRS_LOKASYON_ID = {lokasyonId}";
+
             DataTable dt = klas.GetDataTable(query, new List<WebApiNew.Prm>());
             for (int i = 0; i < dt.Rows.Count; i++)
             {
