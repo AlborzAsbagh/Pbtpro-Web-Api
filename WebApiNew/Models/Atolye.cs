@@ -45,6 +45,14 @@ namespace WebApiNew.Models
         [DataMember]
         public string ATL_YETKILI_MAIL { get; set; }
 
+        [DataMember]
+        public string ALT_GRUP_TANIM { get; set; }
+
+        [DataMember]
+        public int ATL_RESIM { get; set; }
+
+        [DataMember]
+        public string ALT_BELGE { get; set; }
 
 
 	}

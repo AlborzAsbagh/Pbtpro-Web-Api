@@ -27,6 +27,8 @@ namespace WebApiNew.Models
 		[DataMember]
         public int IST_ATOLYE_ID { get; set; }
         [DataMember]
+        public string IST_ATOLYE { get; set; }
+		[DataMember]
         public double IST_CALISMA_SURE { get; set; }
         [DataMember]
         public double IST_DURUS_SURE { get; set; }
@@ -34,9 +36,13 @@ namespace WebApiNew.Models
         public int IST_PERSONEL_SAYI { get; set; }
         [DataMember] 
         public int IST_ONCELIK_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_ONCELIK { get; set; }
+		[DataMember]
         public int IST_TALIMAT_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_TALIMAT { get; set; }
+		[DataMember]
         public string IST_ACIKLAMA { get; set; }
         [DataMember]
         public int IST_OLUSTURAN_ID { get; set; }
@@ -98,7 +104,9 @@ namespace WebApiNew.Models
         public int IST_UYARI_SIKLIGI { get; set; }
         [DataMember]
         public int IST_LOKASYON_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_LOKASYON { get; set; }
+		[DataMember]
         public bool IST_OTONOM_BAKIM { get; set; }
         [DataMember]
         public int IST_KONTROL_SAYI { get; set; }

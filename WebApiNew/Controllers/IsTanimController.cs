@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Web.Http;
-using Microsoft.Extensions.DependencyInjection;
 using WebApiNew.Filters;
 using WebApiNew.Models;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using WebApiNew.Utility.Abstract;
-using System.Web.Helpers;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace WebApiNew.Controllers
 {
@@ -19,6 +19,7 @@ namespace WebApiNew.Controllers
     {
         Util klas = new Util();
         Parametreler prms = new Parametreler();
+        String query = "";
 
         private readonly ILogger _logger;
         private readonly System.Windows.Forms.RichTextBox RTB = new System.Windows.Forms.RichTextBox();
@@ -33,23 +34,15 @@ namespace WebApiNew.Controllers
         public List<IsTanim> BakimGetir()
         {
             prms.Clear();
-            string query = @"select * from orjin.TB_IS_TANIM where IST_DURUM ='BAKIM'";
-            DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+            string query = @" select * from orjin.VW_BAKIM_PROCEDURE ";
             List<IsTanim> listem = new List<IsTanim>();
-            for (int i = 0; i < dt.Rows.Count; i++)
+            using(var cnn = klas.baglan())
             {
-                IsTanim entity = new IsTanim();
-                entity.TB_IS_TANIM_ID = (int)dt.Rows[i]["TB_IS_TANIM_ID"];
-                entity.IST_AKTIF = Convert.ToBoolean(dt.Rows[i]["IST_AKTIF"]);
-                entity.IST_GRUP_KOD_ID = Util.getFieldInt(dt.Rows[i], "IST_GRUP_KOD_ID");
-                entity.IST_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "IST_TIP_KOD_ID");
-                entity.IST_KOD = Util.getFieldString(dt.Rows[i], "IST_KOD");
-                entity.IST_TANIM = Util.getFieldString(dt.Rows[i], "IST_TANIM");
-                entity.IST_DURUM = Util.getFieldString(dt.Rows[i], "IST_DURUM");
-                listem.Add(entity);
+                listem = cnn.Query<IsTanim>(query).ToList();
             }
             return listem;
         }
+
         [Route("api/ArizaGetir")]
         [HttpGet]
         public List<IsTanim> ArizaGetir()
@@ -254,5 +247,381 @@ namespace WebApiNew.Controllers
             else if (tip == "BAKIM") return Json(new { PROSEDUR_LISTE = BakimGetir() });
             else return Json(new { error = "Tanimsiz !" });
 		}
-    }
+
+		// Add Bakim Wep App
+		[Route("api/AddBakim")]
+		[HttpPost]
+		public async Task<object> AddBakim([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_IS_TANIM  ( IST_OLUSTURMA_TARIH , IST_DURUM , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , 'BAKIM' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message});
+			}
+		}
+
+		// Bakim Guncelle Web App 
+		[Route("api/UpdateBakim")]
+		[HttpPost]
+		public async Task<Object> UpdateBakim([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_IS_TANIM_ID")) >= 1)
+					{
+						query = " update orjin.TB_IS_TANIM set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_IS_TANIM_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_IS_TANIM_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+        // Web App Malzeme List
+		[Route("api/GetIsTanimMazleme")]
+		[HttpGet]
+		public List<IsTanimMalzemeWebAppModel> GetIsTanimMazleme(int isTanimID)
+		{
+			var prms = new {@ISTNM_ID =  isTanimID};
+			string query = @"select mlz.* , stk.STK_KOD as ISM_STOK_KOD , orjin.UDF_KOD_TANIM(ISM_BIRIM_KOD_ID) as 
+            ISM_BIRIM  , stk.STK_TIP_KOD_ID as ISM_STOK_TIP_KOD_ID , orjin.UDF_KOD_TANIM(stk.STK_TIP_KOD_ID) as ISM_STOK_TIP , dp.DEP_TANIM as ISM_DEPO , stk.STK_STOKSUZ_MALZEME as ISM_STOKSUZ from orjin.TB_IS_TANIM_MLZ mlz
+            left join orjin.VW_STOK stk on stk.TB_STOK_ID = mlz.ISM_STOK_ID
+            left join orjin.TB_DEPO dp on stk.STK_DEPO_ID = dp.TB_DEPO_ID where ISM_IS_TANIM_ID = @ISTNM_ID";
+            List<IsTanimMalzemeWebAppModel> listem = new List<IsTanimMalzemeWebAppModel>();
+
+            using(var cnn = klas.baglan())
+            {
+                listem = cnn.Query<IsTanimMalzemeWebAppModel>(query, prms).ToList();
+            }
+			
+			return listem;
+		}
+
+
+		// Add Is Tanim Malzeme Wep App
+		[Route("api/AddIsTanimMalzeme")]
+		[HttpPost]
+		public async Task<object> AddIsTanimMalzeme([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_IS_TANIM_MLZ  ( ISM_OLUSTURMA_TARIH ,  ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ,  ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		// Is Tanim Malzeme Guncelle Web App 
+		[Route("api/UpdateIsTanimMalzeme")]
+		[HttpPost]
+		public async Task<Object> UpdateIsTanimMalzeme([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_IS_TANIM_MLZ_ID")) >= 1)
+					{
+						query = " update orjin.TB_IS_TANIM_MLZ set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_IS_TANIM_MLZ_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , ISM_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_IS_TANIM_MLZ_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_MLZ_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+
+		// Web App Olcum List
+		[Route("api/GetIsTanimOlcum")]
+		[HttpGet]
+		public List<OlcumParametreWebApp> GetIsTanimOlcum(int isTanimID)
+		{
+			var prms = new { @ISTNM_ID = isTanimID };
+			string query = @" select * , orjin.UDF_KOD_TANIM(IOC_BIRIM_KOD_ID) as IOC_BIRIM from orjin.TB_IS_TANIM_OLCUM_PARAMETRE IOC where IOC_IS_TANIM_ID = @ISTNM_ID ";
+			List<OlcumParametreWebApp> listem = new List<OlcumParametreWebApp>();
+
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<OlcumParametreWebApp>(query, prms).ToList();
+			}
+
+			return listem;
+		}
+
+
+		// Add Is Tanim Olcum Wep App
+		[Route("api/AddIsTanimOlcum")]
+		[HttpPost]
+		public async Task<object> AddIsTanimOlcum([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_IS_TANIM_OLCUM_PARAMETRE  ( IOC_OLUSTURMA_TARIH ,  ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ,  ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		// Is Tanim Olcum Guncelle Web App 
+		[Route("api/UpdateIsTanimOlcum")]
+		[HttpPost]
+		public async Task<Object> UpdateIsTanimOlcum([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_IS_TANIM_OLCUM_PARAMETRE_ID")) >= 1)
+					{
+						query = " update orjin.TB_IS_TANIM_OLCUM_PARAMETRE set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_IS_TANIM_OLCUM_PARAMETRE_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , IOC_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_IS_TANIM_OLCUM_PARAMETRE_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_OLCUM_PARAMETRE_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+		// Add Is Tanim KontrolList Wep App
+		[Route("api/AddIsTanimKontrolList")]
+		[HttpPost]
+		public async Task<object> AddIsTanimKontrolList([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_IS_TANIM_KONTROLLIST  ( ISK_OLUSTURMA_TARIH ,  ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ,  ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		// Is Tanim KontrolList Guncelle Web App 
+		[Route("api/UpdateIsTanimKontrolList")]
+		[HttpPost]
+		public async Task<Object> UpdateIsTanimKontrolList([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_IS_TANIM_KONROLLIST_ID")) >= 1)
+					{
+						query = " update orjin.TB_IS_TANIM_KONTROLLIST set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_IS_TANIM_KONROLLIST_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , ISK_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_IS_TANIM_KONROLLIST_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_KONROLLIST_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+	}
 }

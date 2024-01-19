@@ -1,15 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.WebPages;
 using Dapper;
 using Newtonsoft.Json.Linq;
-using WebApiNew.App_GlobalResources;
 using WebApiNew.Filters;
 using WebApiNew.Models;
 
@@ -17,39 +13,39 @@ namespace WebApiNew.Controllers
 {
 
 	[MyBasicAuthenticationFilter]
-	public class VardiyaController : ApiController
+	public class AtolyeController : ApiController
 	{
+		List<Prm> parametreler = new List<Prm>();
+		Parametreler prms = new Parametreler();
 		Util klas = new Util();
+		SqlCommand cmd = null;
 		string query = "";
 
+		[Route("api/GetAtolyeList")]
 		[HttpGet]
-		[Route("api/GetVardiyaList")]
-		public object GetVardiyaList()
+		public List<Atolye> GetAtolyeList(int kulID)
 		{
-			string query = @" select * , 
-							  (select LOK_TANIM from orjin.TB_LOKASYON where TB_LOKASYON_ID = v.VAR_LOKASYON_ID) as VAR_LOKASYON , 
-							  (select PRJ_TANIM from orjin.TB_PROJE where TB_PROJE_ID = v.VAR_PROJE_ID) as VAR_PROJE , 
-							  (select KOD_TANIM from orjin.TB_KOD where TB_KOD_ID = v.VAR_VARDIYA_TIPI_KOD_ID) as VAR_VARDIYA_TIPI  
-							  from orjin.TB_VARDIYA v";
-			List<Vardiya> listem = new List<Vardiya>();
+			query =
+			  $"select * from orjin.TB_ATOLYE where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, {kulID}) = 1";
+			List<Atolye> listem = new List<Atolye>();
 			try
 			{
 				using (var cnn = klas.baglan())
 				{
-					listem = cnn.Query<Vardiya>(query).ToList();
+					listem = cnn.Query<Atolye>(query).ToList();
 				}
-				return Json(new { VARDIYA_LISTE = listem });
+				return listem;
 			}
 			catch (Exception ex)
 			{
-				return Json(new { error = ex.Message });
+				return listem;
 			}
 		}
 
 
+		[Route("api/AddAtolye")]
 		[HttpPost]
-		[Route("api/AddVardiya")]
-		public async Task<object> AddVardiya(JObject entity)
+		public async Task<object> AddAtolye([FromBody] JObject entity)
 		{
 			int count = 0;
 			try
@@ -58,7 +54,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_VARDIYA ( VAR_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_ATOLYE  ( ATL_OLUSTURMA_TARIH , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -90,29 +86,29 @@ namespace WebApiNew.Controllers
 		}
 
 
+		[Route("api/UpdateAtolye")]
 		[HttpPost]
-		[Route("api/UpdateVardiya")]
-		public async Task<object> UpdateVardiya(JObject entity)
+		public async Task<Object> UpdateAtolye([FromBody] JObject entity)
 		{
 			int count = 0;
 			try
 			{
 				using (var cnn = klas.baglan())
 				{
-					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_VARDIYA_ID")) >= 1)
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_ATOLYE_ID")) >= 1)
 					{
-						query = " update orjin.TB_VARDIYA set ";
+						query = " update orjin.TB_ATOLYE set ";
 						foreach (var item in entity)
 						{
 
-							if (item.Key.Equals("TB_VARDIYA_ID")) continue;
+							if (item.Key.Equals("TB_ATOLYE_ID")) continue;
 
 							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , VAR_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
-						query += $" where TB_VARDIYA_ID = {Convert.ToInt32(entity.GetValue("TB_VARDIYA_ID"))}";
+						query += $" , ATL_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_ATOLYE_ID = {Convert.ToInt32(entity.GetValue("TB_ATOLYE_ID"))}";
 
 						await cnn.ExecuteAsync(query);
 
@@ -131,7 +127,4 @@ namespace WebApiNew.Controllers
 		}
 
 	}
-
-
-
 }

@@ -126,7 +126,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -171,7 +171,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , LOK_DEGISTIRME_TARIH = '{DateTime.Now}' ";
+						query += $" , LOK_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
 						query += $" where TB_LOKASYON_ID = {Convert.ToInt32(entity.GetValue("TB_LOKASYON_ID"))}";
 
 						await cnn.ExecuteAsync(query);
@@ -240,7 +240,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -286,7 +286,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , LOT_DEGISTIRME_TARIH = '{DateTime.Now}' ";
+						query += $" , LOT_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
 						query += $" where TB_LOKASYON_TIP_ID = {Convert.ToInt32(entity.GetValue("TB_LOKASYON_TIP_ID"))}";
 
 						await cnn.ExecuteAsync(query);

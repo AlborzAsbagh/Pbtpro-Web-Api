@@ -289,6 +289,7 @@
     <Compile Include="App_Start\UnityWebApiActivator.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="C.cs" />
+    <Compile Include="Controllers\AtolyeController.cs" />
     <Compile Include="Controllers\VardiyaController.cs" />
     <Compile Include="Controllers\WebAppVersionIsEmriController.cs" />
     <Compile Include="Controllers\OlcumController.cs" />
