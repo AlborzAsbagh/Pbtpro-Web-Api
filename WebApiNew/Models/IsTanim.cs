@@ -62,9 +62,13 @@ namespace WebApiNew.Models
         public double IST_TOPLAM_MALIYET { get; set; }
         [DataMember]
         public int IST_NEDEN_KOD_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_NEDEN { get; set; }
+		[DataMember]
         public int IST_FIRMA_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_FIRMA { get; set; }
+		[DataMember]
         public bool IST_IS_TALEPTE_GORUNSUN { get; set; }
         [DataMember]
         public int IST_MASRAF_MERKEZ_ID { get; set; }
@@ -89,20 +93,29 @@ namespace WebApiNew.Models
         [DataMember]
         public string IST_OZEL_ALAN_5 { get; set; }
         [DataMember]
-        public double IST_OZEL_ALAN_7_KOD_ID { get; set; }
-        [DataMember]
+        public double IST_OZEL_ALAN_6_KOD_ID { get; set; }
+		[DataMember]
+		public string IST_OZEL_ALAN_6 { get; set; }
+		[DataMember]
+		public double IST_OZEL_ALAN_7_KOD_ID { get; set; }
+		[DataMember]
+		public string IST_OZEL_ALAN_7 { get; set; }
+		[DataMember]
+		public double IST_OZEL_ALAN_8_KOD_ID { get; set; }
+		[DataMember]
+		public string IST_OZEL_ALAN_8 { get; set; }
+		[DataMember]
         public double IST_OZEL_ALAN_9 { get; set; }
         [DataMember]
         public double IST_OZEL_ALAN_10 { get; set; }
-        [DataMember]
-        public int IST_OZEL_ALAN_6_KOD_ID { get; set; }
-        [DataMember]
-        public int IST_OZEL_ALAN_8_KOD_ID { get; set; }
         [DataMember]
         public bool IST_UYAR { get; set; }
         [DataMember]
         public int IST_UYARI_SIKLIGI { get; set; }
         [DataMember]
+        public int IST_UYARI_PERIYOT { get; set; }
+
+		[DataMember]
         public int IST_LOKASYON_ID { get; set; }
 		[DataMember]
 		public string IST_LOKASYON { get; set; }

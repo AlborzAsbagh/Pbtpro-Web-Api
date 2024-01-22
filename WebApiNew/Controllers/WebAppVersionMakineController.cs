@@ -507,6 +507,49 @@ namespace WebApiNew.Controllers
 			}
 		}
 
+		
+		[Route("api/ChangeMakineOperator")]
+		[HttpPost]
+		public async Task<object> ChangeMakineOperator([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_MAKINE_OPERATOR  ( MKO_OLUSTURMA_TARIH , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						query += $" update orjin.TB_MAKINE set MKN_OPERATOR_PERSONEL_ID = {entity.GetValue("MKN_OPERATOR_PERSONEL_ID")} where TB_MAKINE_ID = {entity.GetValue("TB_MAKINE_ID")}";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
 
 		//Yeni Sayaca Ekle
 		[Route("api/AddSayac")]

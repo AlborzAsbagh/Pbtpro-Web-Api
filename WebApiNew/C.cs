@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿
 
 namespace WebApiNew
 {
@@ -20,5 +17,14 @@ namespace WebApiNew
         public static readonly string KGP_ARIZA_NEDENLERI = "32413";
         public static readonly string KGP_BAKIM_NEDENLERI = "32452";
         public static readonly string KGP_DURUS_NEDENLERI = "32300";
+    }
+
+    public class PersonelRolloeri
+    {
+        public static readonly int PERSONEL_TEKNESIYEN = 1;
+        public static readonly int PERSONEL_SURUCU = 2;
+        public static readonly int PERSONEL_OPERATOR = 3;
+        public static readonly int PERSONEL_BAKIM = 4;
+        public static readonly int PERSONEL_SANTIYE = 5;
     }
 }

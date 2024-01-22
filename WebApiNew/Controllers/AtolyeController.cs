@@ -15,18 +15,15 @@ namespace WebApiNew.Controllers
 	[MyBasicAuthenticationFilter]
 	public class AtolyeController : ApiController
 	{
-		List<Prm> parametreler = new List<Prm>();
-		Parametreler prms = new Parametreler();
 		Util klas = new Util();
-		SqlCommand cmd = null;
 		string query = "";
 
-		[Route("api/GetAtolyeList")]
+		[Route("api/AtolyeList")]
 		[HttpGet]
-		public List<Atolye> GetAtolyeList(int kulID)
+		public List<Atolye> AtolyeListesi(int kulID)
 		{
-			query =
-			  $"select * from orjin.TB_ATOLYE where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, {kulID}) = 1";
+			string query =
+				$" select * , orjin.UDF_KOD_TANIM(atl.ATL_ATOLYE_GRUP_ID) as ATL_GRUP_TANIM from orjin.TB_ATOLYE atl where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, {kulID}) = 1 ";
 			List<Atolye> listem = new List<Atolye>();
 			try
 			{
@@ -126,5 +123,28 @@ namespace WebApiNew.Controllers
 
 		}
 
+		[Route("api/AtolyeKodGetir")]
+		[HttpGet]
+		public String AtolyeKodGetir()
+		{
+			try
+			{
+				var util = new Util();
+				using (var conn = util.baglan())
+				{
+					var sql = @"  
+                        UPDATE orjin.TB_NUMARATOR SET NMR_NUMARA = NMR_NUMARA+1 WHERE NMR_KOD = 'ATL_KOD';
+                        SELECT 
+                        NMR_ON_EK+right(replicate('0',NMR_HANE_SAYISI)+CAST(NMR_NUMARA AS VARCHAR(MAX)),NMR_HANE_SAYISI) as deger FROM orjin.TB_NUMARATOR
+                        WHERE NMR_KOD = 'ATL_KOD'";
+					var kod = conn.Query<String>(sql).FirstOrDefault();
+					return kod;
+				}
+			}
+			catch (Exception)
+			{
+				throw;
+			}
+		}
 	}
 }

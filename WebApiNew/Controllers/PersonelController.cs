@@ -13,7 +13,7 @@ namespace WebApiNew.Controllers
     {
         Util klas = new Util();
 
-        public List<Personel> Get([FromUri] int? lokasyonId = 0 , [FromUri] int? atolyeId = 0)
+        public List<Personel> Get([FromUri] int? lokasyonId = 0 , [FromUri] int? atolyeId = 0 , [FromUri] int? personelRol = 0)
         {
             List<Personel> listem = new List<Personel>();
             string query = @"SELECT *
@@ -22,12 +22,11 @@ namespace WebApiNew.Controllers
                         ,ISNULL(PRS_UCRET_TIPI,250) PRS_UCRETTIPI
                         ,(SELECT COALESCE(TB_RESIM_ID,-1) FROM orjin.TB_RESIM WHERE RSM_VARSAYILAN = 1 AND RSM_REF_GRUP = 'PERSONEL' AND RSM_REF_ID = TB_PERSONEL_ID ) AS PRS_RESIM_ID
                         ,STUFF((SELECT ';' + CONVERT(VARCHAR(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'PERSONEL' AND R.RSM_REF_ID = TB_PERSONEL_ID FOR XML PATH('')), 1, 1, '') AS PRS_RESIM_IDLERI
-                        FROM orjin.VW_PERSONEL WHERE PRS_AKTIF = 1";
+                        FROM orjin.VW_PERSONEL WHERE PRS_AKTIF = 1 ";
 
-            if (lokasyonId != null && lokasyonId > 0) query += $" and PRS_LOKASYON_ID = {lokasyonId}";
-            if (atolyeId != null && atolyeId > 0) query += $" and PRS_ATOLYE_ID = {atolyeId}";
+			if (lokasyonId > 0 || atolyeId > 0 || personelRol > 0) query += getPersonelWhereQuery(personelRol, lokasyonId, atolyeId);
 
-            DataTable dt = klas.GetDataTable(query, new List<WebApiNew.Prm>());
+			DataTable dt = klas.GetDataTable(query, new List<WebApiNew.Prm>());
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 double birimUcret = Util.getFieldDouble(dt.Rows[i], "PRS_UCRET");
@@ -60,5 +59,48 @@ namespace WebApiNew.Controllers
             }
             return listem;
         }
-    }
+
+        [HttpGet]
+        [Route("api/GetPersonelWhereQuery")]
+        public string getPersonelWhereQuery(int? personelRol = 0 , int? lokasyonId = 0 , int? atolyeId = 0 )
+        {
+            string where = "";
+
+			if (lokasyonId != null && lokasyonId > 0) where += $" and PRS_LOKASYON_ID = {lokasyonId} ";
+			if (atolyeId != null && atolyeId > 0) where += $" and PRS_ATOLYE_ID = {atolyeId} ";
+            if (personelRol != null && personelRol > 0)
+            {
+                switch (personelRol)
+                {
+                    case 1:
+						where += @" and PRS_TEKNISYEN = 1 or (
+						( PRS_TEKNISYEN = 0 and PRS_SURUCU = 0 and PRS_OPERATOR = 0 and PRS_BAKIM = 0 and PRS_SANTIYE = 0 ) ) ";
+						break;
+                    case 2:
+						where += @" and PRS_SURUCU = 1 or (
+						( PRS_TEKNISYEN = 0 and PRS_SURUCU = 0 and PRS_OPERATOR = 0 and PRS_BAKIM = 0 and PRS_SANTIYE = 0 )  ) ";
+						break;
+                    case 3:
+                        where += @" and PRS_OPERATOR = 1 or (
+						( PRS_TEKNISYEN = 0 and PRS_SURUCU = 0 and PRS_OPERATOR = 0 and PRS_BAKIM = 0 and PRS_SANTIYE = 0 )  ) ";
+						break;
+                    case 4:
+						where += @" and PRS_BAKIM = 1 or (
+						( PRS_TEKNISYEN = 0 and PRS_SURUCU = 0 and PRS_OPERATOR = 0 and PRS_BAKIM = 0 and PRS_SANTIYE = 0 )  ) ";
+						break;
+                    case 5:
+						where += @" and PRS_SANTIYE = 1 or (
+						( PRS_TEKNISYEN = 0 and PRS_SURUCU = 0 and PRS_OPERATOR = 0 and PRS_BAKIM = 0 and PRS_SANTIYE = 0 )  ) ";
+						break;
+                    default:
+                        where += " and PRS_DIGER = 1";
+                        break;
+                }
+            }
+            else where += " and 1=1 ";
+            return where;
+	
+        }
+
+	}
 }

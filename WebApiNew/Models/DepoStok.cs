@@ -137,6 +137,8 @@ namespace WebApiNew.Models
         [DataMember]
         public string STK_BARKOD_NO { get; set; }
 
+        [DataMember]
+        public int STK_TIP_KOD_ID { get; set; }
 
 
 	}

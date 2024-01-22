@@ -232,7 +232,8 @@ namespace WebApiNew.Controllers
 			{
 				parametreler.Clear();
 				string query = @" select ds.TB_DEPO_STOK_ID, ds.DPS_DEPO , s.TB_STOK_ID , s.STK_KOD , s.STK_TANIM , s.STK_TIP , s.STK_BIRIM , s.STK_GRUP , s.STK_LOKASYON , 
-                            s.STK_BIRIM_KOD_ID , s.STK_MARKA_KOD_ID , s.STK_MODEL_KOD_ID , s.STK_ATOLYE_ID , s.STK_ATOLYE , s.STK_MARKA , s.STK_MODEL , s.STK_SINIF , s.STK_GIRIS_FIYAT_DEGERI,
+                            s.STK_BIRIM_KOD_ID , s.STK_MARKA_KOD_ID , s.STK_MODEL_KOD_ID , s.STK_ATOLYE_ID , s.STK_TIP_KOD_ID ,
+                            s.STK_ATOLYE , s.STK_MARKA , s.STK_MODEL , s.STK_SINIF , s.STK_GIRIS_FIYAT_DEGERI,
                             s.STK_GIRIS_FIYAT_DEGERI AS STK_MALIYET , s.STK_STOKSUZ_MALZEME, b.STB_BARKODNO 
 
                             from orjin.VW_DEPO_STOK ds 
@@ -263,6 +264,7 @@ namespace WebApiNew.Controllers
 					entity.STK_MARKA_KOD_ID = Util.getFieldInt(dt.Rows[i], "STK_MARKA_KOD_ID");
 					entity.STK_MODEL_KOD_ID = Util.getFieldInt(dt.Rows[i], "STK_MODEL_KOD_ID");
 					entity.STK_ATOLYE_ID = Util.getFieldInt(dt.Rows[i], "STK_ATOLYE_ID");
+					entity.STK_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "STK_TIP_KOD_ID");
 					entity.STK_ATOLYE = Util.getFieldString(dt.Rows[i], "STK_ATOLYE");
 					entity.STK_MARKA = Util.getFieldString(dt.Rows[i], "STK_MARKA");
 					entity.STK_MODEL = Util.getFieldString(dt.Rows[i], "STK_MODEL");
@@ -278,7 +280,7 @@ namespace WebApiNew.Controllers
 			{
 				parametreler.Clear();
 				string query = @" select ds.TB_DEPO_STOK_ID, ds.DPS_DEPO , s.TB_STOK_ID , s.STK_KOD , s.STK_TANIM , s.STK_TIP , s.STK_BIRIM , s.STK_GRUP , s.STK_LOKASYON 
-                            , s.STK_BIRIM_KOD_ID , s.STK_MARKA_KOD_ID , s.STK_MODEL_KOD_ID , s.STK_ATOLYE_ID , 
+                            , s.STK_BIRIM_KOD_ID , s.STK_MARKA_KOD_ID , s.STK_MODEL_KOD_ID , s.STK_ATOLYE_ID , s.STK_TIP_KOD_ID ,
                             s.STK_ATOLYE , s.STK_MARKA , s.STK_MODEL , s.STK_SINIF , s.STK_GIRIS_FIYAT_DEGERI,
                             s.STK_GIRIS_FIYAT_DEGERI AS STK_MALIYET , s.STK_STOKSUZ_MALZEME, b.STB_BARKODNO 
 
@@ -305,6 +307,7 @@ namespace WebApiNew.Controllers
 					entity.STK_MARKA_KOD_ID = Util.getFieldInt(dt.Rows[i], "STK_MARKA_KOD_ID");
 					entity.STK_MODEL_KOD_ID = Util.getFieldInt(dt.Rows[i], "STK_MODEL_KOD_ID");
 					entity.STK_ATOLYE_ID = Util.getFieldInt(dt.Rows[i], "STK_ATOLYE_ID");
+					entity.STK_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "STK_TIP_KOD_ID");
 					entity.STK_ATOLYE = Util.getFieldString(dt.Rows[i], "STK_ATOLYE");
 					entity.STK_ATOLYE = Util.getFieldString(dt.Rows[i], "STK_ATOLYE");
 					entity.STK_MARKA = Util.getFieldString(dt.Rows[i], "STK_MARKA");

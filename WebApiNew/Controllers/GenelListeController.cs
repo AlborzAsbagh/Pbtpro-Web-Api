@@ -21,26 +21,7 @@ namespace WebApiNew.Controllers
         Util klas = new Util();
         SqlCommand cmd = null;
 
-        [Route("api/AtolyeList")]
-        [HttpGet]
-        public List<Atolye> AtolyeListesi(int kulID)
-        {
-            string query =
-                $"select * from orjin.TB_ATOLYE where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, {kulID}) = 1";
-            List<Atolye> listem = new List<Atolye>();
-			try
-			{
-				using (var cnn = klas.baglan())
-				{
-					listem = cnn.Query<Atolye>(query).ToList();
-				}
-				return listem;
-			}
-			catch (Exception ex)
-			{
-				return listem;
-			}
-		}
+        
 
         [Route("api/MasrafMerkeziList")]
         [HttpGet]

@@ -1095,8 +1095,8 @@ namespace WebApiNew.Controllers
                 prms.Add("ITL_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));
                 if (atolyeId != -1)
                 {
-                    GenelListeController gnlCont = new GenelListeController();
-                    string atolyeTanim = gnlCont.AtolyeListesi(userId).FirstOrDefault(a => a.TB_ATOLYE_ID == atolyeId).ATL_TANIM;
+                    AtolyeController atlCont = new AtolyeController();
+                    string atolyeTanim = atlCont.AtolyeListesi(userId).FirstOrDefault(a => a.TB_ATOLYE_ID == atolyeId).ATL_TANIM;
                     prms.Add("ITL_ISLEM", "Atölye Ataması");
                     prms.Add("ITL_TALEP_ISLEM", "Atölye Ataması");
                     prms.Add("ITL_ACIKLAMA", String.Format("Atölye: {0}  İş Emri Numarası: {1}", atolyeTanim, entity.ISM_ISEMRI_NO));
