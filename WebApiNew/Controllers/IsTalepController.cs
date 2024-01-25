@@ -724,34 +724,6 @@ namespace WebApiNew.Controllers
                             bildirimEntity.Durum = true;
 
                             ts.Complete();
-                            // Bildirim Gönder
-                            try
-                            {
-                                var parametreler = new DynamicParameters();
-                                parametreler.Add("KUL_ID", ID);
-                                string queryBld =
-                                    @"select KLL_MOBILCIHAZ_ID from {0}.orjin.TB_KULLANICI where KLL_ROLBILGISI ='TEKNIK' AND KLL_MOBIL_BILDIRI=1 AND KLL_MOBIL_KULLANICI = 1 and TB_KULLANICI_ID <> @KUL_ID ";
-                                if (entity.IST_BILDIREN_LOKASYON_ID > 0)
-                                {
-                                    parametreler.Add("LOK_ID", ID);
-                                    queryBld = queryBld +
-                                               " and {0}.orjin.UDF_LOKASYON_YETKI_KONTROL(@LOK_ID,TB_KULLANICI_ID) = 1";
-                                }
-
-                                queryBld = String.Format(queryBld, util.GetMasterDbName());
-                                string[] cihazIDler = cnn.Query<String>(queryBld).ToArray();
-                                if (cihazIDler.Length > 0)
-                                {
-                                    Util.SendNotificationToTopic(entity.IST_KOD, Localization.YeniIsTalebi,
-                                        string.Format(Localization.KodluIsTalebiOlusturuldu, entity.IST_KOD),
-                                        Util.isTalebi, cihazIDler);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.StackTrace);
-                            }
-
                         }
                     }
                     catch (Exception e)

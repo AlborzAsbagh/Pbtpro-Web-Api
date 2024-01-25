@@ -47,24 +47,15 @@ namespace WebApiNew.Controllers
         [HttpGet]
         public List<IsTanim> ArizaGetir()
         {
-            prms.Clear();
-            string query = @"SELECT * FROM orjin.TB_IS_TANIM WHERE IST_DURUM ='ARIZA'";
-            DataTable dt = klas.GetDataTable(query, prms.PARAMS);
-            List<IsTanim> listem = new List<IsTanim>();
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                IsTanim entity = new IsTanim();
-                entity.TB_IS_TANIM_ID = (int)dt.Rows[i]["TB_IS_TANIM_ID"];
-                entity.IST_DURUM = dt.Rows[i]["IST_DURUM"].ToString();
-                entity.IST_AKTIF = Util.getFieldBool(dt.Rows[i], "IST_AKTIF");
-                entity.IST_GRUP_KOD_ID = Util.getFieldInt(dt.Rows[i], "IST_GRUP_KOD_ID");
-                entity.IST_TIP_KOD_ID = Util.getFieldInt(dt.Rows[i], "IST_TIP_KOD_ID");
-                entity.IST_KOD = Util.getFieldString(dt.Rows[i], "IST_KOD");
-                entity.IST_TANIM = Util.getFieldString(dt.Rows[i], "IST_TANIM");
-                listem.Add(entity);
-            }
-            return listem;
-        }
+			prms.Clear();
+			string query = @" select * from orjin.VW_ARIZA_PROCEDURE ";
+			List<IsTanim> listem = new List<IsTanim>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<IsTanim>(query).ToList();
+			}
+			return listem;
+		}
         [Route("api/IsTanimKontrolList")]
         [HttpGet]
         public List<IsTanimKontrol> IsTanimKontrolList(int isTanimID)
@@ -339,7 +330,7 @@ namespace WebApiNew.Controllers
 		{
 			var prms = new {@ISTNM_ID =  isTanimID};
 			string query = @"select mlz.* , stk.STK_KOD as ISM_STOK_KOD , orjin.UDF_KOD_TANIM(ISM_BIRIM_KOD_ID) as 
-            ISM_BIRIM  , stk.STK_TIP_KOD_ID as ISM_STOK_TIP_KOD_ID , orjin.UDF_KOD_TANIM(stk.STK_TIP_KOD_ID) as ISM_STOK_TIP , dp.DEP_TANIM as ISM_DEPO , stk.STK_STOKSUZ_MALZEME as ISM_STOKSUZ from orjin.TB_IS_TANIM_MLZ mlz
+            ISM_BIRIM  , mlz.ISM_STOK_TIP_KOD_ID as ISM_STOK_TIP_KOD_ID , orjin.UDF_KOD_TANIM(mlz.ISM_STOK_TIP_KOD_ID) as ISM_STOK_TIP , dp.DEP_TANIM as ISM_DEPO , stk.STK_STOKSUZ_MALZEME as ISM_STOKSUZ from orjin.TB_IS_TANIM_MLZ mlz
             left join orjin.VW_STOK stk on stk.TB_STOK_ID = mlz.ISM_STOK_ID
             left join orjin.TB_DEPO dp on stk.STK_DEPO_ID = dp.TB_DEPO_ID where ISM_IS_TANIM_ID = @ISTNM_ID";
             List<IsTanimMalzemeWebAppModel> listem = new List<IsTanimMalzemeWebAppModel>();
@@ -623,5 +614,92 @@ namespace WebApiNew.Controllers
 			}
 
 		}
+
+
+		// Add Bakim Wep App
+		[Route("api/AddAriza")]
+		[HttpPost]
+		public async Task<object> AddAriza([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_IS_TANIM  ( IST_OLUSTURMA_TARIH , IST_DURUM , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , 'ARIZA' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		// Bakim Guncelle Web App 
+		[Route("api/UpdateAriza")]
+		[HttpPost]
+		public async Task<Object> UpdateAriza([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_IS_TANIM_ID")) >= 1)
+					{
+						query = " update orjin.TB_IS_TANIM set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_IS_TANIM_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_IS_TANIM_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+
 	}
 }

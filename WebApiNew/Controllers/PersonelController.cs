@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Dapper;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -12,6 +15,7 @@ namespace WebApiNew.Controllers
     public class PersonelController : ApiController
     {
         Util klas = new Util();
+        string query = "";
 
         public List<Personel> Get([FromUri] int? lokasyonId = 0 , [FromUri] int? atolyeId = 0 , [FromUri] int? personelRol = 0)
         {
@@ -26,37 +30,27 @@ namespace WebApiNew.Controllers
 
 			if (lokasyonId > 0 || atolyeId > 0 || personelRol > 0) query += getPersonelWhereQuery(personelRol, lokasyonId, atolyeId);
 
-			DataTable dt = klas.GetDataTable(query, new List<WebApiNew.Prm>());
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                double birimUcret = Util.getFieldDouble(dt.Rows[i], "PRS_UCRET");
-                double saatUcret = Util.getFieldDouble(dt.Rows[i], "PRS_SAATUCRET");
-                Personel entity = new Personel();
-                entity.PRS_UNVAN = Util.getFieldString(dt.Rows[i], "PRS_UNVAN");
-                entity.PRS_PERSONEL_KOD = Util.getFieldString(dt.Rows[i], "PRS_PERSONEL_KOD");
-                entity.PRS_ISIM = Util.getFieldString(dt.Rows[i], "PRS_ISIM");
-                entity.PRS_LOKASYON = Util.getFieldString(dt.Rows[i], "PRS_LOKASYON");
-                entity.PRS_DEPARTMAN = Util.getFieldString(dt.Rows[i], "PRS_DEPARTMAN");
-                entity.PRS_TIP = Util.getFieldString(dt.Rows[i], "PRS_TIP");
-                entity.PRS_RESIM_IDLERI = Util.getFieldString(dt.Rows[i], "PRS_RESIM_IDLERI");
-                entity.TB_PERSONEL_ID = dt.Rows[i]["TB_PERSONEL_ID"] != DBNull.Value ? Convert.ToInt32(dt.Rows[i]["TB_PERSONEL_ID"]) : 0;
-                entity.PRS_RESIM_ID = dt.Rows[i]["PRS_RESIM_ID"] != DBNull.Value ? Convert.ToInt32(dt.Rows[i]["PRS_RESIM_ID"]) : -1;
-                entity.PRS_TEKNISYEN = dt.Rows[i]["PRS_TEKNISYEN"] != DBNull.Value && Convert.ToBoolean(dt.Rows[i]["PRS_TEKNISYEN"]);
-                entity.PRS_OPERATOR = dt.Rows[i]["PRS_OPERATOR"] != DBNull.Value && Convert.ToBoolean(dt.Rows[i]["PRS_OPERATOR"]);
-                entity.PRS_AKTIF = dt.Rows[i]["PRS_AKTIF"] != DBNull.Value && Convert.ToBoolean(dt.Rows[i]["PRS_AKTIF"]);
-                entity.PRS_SURUCU = dt.Rows[i]["PRS_SURUCU"] != DBNull.Value && Convert.ToBoolean(dt.Rows[i]["PRS_SURUCU"]);
 
-                if(dt.Rows[i]["PRS_UCRET_TIPI"] == DBNull.Value)
-                    saatUcret = birimUcret / 240;
-                else if (Convert.ToInt32(dt.Rows[i]["PRS_UCRET_TIPI"]) == 250)
-                    saatUcret = birimUcret;
-                else if (Convert.ToInt32(dt.Rows[i]["PRS_UCRET_TIPI"]) == 500)
-                    saatUcret = birimUcret / 8;
-                else
-                    saatUcret = birimUcret / 240;
-                entity.PRS_SAAT_UCRET = saatUcret;
-                listem.Add(entity);
+            using(var cnn = klas.baglan())
+            {
+                listem = cnn.Query<Personel>(query).ToList();
+
             }
+            //for (int i = 0; i < listem.Count; i++)
+            //{
+            //    double birimUcret = Util.getFieldDouble(dt.Rows[i], "PRS_UCRET");
+            //    double saatUcret = Util.getFieldDouble(dt.Rows[i], "PRS_SAATUCRET");
+            //    if(dt.Rows[i]["PRS_UCRET_TIPI"] == DBNull.Value)
+            //        saatUcret = birimUcret / 240;
+            //    else if (Convert.ToInt32(dt.Rows[i]["PRS_UCRET_TIPI"]) == 250)
+            //        saatUcret = birimUcret;
+            //    else if (Convert.ToInt32(dt.Rows[i]["PRS_UCRET_TIPI"]) == 500)
+            //        saatUcret = birimUcret / 8;
+            //    else
+            //        saatUcret = birimUcret / 240;
+            //    entity.PRS_SAAT_UCRET = saatUcret;
+            //    listem.Add(entity);
+            //}
             return listem;
         }
 
@@ -102,5 +96,87 @@ namespace WebApiNew.Controllers
 	
         }
 
+
+        [HttpPost]
+        [Route("api/AddPersonel")]
+        public async Task<object> AddPersonel([FromBody] JObject entity) 
+        {
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_PERSONEL  ( PRS_OLUSTURMA_TARIH , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/UpdatePersonel")]
+		[HttpPost]
+		public async Task<object> UpdatePersonel([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_PERSONEL_ID")) >= 1)
+					{
+						query = " update orjin.TB_PERSONEL set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_PERSONEL_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , PRS_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_PERSONEL_ID = {Convert.ToInt32(entity.GetValue("TB_PERSONEL_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
 	}
 }
