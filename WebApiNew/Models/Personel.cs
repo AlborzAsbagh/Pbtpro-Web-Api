@@ -168,7 +168,7 @@ namespace WebApiNew.Models
 
         [DataMember] public string PRS_BABA_ADI { get; set; }
 
-        [DataMember] public string PRS_ANNE_ADI { get; set; }
+        [DataMember] public string PRS_ANA_ADI { get; set; }
 
         [DataMember] public string PRS_DOGUM_YERI { get; set; }
 

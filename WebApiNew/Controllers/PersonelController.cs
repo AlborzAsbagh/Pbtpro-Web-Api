@@ -178,5 +178,198 @@ namespace WebApiNew.Controllers
 			}
 
 		}
+
+		[Route("api/PersonelSertifikaList")]
+		[HttpGet]
+		public List<PersonelSertifika> PersonelSertifikaList([FromUri] int? personelId)
+		{
+			var prm = new { @PSE_PERSONEL_ID =  personelId};
+			string query = @" select * from orjin.VW_PERSONEL_SERTIFIKA where PSE_PERSONEL_ID = @PSE_PERSONEL_ID ";
+			List<PersonelSertifika> listem = new List<PersonelSertifika>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<PersonelSertifika>(query,prm).ToList();
+			}
+			return listem;
+		}
+
+		[HttpPost]
+		[Route("api/AddPersonelSertifika")]
+		public async Task<object> AddPersonelSertifika([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_PERSONEL_SERTIFIKA  ( PSE_OLUSTURMA_TARIH , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/UpdatePersonelSertifika")]
+		[HttpPost]
+		public async Task<object> UpdatePersonelSertifika([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_PERSONEL_SERTIFIKA_ID")) >= 1)
+					{
+						query = " update orjin.TB_PERSONEL_SERTIFIKA set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_PERSONEL_SERTIFIKA_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , PSE_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_PERSONEL_SERTIFIKA_ID = {Convert.ToInt32(entity.GetValue("TB_PERSONEL_SERTIFIKA_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
+
+
+		[Route("api/PersonelSantiyeList")]
+		[HttpGet]
+		public List<PersonelSantiye> PersonelSantiyeList([FromUri] int? personelId)
+		{
+			var prm = new { @PSS_PERSONEL_ID = personelId };
+			string query = @" select * from orjin.VW_PERSONEL_SANTIYE where PSS_PERSONEL_ID = @PSS_PERSONEL_ID ";
+			List<PersonelSantiye> listem = new List<PersonelSantiye>();
+			using (var cnn = klas.baglan())
+			{
+				listem = cnn.Query<PersonelSantiye>(query, prm).ToList();
+			}
+			return listem;
+		}
+
+		[HttpPost]
+		[Route("api/AddPersonelSantiye")]
+		public async Task<object> AddPersonelSantiye([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0)
+					{
+						query = " insert into orjin.TB_PERSONEL_SANTIYE  ( PSS_OLUSTURMA_TARIH , ";
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
+							else query += $" {item.Key} ";
+							count++;
+						}
+
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						count = 0;
+
+						foreach (var item in entity)
+						{
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
+							else query += $" '{item.Value}' ";
+							count++;
+						}
+						query += " ) ";
+						await cnn.ExecuteAsync(query);
+
+						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+					}
+					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				}
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/UpdatePersonelSantiye")]
+		[HttpPost]
+		public async Task<object> UpdatePersonelSantiye([FromBody] JObject entity)
+		{
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_PERSONEL_SANTIYE_ID")) >= 1)
+					{
+						query = " update orjin.TB_PERSONEL_SANTIYE set ";
+						foreach (var item in entity)
+						{
+
+							if (item.Key.Equals("TB_PERSONEL_SANTIYE_ID")) continue;
+
+							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
+							count++;
+						}
+						query += $" , PSS_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_PERSONEL_SANTIYE_ID = {Convert.ToInt32(entity.GetValue("TB_PERSONEL_SANTIYE_ID"))}";
+
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
+			}
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+
+		}
 	}
 }

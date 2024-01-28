@@ -345,6 +345,8 @@
     <Compile Include="Models\MakineOperator.cs" />
     <Compile Include="Models\Marka.cs" />
     <Compile Include="Models\Model.cs" />
+    <Compile Include="Models\PersonelSantiye.cs" />
+    <Compile Include="Models\PersonelSertifika.cs" />
     <Compile Include="Models\Takvim.cs" />
     <Compile Include="Models\Talimat.cs" />
     <Compile Include="Models\WebVersionIsEmriModel.cs" />
