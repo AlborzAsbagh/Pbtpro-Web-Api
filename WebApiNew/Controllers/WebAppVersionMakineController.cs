@@ -131,7 +131,7 @@ namespace WebApiNew.Controllers
 				{
 					if(entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_MAKINE ( ";
+						query = " insert into orjin.TB_MAKINE ( MKN_OLUSTURMA_TARIH ,";
 						foreach (var item in entity)
 						{
 							//if (item.Key.Equals("MakineSayacList") ||
@@ -143,7 +143,7 @@ namespace WebApiNew.Controllers
 							count ++;
 						}
 
-						query += " ) values ( ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -210,6 +210,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
+						query += $" , MKN_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
 						query += $" where TB_MAKINE_ID = {Convert.ToInt32(entity.GetValue("TB_MAKINE_ID"))}";
 
 						await cnn.ExecuteAsync(query);

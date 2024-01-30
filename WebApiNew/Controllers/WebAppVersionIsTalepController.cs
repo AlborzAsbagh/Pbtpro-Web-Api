@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using Newtonsoft.Json.Linq;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -55,7 +56,7 @@ namespace WebApiNew.Controllers
 					query += $" IST_KONU like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_KONU like '%{parametre}%' or ";
 					query += $" IST_BILDIREN_LOKASYON like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_BILDIREN_LOKASYON like '%{parametre}%' or ";
 					query += $" IST_MAKINE_KOD like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_MAKINE_KOD like '%{parametre}%' or ";
-					query += $" IST_TALEP_EDEN_ADI like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_TALEP_EDEN_ADI like '%{parametre}%' or ";
+					query += $" IST_TALEP_EDEN_ADI like '%{parametre}%' ) "; toplamIsTalepSayisiQuery += $" IST_TALEP_EDEN_ADI like '%{parametre}%' ) ";
 				}
 				if ((filters["customfilters"] as JObject) != null && (filters["customfilters"] as JObject).Count > 0)
 				{
@@ -133,6 +134,26 @@ namespace WebApiNew.Controllers
 						}
 						query += " ) ";
 						await cnn.ExecuteAsync(query);
+
+						int SonTalepId = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 TB_IS_TALEP_ID FROM orjin.TB_IS_TALEBI ORDER BY  TB_IS_TALEP_ID DESC");
+						if (SonTalepId > 0)
+						{
+							var itl = new IsTalebiLog
+							{
+								ITL_IS_TANIM_ID = SonTalepId,
+								ITL_KULLANICI_ID = Convert.ToInt32(entity.GetValue("IST_TALEP_EDEN_ID")),
+								ITL_TARIH = Convert.ToDateTime(entity.GetValue("IST_ACILIS_TARIHI")),
+								ITL_SAAT = Convert.ToString(entity.GetValue("IST_ACILIS_SAATI")),
+								ITL_ISLEM = "Yeni iş talebi",
+								ITL_ACIKLAMA = String.Format("Talep no: '{0}' - Konu :'{1}'", Convert.ToString(entity.GetValue("IST_KOD")),
+									Convert.ToString(entity.GetValue("IST_TANIMI"))),
+								ITL_ISLEM_DURUM = "AÇIK",
+								ITL_TALEP_ISLEM = "Yeni İş Talebi",
+								ITL_OLUSTURAN_ID = Convert.ToInt32(entity.GetValue("IST_OLUSTURAN_ID")),
+								ITL_OLUSTURMA_TARIH = DateTime.Now
+							};
+							cnn.Insert(itl);
+						}
 
 						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
 					}
