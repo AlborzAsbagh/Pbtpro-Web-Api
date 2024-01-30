@@ -104,6 +104,21 @@ namespace WebApiNew.Controllers
 			}
 		}
 
+
+		[Route("api/GetMakineById")]
+		[HttpGet]
+		public object GetMakineById([FromUri] int makineId)
+		{
+			Util klas = new Util();
+			List<WebVersionMakineModel> listem = new List<WebVersionMakineModel>();
+			string query = @"select * from orjin.VW_MAKINE where TB_MAKINE_ID = @TB_MAKINE_ID";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<WebVersionMakineModel>(query, new { @TB_MAKINE_ID = makineId }).ToList();
+			}
+			return listem;
+		}
+
 		//Makine Ekle 
 		[Route("api/AddMakine")]
 		[HttpPost]

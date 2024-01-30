@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Dapper;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using WebApiNew.Models;
 
@@ -44,5 +46,26 @@ namespace WebApiNew.Controllers
 			return bld;
 		}
 
+
+		[Route("api/GetIsTalepKullaniciList")]
+		[HttpGet]
+		public object GetIsTalepKullaniciList()
+		{
+			Util klas = new Util();
+			List<IsTalepKullanici> listem = new List<IsTalepKullanici>();
+			string query = @"SELECT *
+
+						  , orjin.UDF_KOD_TANIM(ISK_KULLANICI_TIP_KOD_ID) as ISK_KULLANICI_TIP
+						  , orjin.UDF_KOD_TANIM(ISK_DEPARTMAN_ID) as ISK_DEPARTMAN
+						  , (select LOK_TANIM from orjin.TB_LOKASYON where TB_LOKASYON_ID = isk.ISK_LOKASYON_ID) as ISK_LOKASYON
+						  , (select PRS_ISIM from orjin.TB_PERSONEL where TB_PERSONEL_ID = isk.ISK_PERSONEL_ID) as ISK_PERSONEL_ISIM
+
+					  FROM orjin.TB_IS_TALEBI_KULLANICI isk";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<IsTalepKullanici>(query).ToList();
+			}
+			return listem;
+		}
 	}
 }

@@ -342,6 +342,7 @@
     <Compile Include="Models\CozumKatalogModel.cs" />
     <Compile Include="Models\IsEmriAracGerec.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
+    <Compile Include="Models\IsTalepKullanici.cs" />
     <Compile Include="Models\LokasyonTip.cs" />
     <Compile Include="Models\MakineOperator.cs" />
     <Compile Include="Models\Marka.cs" />

@@ -187,7 +187,20 @@ namespace WebApiNew.Controllers
 		}
 
 
-
+		
+		[Route("api/GetIsTalepById")]
+		[HttpGet]
+		public object GetIsTalepById([FromUri] int isTalepId)
+		{
+			Util klas = new Util();
+			List<IsTalep> listem = new List<IsTalep>();
+			string query = @"select * from orjin.VW_IS_TALEP where TB_IS_TALEP_ID = @TB_IS_TALEP_ID";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<IsTalep>(query, new { @TB_IS_TALEP_ID = isTalepId }).ToList();
+			}
+			return listem;
+		}
 
 	}
 }
