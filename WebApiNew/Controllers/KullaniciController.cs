@@ -190,6 +190,19 @@ namespace WebApiNew.Controllers
             return name;
         }
 
-
-    }
+		
+		[Route("api/GetKullaniciList")]
+		[HttpGet]
+		public object GetKullaniciList()
+		{
+			Util klas = new Util();
+			List<Kullanici> listem = new List<Kullanici>();
+			string query = @"select * from [PBTPRO_MASTER].[orjin].[VW_KULLANICI] where KLL_AKTIF = 1";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<Kullanici>(query).ToList();
+			}
+			return listem;
+		}
+	}
 }

@@ -102,11 +102,11 @@ namespace WebApiNew.Models
 
 		[DataMember] public string PRS_OZEL_ALAN_5 { get; set; }
 
-		[DataMember] public float PRS_OZEL_ALAN_6 { get; set; }
+		[DataMember] public string PRS_OZEL_ALAN_6 { get; set; }
 
-		[DataMember] public float PRS_OZEL_ALAN_7 { get; set; }
+		[DataMember] public string PRS_OZEL_ALAN_7 { get; set; }
 
-		[DataMember] public float PRS_OZEL_ALAN_8 { get; set; }
+		[DataMember] public string PRS_OZEL_ALAN_8 { get; set; }
 
 		[DataMember] public float PRS_OZEL_ALAN_9 { get; set; }
 
@@ -208,7 +208,15 @@ namespace WebApiNew.Models
 
         [DataMember] public string PRS_EHLIYETNO { get; set; }
 
+		[DataMember] public int PRS_SERTIFIKA_KOD_ID { get; set; }
 
+		[DataMember] public string PRS_SERTIFIKA { get; set; }
+
+		[DataMember] public int PRS_OZEL_ALAN_6_KOD_ID { get; set; }
+
+		[DataMember] public int PRS_OZEL_ALAN_7_KOD_ID { get; set; }
+
+		[DataMember] public int PRS_OZEL_ALAN_8_KOD_ID { get; set; }
 
 	}
 }

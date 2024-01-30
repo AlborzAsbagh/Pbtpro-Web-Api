@@ -24,6 +24,9 @@ namespace WebApiNew.Models
         public string KLL_TANIM { get; set; }
 
         [DataMember]
+        public string KLL_UNVAN { get; set; }
+
+        [DataMember]
         public string KLL_KOD { get; set; }
 
         [DataMember]
@@ -46,6 +49,40 @@ namespace WebApiNew.Models
 
         [DataMember]
         public Personel KLL_PERSONEL { get; set; }
-    }
+
+        [DataMember]
+        public int KLL_KULLANICI_TIP_KOD_ID { get; set; }
+
+        [DataMember]
+        public string KLL_KULLANICI_TIP_TANIM { get; set; }
+
+		[DataMember]
+		public int KLL_DEPARTMAN_ID { get; set; }
+
+		[DataMember]
+		public string KLL_DEPARTMAN { get; set; }
+
+		[DataMember]
+		public int KLL_LOKASYON_ID { get; set; }
+
+		[DataMember]
+		public string KLL_LOKASYON { get; set; }
+
+        [DataMember]
+        public string KLL_TELEFON_1 { get; set; }
+
+		[DataMember]
+		public string KLL_TELEFON_2 { get; set; }
+
+		[DataMember]
+		public string KLL_DAHILI { get; set; }
+
+		[DataMember]
+		public string KLL_GSM { get; set; }
+
+		[DataMember]
+		public string KLL_PERSONEL_ADI { get; set; }
+
+	}
 
 }

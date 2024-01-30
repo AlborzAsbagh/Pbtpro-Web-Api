@@ -207,6 +207,8 @@ namespace WebApiNew.Models
         [DataMember]
         public string IST_MAKINE_TANIM { get; set; }
         [DataMember]
+        public string IST_MAKINE_PLAKA { get; set; }
+        [DataMember]
         public string IST_EKIPMAN_KOD { get; set; }
         [DataMember]
         public string IST_EKIPMAN_TANIM { get; set; }

@@ -296,6 +296,7 @@
     <Compile Include="Controllers\DurusController.cs" />
     <Compile Include="Controllers\OnayController.cs" />
     <Compile Include="Controllers\OtonomBakimController.cs" />
+    <Compile Include="Controllers\WebAppVersionIsTalepController.cs" />
     <Compile Include="Controllers\WebAppVersionMakineController.cs" />
     <Compile Include="Filters\Authorization.cs" />
     <Compile Include="Controllers\MakineCalismaController.cs" />
