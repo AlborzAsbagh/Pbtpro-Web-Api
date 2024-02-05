@@ -20,6 +20,10 @@ namespace WebApiNew.Models
 		public int ISK_DEPARTMAN_ID { get; set; }
 
 		[DataMember]
+		public string ISK_DEPARTMAN { get; set; }
+
+
+		[DataMember]
 		public int ISK_KULLANICI_TIP_KOD_ID { get; set; }
 
 		[DataMember]

@@ -96,7 +96,7 @@ namespace WebApiNew.Models
         public int IST_BIRLESIM_ID { get; set; }
         [DataMember]
         public string IST_ACILIS_NEDEN { get; set; }
-        [DataMember]
+		[DataMember]
         public int IST_SABLON_ID { get; set; }
         [DataMember]
         public int IST_ARIZA_ID { get; set; }
@@ -166,7 +166,9 @@ namespace WebApiNew.Models
         public string IST_DEGERLENDIRME_ACIKLAMA { get; set; }
         [DataMember]
         public int IST_DEPARTMAN_ID { get; set; }
-        [DataMember]
+		[DataMember]
+		public string IST_DEPARTMAN { get; set; }
+		[DataMember]
         public int IST_ILGILI_ATOLYE_ID { get; set; }
         [DataMember]
         public string IST_TALEP_EDEN_ADI { get; set; }
