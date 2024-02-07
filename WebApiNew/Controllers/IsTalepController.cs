@@ -949,8 +949,8 @@ namespace WebApiNew.Controllers
             return listem;
         }
 
-
-        [Route("api/IsEmriOlustur")]
+		// Mobilden gelen istekte sadece bir teknesiyen seçilebilir
+		[Route("api/IsEmriOlustur")]
         [HttpGet]
         public async Task<string> IsEmriOlustur([FromUri] int talepID, [FromUri] int userId, [FromUri] int teknisyenId, [FromUri] int atolyeId)
         {

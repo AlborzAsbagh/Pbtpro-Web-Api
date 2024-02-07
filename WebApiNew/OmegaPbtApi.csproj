@@ -290,6 +290,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="C.cs" />
     <Compile Include="Controllers\AtolyeController.cs" />
+    <Compile Include="Controllers\IsTalepParametreController.cs" />
     <Compile Include="Controllers\VardiyaController.cs" />
     <Compile Include="Controllers\WebAppVersionIsEmriController.cs" />
     <Compile Include="Controllers\OlcumController.cs" />
@@ -342,6 +343,7 @@
     <Compile Include="Models\CozumKatalogModel.cs" />
     <Compile Include="Models\IsEmriAracGerec.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
+    <Compile Include="Models\IsTalepIptalModel.cs" />
     <Compile Include="Models\IsTalepKullanici.cs" />
     <Compile Include="Models\LokasyonTip.cs" />
     <Compile Include="Models\MakineOperator.cs" />
