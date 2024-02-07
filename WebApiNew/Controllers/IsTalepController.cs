@@ -752,6 +752,7 @@ namespace WebApiNew.Controllers
 
 
         }
+
         [HttpPost]
         [Route("api/IsTalepSil")]
         public void IsTalepSil([FromUri] int talepID)
@@ -780,6 +781,7 @@ namespace WebApiNew.Controllers
                 throw;
             }
         }
+
         [HttpPost]
         [Route("api/IsTalepGuncelle")]
         public void IsTalepGuncelle([FromBody] IsTalep entity)
@@ -920,6 +922,7 @@ namespace WebApiNew.Controllers
                 klas.kapat();
             }
         }
+
         [Route("api/IsTalepTarihce")]
         public List<IsTalebiLog> GetIsTalepTarihceByID([FromUri] int talepID)
         {
@@ -1211,7 +1214,7 @@ namespace WebApiNew.Controllers
             return isTalepEkleData;
         }
 
-        //Is Talebi Post Method For Hacettepe Web Form
+        //Is Talebi Post Method For Web Form
 		[HttpGet]
 		[Route("api/postIsTalebi")]
 		public string postIsTalebi(

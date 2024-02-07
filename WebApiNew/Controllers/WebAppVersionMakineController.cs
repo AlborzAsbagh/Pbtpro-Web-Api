@@ -16,6 +16,7 @@ using WebApiNew.Models;
  * 
  * 
  *      MAKINE Controller For Web App Versions
+ *      ( Mobil ve Web Arasındaki ortak fonksiyonlar kendi kontrollerinde yazılmıştır . )
  *
  *
  *

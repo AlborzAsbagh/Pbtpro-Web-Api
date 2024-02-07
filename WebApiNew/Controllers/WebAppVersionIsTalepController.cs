@@ -16,6 +16,7 @@ using WebApiNew.Models;
  * 
  * 
  *      IS TALEP Controller For Web App Versions
+ *      ( Mobil ve Web Arasındaki ortak fonksiyonlar kendi kontrollerinde yazılmıştır . )
  *
  *
  *
@@ -47,8 +48,8 @@ namespace WebApiNew.Controllers
 			List<IsTalep> listem = new List<IsTalep>();
 			try
 			{
-				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_IS_TALEP_ID DESC) AS subRow FROM orjin.VW_IS_TALEP where 1=1";
-				toplamIsTalepSayisiQuery = @"select count(*) from (select * from orjin.VW_IS_TALEP where 1=1";
+				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_IS_TALEP_ID DESC) AS subRow FROM orjin.VW_IS_TALEP where 1=1 ";
+				toplamIsTalepSayisiQuery = @" select count(*) from (select * from orjin.VW_IS_TALEP where 1=1 ";
 
 				if (!string.IsNullOrEmpty(parametre))
 				{
@@ -58,6 +59,7 @@ namespace WebApiNew.Controllers
 					query += $" IST_MAKINE_KOD like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_MAKINE_KOD like '%{parametre}%' or ";
 					query += $" IST_TALEP_EDEN_ADI like '%{parametre}%' ) "; toplamIsTalepSayisiQuery += $" IST_TALEP_EDEN_ADI like '%{parametre}%' ) ";
 				}
+
 				if ((filters["customfilters"] as JObject) != null && (filters["customfilters"] as JObject).Count > 0)
 				{
 					query += " and ( ";
@@ -77,11 +79,34 @@ namespace WebApiNew.Controllers
 					query += " ) ";
 					toplamIsTalepSayisiQuery += " ) ";
 				}
+
 				if (lokasyonId > 0 && lokasyonId != null)
 				{
 					query += $" and IST_BILDIREN_LOKASYON_ID = {lokasyonId} ";
 					toplamIsTalepSayisiQuery += $" and IST_BILDIREN_LOKASYON_ID = {lokasyonId} ";
 				}
+
+				if( (filters["durumlar"] as JObject) != null && (filters["durumlar"] as JObject).Count > 0)
+				{
+					query += " and (  ";
+					toplamIsTalepSayisiQuery += " and (  ";
+					counter = 0;
+					foreach (var property in filters["durumlar"] as JObject)
+					{
+						query += $" IST_DURUM_ID LIKE '%{property.Value}%' ";
+						toplamIsTalepSayisiQuery += $" IST_DURUM_ID LIKE '%{property.Value}%' ";
+
+						if (counter < (filters["durumlar"] as JObject).Count - 1)
+						{
+							query += " or ";
+							toplamIsTalepSayisiQuery += " or ";
+						}
+						counter++;
+					}
+					query += " ) ";
+					toplamIsTalepSayisiQuery += " ) ";
+				}
+
 				query += $" ) RowIndex WHERE RowIndex.subRow >= {pagingIlkDeger} AND RowIndex.subRow < {pagingSonDeger}";
 				toplamIsTalepSayisiQuery += ") as TotalIsTalepSayisi";
 
@@ -221,6 +246,71 @@ namespace WebApiNew.Controllers
 				listem = conn.Query<IsTalep>(query, new { @TB_IS_TALEP_ID = isTalepId }).ToList();
 			}
 			return listem;
+		}
+
+
+		// Ek olarak iptal nedeni , tarih ve saati eklendi .
+
+		[Route("api/IsTalepIptalEt")]
+		[HttpGet]
+		public void IsTalepIptalEt( 
+			[FromUri] int talepID, 
+			[FromUri] int userId, 
+			[FromUri] string talepNo, 
+			[FromUri] string userName,
+			[FromUri] string iptalNeden, 
+			[FromUri] DateTime? iptalTarih, 
+			[FromUri] string iptalSaat )
+		{
+			string isTalepLogQuery =
+				@"
+                    insert into orjin.TB_IS_TALEBI_LOG (
+                    ITL_IS_TANIM_ID,
+                    ITL_KULLANICI_ID,
+                    ITL_TARIH,
+                    ITL_SAAT,
+                    ITL_ISLEM,
+                    ITL_ACIKLAMA,
+                    ITL_ISLEM_DURUM,
+                    ITL_TALEP_ISLEM,
+                    ITL_OLUSTURAN_ID ) values (";
+
+			isTalepLogQuery += $" {talepID} , ";
+			isTalepLogQuery += $" {userId} , ";
+			isTalepLogQuery += $" '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , "; // Changed date format
+			isTalepLogQuery += $" '{DateTime.Now.ToString("HH:mm:ss")}' , ";
+			isTalepLogQuery += " 'İptal' , ";
+			isTalepLogQuery += $" 'Talep no : {talepNo} - Konu : {userName} tarafından iptal edildi' , ";
+			isTalepLogQuery += " 'İPTAL EDİLDİ' , ";
+			isTalepLogQuery += " 'İptal' , ";
+			isTalepLogQuery += $" {userId} )";
+
+			try
+			{
+				var util = new Util();
+				using (var cnn = util.baglan())
+				{
+					var parametreler = new DynamicParameters();
+					parametreler.Add("IS_TALEP_ID", talepID);
+					parametreler.Add("IST_IPTAL_NEDEN", iptalNeden);
+					parametreler.Add("IST_IPTAL_TARIH", iptalTarih);
+					parametreler.Add("IST_IPTAL_SAAT", iptalSaat);
+					// Log data is recorded
+					cnn.Execute(isTalepLogQuery, parametreler);
+					// Job request status is being canceled
+					cnn.Execute($"update orjin.TB_IS_TALEBI set IST_DURUM_ID = 5 WHERE TB_IS_TALEP_ID = {talepID}", parametreler);
+
+					// Job cancellation reason & date & time
+					cnn.Execute("update orjin.TB_IS_TALEBI set IST_IPTAL_NEDEN = @IST_IPTAL_NEDEN , " +
+						"IST_IPTAL_TARIH = @IST_IPTAL_TARIH , " +
+						"IST_IPTAL_SAAT = @IST_IPTAL_SAAT WHERE TB_IS_TALEP_ID = @IS_TALEP_ID", parametreler);
+					
+				}
+			}
+			catch (Exception)
+			{
+				throw;
+			}
 		}
 
 	}
