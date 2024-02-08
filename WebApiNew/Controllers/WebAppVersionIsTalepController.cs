@@ -274,6 +274,7 @@ namespace WebApiNew.Controllers
 			return listem;
 		}
 		
+		// Add one by one
 		public void IsTalepIptalProcess(IsTalepIptalModel entity)
 		{
 			string isTalepLogQuery =
@@ -351,16 +352,14 @@ namespace WebApiNew.Controllers
 		}
 
 
-		// Webden gelen istekte kaç tane teknesiyen seçilebilir
-		[Route("api/IsTalepToIsEmri")]
-		[HttpPost]
-		public async Task<string> IsTalepToIsEmri([FromUri] int talepID, [FromUri] int userId, [FromUri] int atolyeId , [FromBody] List<int> teknisyenIds)
+		// Add one by one
+		public async void IsTalepToIsEmriProcess(IsTalepToIsEmriModel isTalepToIsEmriModel)
 		{
-			string isemriNo = "";
+			
 			try
 			{
 				parametreler.Clear();
-				parametreler.Add(new Prm("TB_IS_TALEP_ID", talepID));
+				parametreler.Add(new Prm("TB_IS_TALEP_ID", isTalepToIsEmriModel.TALEP_ID));
 				DataRow drTalep = klas.GetDataRow("select * from orjin.VW_IS_TALEP where TB_IS_TALEP_ID = @TB_IS_TALEP_ID", parametreler);
 				parametreler.Clear();
 				parametreler.Add(new Prm("TB_MAKINE_ID", drTalep["IST_MAKINE_ID"]));
@@ -369,7 +368,7 @@ namespace WebApiNew.Controllers
 				IsEmriController ismCont = new IsEmriController(_logger);
 				entity.ISM_DUZENLEME_TARIH = DateTime.Now;
 				entity.ISM_DUZENLEME_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT);
-				entity.ISM_ATOLYE_ID = atolyeId;
+				entity.ISM_ATOLYE_ID = isTalepToIsEmriModel.ATOLYE_ID;
 				entity.ISM_ONCELIK_ID = Util.getFieldInt(drTalep, "IST_ONCELIK_ID");
 				entity.ISM_BILDIREN = Util.getFieldString(drTalep, "IST_TALEP_EDEN_ADI");
 				entity.ISM_IS_TARIH = Util.getFieldDateTime(drTalep, "IST_ACILIS_TARIHI");
@@ -410,11 +409,11 @@ namespace WebApiNew.Controllers
 
 
 				entity.ISM_KONU = Util.getFieldString(drTalep, "IST_TANIMI");
-				entity.ISM_ATOLYE_ID = atolyeId;
+				entity.ISM_ATOLYE_ID = isTalepToIsEmriModel.ATOLYE_ID;
 
-				entity.ISM_OLUSTURAN_ID = userId;
+				entity.ISM_OLUSTURAN_ID = isTalepToIsEmriModel.USER_ID;
 				entity.ISM_ACIKLAMA = String.Format("'{0}' koldu iş talebi", drTalep["IST_KOD"].ToString());
-				await ismCont.Post(entity, userId);
+				await ismCont.Post(entity, isTalepToIsEmriModel.USER_ID);
 				parametreler.Clear();
 				int _isemriID = Convert.ToInt32(klas.GetDataCell("SELECT MAX(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI", parametreler));
 				// iş talep durumu değiştiriliyor.
@@ -424,11 +423,11 @@ namespace WebApiNew.Controllers
 				klas.cmd("UPDATE orjin.TB_IS_TALEBI SET IST_ISEMRI_ID=@IST_ISEMRI_ID , IST_DURUM_ID=3 WHERE TB_IS_TALEP_ID= @TB_IS_TALEP_ID", parametreler);
 
 				// iş talep personel ekleniyor
-				if(teknisyenIds.Count > 0)
+				if(isTalepToIsEmriModel.TEKNISYEN_IDS.Count > 0)
 				{
 					parametreler.Clear();
 					parametreler.Add(new Prm("TB_IS_TALEP_ID", drTalep["TB_IS_TALEP_ID"]));
-					foreach(int i in teknisyenIds)
+					foreach(int i in isTalepToIsEmriModel.TEKNISYEN_IDS)
 					{
 						parametreler.Add(new Prm("ITK_TEKNISYEN_ID", i));
 						klas.cmd("INSERT INTO orjin.TB_IS_TALEBI_TEKNISYEN (ITK_IS_TALEBI_ID,ITK_TEKNISYEN_ID,ITK_FAZLA_MESAI_VAR,ITK_MAIL_GONDERILDI) VALUES(@TB_IS_TALEP_ID,@ITK_TEKNISYEN_ID,0,0)", parametreler);
@@ -436,7 +435,7 @@ namespace WebApiNew.Controllers
 						IsEmriPersonel ismPersonel = new IsEmriPersonel();
 						ismPersonel.IDK_ISEMRI_ID = _isemriID;
 						ismPersonel.IDK_REF_ID = i;
-						ismPersonel.IDK_OLUSTURAN_ID = userId;
+						ismPersonel.IDK_OLUSTURAN_ID = isTalepToIsEmriModel.USER_ID;
 						ismCont.PersonelListKaydet(ismPersonel);
 					}
 				}
@@ -465,20 +464,20 @@ namespace WebApiNew.Controllers
                                             @ITL_OLUSTURAN_ID,
                                             @ITL_OLUSTURMA_TARIH)";
 				parametreler.Clear();
-				foreach (int i in teknisyenIds)
+				foreach (int i in isTalepToIsEmriModel.TEKNISYEN_IDS)
 				{
 					parametreler.Add(new Prm("TB_PERSONEL_ID", i));
 					string PRS_ISIM = klas.GetDataCell("select PRS_ISIM from orjin.TB_PERSONEL where TB_PERSONEL_ID=@TB_PERSONEL_ID", parametreler);
 					prms.Clear();
 
-					prms.Add("ITL_IS_TANIM_ID", talepID);
-					prms.Add("ITL_KULLANICI_ID", userId);
+					prms.Add("ITL_IS_TANIM_ID", isTalepToIsEmriModel.TALEP_ID);
+					prms.Add("ITL_KULLANICI_ID", isTalepToIsEmriModel.USER_ID);
 					prms.Add("ITL_TARIH", DateTime.Now);
 					prms.Add("ITL_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));
-					if (atolyeId > -1)
+					if (isTalepToIsEmriModel.ATOLYE_ID > -1)
 					{
 						AtolyeController atlCont = new AtolyeController();
-						string atolyeTanim = atlCont.AtolyeListesi(userId).FirstOrDefault(a => a.TB_ATOLYE_ID == atolyeId).ATL_TANIM;
+						string atolyeTanim = atlCont.AtolyeListesi(isTalepToIsEmriModel.USER_ID).FirstOrDefault(a => a.TB_ATOLYE_ID == isTalepToIsEmriModel.ATOLYE_ID).ATL_TANIM;
 						prms.Add("ITL_ISLEM", "Atölye Ataması");
 						prms.Add("ITL_TALEP_ISLEM", "Atölye Ataması");
 						prms.Add("ITL_ACIKLAMA", String.Format("Atölye: {0}  İş Emri Numarası: {1}", atolyeTanim, entity.ISM_ISEMRI_NO));
@@ -490,20 +489,42 @@ namespace WebApiNew.Controllers
 						prms.Add("ITL_ACIKLAMA", String.Format("Teknisyen : {0} İş Emri Numarası: {1}", PRS_ISIM, entity.ISM_ISEMRI_NO));
 					}
 					prms.Add("ITL_ISLEM_DURUM", "DEVAM EDIYOR");
-					prms.Add("ITL_OLUSTURAN_ID", userId);
+					prms.Add("ITL_OLUSTURAN_ID", isTalepToIsEmriModel.USER_ID);
 					prms.Add("ITL_OLUSTURMA_TARIH", DateTime.Now);
 					klas.cmd(query, prms.PARAMS);
 				}
-				isemriNo = entity.ISM_ISEMRI_NO;
-				return isemriNo;
+				
 			}
 			catch (Exception)
 			{
 				klas.kapat();
-				return isemriNo;
+				throw;
 			}
 
 		}
 
+
+		// Webden gelen istekte kaç tane teknesiyen seçilebilir
+		[Route("api/IsTalepToIsEmri")]
+		[HttpPost]
+		public object IsTalepToIsEmri([FromBody] List<IsTalepToIsEmriModel> entities)
+		{
+			try
+			{
+				if (entities != null && entities.Count != 0)
+				{
+					foreach (var entity in entities)
+					{
+						IsTalepToIsEmriProcess(entity);
+					}
+					return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully" });
+				}
+				else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+			}
+			catch(Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
 	}
 }
