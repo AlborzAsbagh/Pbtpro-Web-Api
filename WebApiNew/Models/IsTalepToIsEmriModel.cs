@@ -15,9 +15,6 @@ public class IsTalepToIsEmriModel
 	public int ATOLYE_ID { get; set; }
 
 	[DataMember]
-	public int IST_TALEP_ID { get; set; }
-
-	[DataMember]
 	public List<int> TEKNISYEN_IDS { get; set; }
 
 }

@@ -142,44 +142,29 @@ namespace WebApiNew.Controllers
 		public async Task<object> AddIsTalep([FromBody] JObject entity)
 		{
 			int count = 0;
-			var isemritipId = -1;
-			var userId = 0;
 			try
 			{
 			
 				using (var cnn = klas.baglan())
 				{
-					if (entity.GetValue("IST_ISEMRI_TIP_ID") == null || 
-						Convert.ToInt32(entity.GetValue("IST_ISEMRI_TIP_ID")) == 0 ||
-						Convert.ToInt32(entity.GetValue("IST_ISEMRI_TIP_ID")) == -1 )
-					{
-						isemritipId = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 ISP_ISEMRI_TIPI_ID FROM orjin.TB_IS_TALEBI_PARAMETRE");
-					}
-					else isemritipId = Convert.ToInt32(entity.GetValue("IST_ISEMRI_TIP_ID"));
-
-					userId = cnn.QueryFirstOrDefault<int>(@" select isk.TB_IS_TALEBI_KULLANICI_ID
-	                                FROM [PBTPRO_MASTER].[orjin].[TB_KULLANICI] kll
-	                                left join [PBTPRO_1].[orjin].[TB_PERSONEL] prs on prs.TB_PERSONEL_ID = kll.KLL_PERSONEL_ID " +
-									$" left join [PBTPRO_1].[orjin].[TB_IS_TALEBI_KULLANICI] isk on prs.TB_PERSONEL_ID = isk.ISK_PERSONEL_ID where kll.TB_KULLANICI_ID = {Convert.ToInt32(entity.GetValue("USER_ID"))}");
-
+					
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_IS_TALEBI  ( IST_OLUSTURMA_TARIH , IST_ISEMRI_TIP_ID , IST_TALEP_EDEN_ID , ";
+						query = " insert into orjin.TB_IS_TALEBI  ( IST_OLUSTURMA_TARIH , ";
 						foreach (var item in entity)
 						{
-							if (item.Key.Equals("USER_ID") || item.Key.Equals("IST_ISEMRI_TIP_ID") ) continue;
-							if (count < entity.Count - 3) query += $" {item.Key} , ";
+							if (count < entity.Count - 1) query += $" {item.Key} , ";
 							else query += $" {item.Key} ";
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {isemritipId} , {userId} , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
 						count = 0;
 
 						foreach (var item in entity)
 						{
-							if (item.Key.Equals("USER_ID") || item.Key.Equals("IST_ISEMRI_TIP_ID")) continue;
-							if (count < entity.Count - 3) query += $" '{item.Value}' , ";
+							
+							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
 							else query += $" '{item.Value}' ";
 							count++;
 						}
@@ -192,7 +177,7 @@ namespace WebApiNew.Controllers
 							var itl = new IsTalebiLog
 							{
 								ITL_IS_TANIM_ID = SonTalepId,
-								ITL_KULLANICI_ID = userId,
+								ITL_KULLANICI_ID = Convert.ToInt32(entity.GetValue("IST_TALEP_EDEN_ID")),
 								ITL_TARIH = Convert.ToDateTime(entity.GetValue("IST_ACILIS_TARIHI")),
 								ITL_SAAT = Convert.ToString(entity.GetValue("IST_ACILIS_SAATI")),
 								ITL_ISLEM = "Yeni iş talebi",
@@ -206,7 +191,7 @@ namespace WebApiNew.Controllers
 							cnn.Insert(itl);
 						}
 
-						return Json(new { has_error = false, status_code = 201, status = "Added Successfully" });
+						return Json(new { has_error = false, status_code = 201, status = " Added Successfully " });
 					}
 					else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
 				}
@@ -318,7 +303,7 @@ namespace WebApiNew.Controllers
 					// Job cancellation reason & date & time
 					cnn.Execute("update orjin.TB_IS_TALEBI set IST_IPTAL_NEDEN = @IST_IPTAL_NEDEN , " +
 						"IST_IPTAL_TARIH = @IST_IPTAL_TARIH , " +
-						"IST_IPTAL_SAAT = @IST_IPTAL_SAAT," +
+						"IST_IPTAL_SAAT = @IST_IPTAL_SAAT " +
 						" WHERE TB_IS_TALEP_ID = @IS_TALEP_ID", parametreler);
 					
 				}

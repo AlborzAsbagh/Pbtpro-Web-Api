@@ -27,12 +27,10 @@ namespace WebApiNew.Controllers
 				var util = new Util();
 				using (var conn = util.baglan())
 				{
-					var sql = @"  
-                        UPDATE orjin.TB_NUMARATOR SET NMR_NUMARA = NMR_NUMARA+1 WHERE NMR_KOD = '@MODUL_KODU';
-                        SELECT 
-                        NMR_ON_EK+right(replicate('0',NMR_HANE_SAYISI)+CAST(NMR_NUMARA AS VARCHAR(MAX)),NMR_HANE_SAYISI) as deger FROM orjin.TB_NUMARATOR
-                        WHERE NMR_KOD = '@MODUL_KODU'";
-					var kod = conn.Query<String>(sql,new {@MODUL_KODU = modulKodu}).FirstOrDefault();
+					var sql = $"  UPDATE orjin.TB_NUMARATOR SET NMR_NUMARA = NMR_NUMARA+1 WHERE NMR_KOD = '{modulKodu}' " + 
+                        "SELECT NMR_ON_EK+right(replicate('0',NMR_HANE_SAYISI)+CAST(NMR_NUMARA AS VARCHAR(MAX)),NMR_HANE_SAYISI) as deger FROM orjin.TB_NUMARATOR " +
+                        $" WHERE NMR_KOD = '{modulKodu}'";
+					var kod = conn.Query<String>(sql).FirstOrDefault();
 					return kod;
 				}
 			}
