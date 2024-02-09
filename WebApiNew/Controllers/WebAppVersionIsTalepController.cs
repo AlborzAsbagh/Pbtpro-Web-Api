@@ -260,7 +260,7 @@ namespace WebApiNew.Controllers
 		}
 		
 		// Add one by one
-		public void IsTalepIptalProcess(IsTalepIptalModel entity)
+		public void IsTalepIptalKapatProcess(IsTalepIptalKapatModel entity)
 		{
 			string isTalepLogQuery =
 				@"
@@ -279,10 +279,10 @@ namespace WebApiNew.Controllers
 			isTalepLogQuery += $" {entity.KLL_ID} , ";
 			isTalepLogQuery += $" '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , "; // Changed date format
 			isTalepLogQuery += $" '{DateTime.Now.ToString("HH:mm:ss")}' , ";
-			isTalepLogQuery += " 'İptal' , ";
-			isTalepLogQuery += $" 'Talep no : {entity.IST_TALEP_NO} - Konu : {entity.KLL_ADI} tarafından iptal edildi' , ";
-			isTalepLogQuery += " 'İPTAL EDİLDİ' , ";
-			isTalepLogQuery += " 'İptal' , ";
+			isTalepLogQuery += $" '{entity.ITL_ISLEM}' , ";
+			isTalepLogQuery += $" '{entity.ITL_ACIKLAMA}' , ";
+			isTalepLogQuery += $" '{entity.ITL_ISLEM_DURUM}' , ";
+			isTalepLogQuery += $" '{entity.ITL_TALEP_ISLEM}' , ";
 			isTalepLogQuery += $" {entity.KLL_ID} )";
 
 			try
@@ -291,20 +291,36 @@ namespace WebApiNew.Controllers
 				using (var cnn = util.baglan())
 				{
 					var parametreler = new DynamicParameters();
-					parametreler.Add("IS_TALEP_ID", entity.TB_IS_TALEP_ID);
-					parametreler.Add("IST_IPTAL_NEDEN", entity.IST_IPTAL_NEDEN);
-					parametreler.Add("IST_IPTAL_TARIH", entity.IST_IPTAL_TARIH);
-					parametreler.Add("IST_IPTAL_SAAT", entity.IST_IPTAL_SAAT);
 					// Log data is recorded
 					cnn.Execute(isTalepLogQuery, parametreler);
-					// Job request status is being canceled
-					cnn.Execute($"update orjin.TB_IS_TALEBI set IST_DURUM_ID = 5 WHERE TB_IS_TALEP_ID = {entity.TB_IS_TALEP_ID}", parametreler);
+					// Job request status is being canceled or closed
+					cnn.Execute($"update orjin.TB_IS_TALEBI set IST_DURUM_ID = {entity.ITL_ISLEM_ID} WHERE TB_IS_TALEP_ID = {entity.TB_IS_TALEP_ID}", parametreler);
 
-					// Job cancellation reason & date & time
-					cnn.Execute("update orjin.TB_IS_TALEBI set IST_IPTAL_NEDEN = @IST_IPTAL_NEDEN , " +
+					// Job cancellation or close reason & date & time
+					if(entity.ITL_ISLEM_ID == 5)
+					{
+						parametreler.Add("IS_TALEP_ID", entity.TB_IS_TALEP_ID);
+						parametreler.Add("IST_IPTAL_NEDEN", entity.IST_IPTAL_NEDEN);
+						parametreler.Add("IST_IPTAL_TARIH", entity.IST_IPTAL_TARIH);
+						parametreler.Add("IST_IPTAL_SAAT", entity.IST_IPTAL_SAAT);
+
+						cnn.Execute("update orjin.TB_IS_TALEBI set IST_IPTAL_NEDEN = @IST_IPTAL_NEDEN , " +
 						"IST_IPTAL_TARIH = @IST_IPTAL_TARIH , " +
 						"IST_IPTAL_SAAT = @IST_IPTAL_SAAT " +
 						" WHERE TB_IS_TALEP_ID = @IS_TALEP_ID", parametreler);
+					}
+					else if(entity.ITL_ISLEM_ID == 4)
+					{
+						parametreler.Add("IS_TALEP_ID", entity.TB_IS_TALEP_ID);
+						parametreler.Add("IST_IPTAL_NEDEN", entity.IST_SONUC);
+						parametreler.Add("IST_IPTAL_TARIH", entity.IST_IPTAL_TARIH);
+						parametreler.Add("IST_IPTAL_SAAT", entity.IST_IPTAL_SAAT);
+
+						cnn.Execute("update orjin.TB_IS_TALEBI set IST_SONUC = @IST_SONUC , " +
+						"IST_IPTAL_TARIH = @IST_IPTAL_TARIH , " +
+						"IST_IPTAL_SAAT = @IST_IPTAL_SAAT " +
+						" WHERE TB_IS_TALEP_ID = @IS_TALEP_ID", parametreler);
+					}
 					
 				}
 			}
@@ -314,9 +330,9 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		[Route("api/IsTalepIptalEt")]
+		[Route("api/IsTalepIptalEtKapat")]
 		[HttpPost]
-		public object IsTalepIptalEt([FromBody] List<IsTalepIptalModel> entities)
+		public object IsTalepIptalEtKapat([FromBody] List<IsTalepIptalKapatModel> entities)
 		{
 			try
 			{
@@ -324,7 +340,7 @@ namespace WebApiNew.Controllers
 				{
 					foreach (var entity in entities)
 					{
-						IsTalepIptalProcess(entity);
+						IsTalepIptalKapatProcess(entity);
 					}
 					return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully" });
 				}
@@ -510,6 +526,28 @@ namespace WebApiNew.Controllers
 			{
 				return Json(new { has_error = true, status_code = 500, status = ex.Message });
 			}
+		}
+
+		[Route("api/GetIsTalepTeknisyenList")]
+		[HttpGet]
+		public object GetIsTalepTeknisyenList([FromUri] int isTalepId)
+		{
+			Util klas = new Util();
+			List<IsTalebiTeknisyen> listem = new List<IsTalebiTeknisyen>();
+			string query = @"select itk.TB_IS_TALEBI_TEKNISYEN_ID , itk.ITK_IS_TALEBI_ID , 
+							  prs.PRS_ISIM as ITK_PERSONEL_ISIM , vrd.VAR_TANIM as ITK_VARDIYA_TANIM , 
+							  itk.ITK_SURE , itk.ITK_SAAT_UCRETI , itk.ITK_FAZLA_MESAI_VAR , 
+                              itk.ITK_FAZLA_MESAI_SURE , itk.ITK_FAZLA_MESAI_SAAT_UCRETI , itk.ITK_MALIYET
+							  from orjin.TB_IS_TALEBI_TEKNISYEN itk
+							  left join orjin.TB_PERSONEL prs on prs.TB_PERSONEL_ID = itk.ITK_TEKNISYEN_ID
+							  left join orjin.TB_VARDIYA vrd on vrd.TB_VARDIYA_ID = itk.ITK_VARDIYA
+							  where ITK_IS_TALEBI_ID = @IS_TALEP_ID";
+
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<IsTalebiTeknisyen>(query, new { @IS_TALEP_ID = isTalepId }).ToList();
+			}
+			return listem;
 		}
 	}
 }
