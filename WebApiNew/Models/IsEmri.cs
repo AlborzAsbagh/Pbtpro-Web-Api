@@ -110,6 +110,9 @@ namespace WebApiNew.Models
         public int ISM_ONCELIK_ID { get; set; }
 
         [DataMember]
+        public string ISM_ONCELIK { get; set;}
+
+		[DataMember]
         public int ISM_REF_ID { get; set; }
 
         [DataMember]

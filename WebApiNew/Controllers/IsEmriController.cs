@@ -247,6 +247,7 @@ namespace WebApiNew.Controllers
                                       ,OA15.KOD_TANIM ISM_OZEL_ALAN_15_KOD_TANIM
                                       ,IS_EMRI_DURUM.KOD_TANIM AS IS_EMRI_DURUMU_TANIM
                                       ,kll.KLL_TANIM AS ISM_OLUSTURAN
+                                      ,(select SOC_TANIM from orjin.TB_SERVIS_ONCELIK where TB_SERVIS_ONCELIK_ID = ISM_ONCELIK_ID) as ISM_ONCELIK  
                     ,(select COALESCE(TB_RESIM_ID,0) from orjin.TB_RESIM where RSM_VARSAYILAN= 1 AND RSM_REF_GRUP = 'ISEMRI' and RSM_REF_ID = TB_ISEMRI_ID) as ResimVarsayilanID
                     ,stuff((SELECT ';' + CONVERT(varchar(11), R.TB_RESIM_ID) FROM orjin.TB_RESIM R WHERE R.RSM_REF_GRUP = 'ISEMRI' and R.RSM_REF_ID = TB_ISEMRI_ID FOR XML PATH('')),1,1,'') ResimIDleri
                     ,ROW_NUMBER() OVER (ORDER BY ISM_DUZENLEME_TARIH {sortstr}, ISM_DUZENLEME_SAAT {sortstr}) AS RowNum
@@ -2765,26 +2766,6 @@ namespace WebApiNew.Controllers
                 throw;
             }
         }
-
-        [Route("api/getIsEmriOncelik")]
-        [HttpGet]
-		public String getIsEmriOncelik([FromUri] int isEmriId)
-		{
-			try
-			{
-				var util = new Util();
-				using (var conn = util.baglan())
-				{
-					var sql = $"SELECT SOC_TANIM FROM orjin.TB_ISEMRI left join orjin.TB_SERVIS_ONCELIK on TB_SERVIS_ONCELIK_ID = ISM_ONCELIK_ID where TB_ISEMRI_ID = {isEmriId}";
-					var oncelik = conn.Query<String>(sql).FirstOrDefault();
-					return oncelik;
-				}
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-		}
 
 
 		// Add Personel entity to Isemri when new Isemri created ( Web App Version )

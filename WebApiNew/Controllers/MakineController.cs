@@ -21,8 +21,17 @@ namespace WebApiNew.Controllers
         [HttpGet]
         public object GetViaDapper([FromUri] int ilkDeger, [FromUri] int sonDeger, [FromUri] int ID, [FromUri] int Tip, [FromUri] int kategori, [FromUri] string prm, [FromUri] Boolean b, [FromUri] int lokasyonID, [FromUri]int YakitKullanimi,[FromUri] Boolean otonombakim , [FromUri] Boolean isComeFromIsTalep)
         {
-            var prms = new DynamicParameters();
-            string query = @";WITH MTABLE AS(
+			using (var conn = klas.baglan())
+			{
+				IEnumerable<Makine> listem = new List<Makine>();
+				Boolean isBarkcodeColumnExist = conn.QueryFirstOrDefault<bool>(@"SELECT
+                                                        CASE
+                                                            WHEN COL_LENGTH('orjin.TB_MAKINE', 'MKN_BARKOD') IS NOT NULL THEN 1
+                                                            ELSE 0
+                                                        END AS IS_EXIST;");
+
+			    var prms = new DynamicParameters();
+                string query = @";WITH MTABLE AS(
                                 SELECT 
                                 TB_MAKINE_ID
                                 ,MKN.MKN_KOD 					
@@ -69,72 +78,67 @@ namespace WebApiNew.Controllers
                                 orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(MKN_LOKASYON_ID,-1),@KUL_ID) = 1 ";
 
                                 if(!isComeFromIsTalep) query += @" AND  orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(MKN_ATOLYE_ID,-1), @KUL_ID ) = 1 ";
-            if (Tip != -1)
-            {
-                prms.Add("MKN_TIP_KOD_ID", Tip);
-                query = query + " and MKN_TIP_KOD_ID = @MKN_TIP_KOD_ID";
-            }
-            if (kategori != -1)
-            {
-                prms.Add("MKN_KATEGORI_KOD_ID", kategori);
-                query = query + " and MKN_KATEGORI_KOD_ID = @MKN_KATEGORI_KOD_ID";
-            }
-            if (YakitKullanimi > -1)
-            {
-                prms.Add("MKN_YAKIT_KULLANIM", YakitKullanimi);
-                query = query + " and MKN_YAKIT_KULLANIM = @MKN_YAKIT_KULLANIM";
-            }
-            if (otonombakim)
-            {
-                query = query + " and MKN_OTONOM_BAKIM = 1";
-            }
-            if (lokasyonID != -1)
-            {
-                prms.Add("MKN_LOKASYON_ID", lokasyonID);
-                query = query + " and MKN_LOKASYON_ID IN (select (TB_LOKASYON_ID) from orjin.UDF_LOKASYON_ALT_AGAC(@MKN_LOKASYON_ID))";
-            }
-            if (!String.IsNullOrEmpty(prm))
-            {
-                if (b)
+                if (Tip != -1)
                 {
-                    prms.Add("MKN_KOD", prm);
-                    query = query + " and MKN_KOD = @MKN_KOD";
+                    prms.Add("MKN_TIP_KOD_ID", Tip);
+                    query = query + " and MKN_TIP_KOD_ID = @MKN_TIP_KOD_ID";
                 }
-                else
+                if (kategori != -1)
                 {
-                    prms.Add("KELIME", prm);
-                    query = query + @" and (
-                    MKN_KOD         LIKE '%'+@KELIME+'%' OR 
-                    ARC.ARC_PLAKA   LIKE '%'+@KELIME+'%' OR 
-                    LOK.LOK_TANIM   LIKE '%'+@KELIME+'%' OR 
-                    MKN_TANIM       LIKE '%'+@KELIME+'%' OR 
-                    MRK.MRK_MARKA   LIKE '%'+@KELIME+'%' OR 
-                    MDL.MDL_MODEL   LIKE '%'+@KELIME+'%' OR 
-                    KTG.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
-                    DRM.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
-                    '*' = @KELIME)";
+                    prms.Add("MKN_KATEGORI_KOD_ID", kategori);
+                    query = query + " and MKN_KATEGORI_KOD_ID = @MKN_KATEGORI_KOD_ID";
                 }
-            }
-            prms.Add("ILK_DEGER", ilkDeger);
-            prms.Add("SON_DEGER", sonDeger);
-            prms.Add("KUL_ID", ID);
-            query = query + @")  SELECT * FROM MTABLE WHERE RowNum > @ILK_DEGER AND RowNum <= @SON_DEGER";
-
-
-
-            IEnumerable<Makine> listem = new List<Makine>();
-            try
-            {
-                using (var conn = klas.baglan())
+                if (YakitKullanimi > -1)
+                {
+                    prms.Add("MKN_YAKIT_KULLANIM", YakitKullanimi);
+                    query = query + " and MKN_YAKIT_KULLANIM = @MKN_YAKIT_KULLANIM";
+                }
+                if (otonombakim)
+                {
+                    query = query + " and MKN_OTONOM_BAKIM = 1";
+                }
+                if (lokasyonID != -1)
+                {   
+                    prms.Add("MKN_LOKASYON_ID", lokasyonID);
+                    query = query + " and MKN_LOKASYON_ID IN (select (TB_LOKASYON_ID) from orjin.UDF_LOKASYON_ALT_AGAC(@MKN_LOKASYON_ID))";
+                }
+                if (!String.IsNullOrEmpty(prm))
+                {
+                    if (b)
+                    {
+                        prms.Add("BARKOD_VALUE", prm);
+                        if (isBarkcodeColumnExist) query = query + " and ( MKN_KOD = @BARKOD_VALUE or MKN_BARKOD = @BARKOD_VALUE ) ";
+                        else query = query + " and MKN_KOD = @BARKOD_VALUE ";
+					}
+                    else
+                    {
+                        prms.Add("KELIME", prm);
+                        query = query + @" and (
+                        MKN_KOD         LIKE '%'+@KELIME+'%' OR 
+                        ARC.ARC_PLAKA   LIKE '%'+@KELIME+'%' OR 
+                        LOK.LOK_TANIM   LIKE '%'+@KELIME+'%' OR 
+                        MKN_TANIM       LIKE '%'+@KELIME+'%' OR 
+                        MRK.MRK_MARKA   LIKE '%'+@KELIME+'%' OR 
+                        MDL.MDL_MODEL   LIKE '%'+@KELIME+'%' OR 
+                        KTG.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                        DRM.KOD_TANIM   LIKE '%'+@KELIME+'%' OR 
+                        '*' = @KELIME)";
+                    }
+                }
+                prms.Add("ILK_DEGER", ilkDeger);
+                prms.Add("SON_DEGER", sonDeger);
+                prms.Add("KUL_ID", ID);
+                query = query + @")  SELECT * FROM MTABLE WHERE RowNum > @ILK_DEGER AND RowNum <= @SON_DEGER ";
+                try
                 {
                     listem = conn.Query<Makine>(query, prms);
                 }
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-            return listem;
+                catch (Exception e)
+                {
+                    return e;
+                }
+				    return listem;
+			    }
         }
 
         [Route("api/MakineBakim")]

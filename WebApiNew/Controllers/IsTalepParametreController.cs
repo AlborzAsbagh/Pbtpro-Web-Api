@@ -19,7 +19,11 @@ namespace WebApiNew.Controllers
 		{
 			Util klas = new Util();
 			List<IsTalepParametre> listem = new List<IsTalepParametre>();
-			string query = @" select * from orjin.TB_IS_TALEBI_PARAMETRE ";
+			string query = @" select * , 
+					(select SOC_TANIM from orjin.TB_SERVIS_ONCELIK where TB_SERVIS_ONCELIK_ID = isp.ISP_ONCELIK_ID ) as ISP_ONCELIK_TEXT ,
+					(select IMT_TANIM from orjin.TB_ISEMRI_TIP where TB_ISEMRI_TIP_ID = isp.ISP_ISEMRI_TIPI_ID ) as ISP_ISEMRI_TIPI_TEXT ,
+					(select KOD_TANIM from orjin.TB_KOD where TB_KOD_ID = isp.ISP_VARSAYILAN_IS_TIPI ) as ISP_VARSAYILAN_IS_TIPI_TEXT 
+					from orjin.TB_IS_TALEBI_PARAMETRE isp";
 			using (var conn = klas.baglan())
 			{
 				listem = conn.Query<IsTalepParametre>(query).ToList();

@@ -32,6 +32,8 @@ namespace WebApiNew.Models
 		[DataMember]
 		public bool ISP_ONCELIK { get; set; }
 		[DataMember]
+		public string ISP_ONCELIK_TEXT { get; set; }
+		[DataMember]
 		public bool ISP_MAKINE_KOD { get; set; }
 		[DataMember]
 		public bool ISP_EKIPMAN_KOD { get; set; }
@@ -90,6 +92,8 @@ namespace WebApiNew.Models
 		[DataMember]
 		public int ISP_ISEMRI_TIPI_ID { get; set; }
 		[DataMember]
+		public string ISP_ISEMRI_TIPI_TEXT { get; set; }
+		[DataMember]
 		public bool ISP_ZOR_ISEMRI_TIPI_ID { get; set; }
 		[DataMember]
 		public bool ISP_ZOR_MAKINE_DURUM_KOD_ID { get; set; }
@@ -118,6 +122,8 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public int ISP_VARSAYILAN_IS_TIPI { get; set; }
+		[DataMember]
+		public string ISP_VARSAYILAN_IS_TIPI_TEXT { get; set; }
 	}
 
 }
