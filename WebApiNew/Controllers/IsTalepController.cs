@@ -943,6 +943,7 @@ namespace WebApiNew.Controllers
                 entity.ITL_SAAT = Util.getFieldString(dt.Rows[i], "ITL_SAAT");
                 entity.ITL_ISLEM_DURUM = Util.getFieldString(dt.Rows[i], "ITL_ISLEM_DURUM");
                 entity.ITL_ISLEM = Util.getFieldString(dt.Rows[i], "ITL_ISLEM");
+                entity.ITL_ACIKLAMA = Util.getFieldString(dt.Rows[i], "ITL_ACIKLAMA");
                 listem.Add(entity);
             }
 

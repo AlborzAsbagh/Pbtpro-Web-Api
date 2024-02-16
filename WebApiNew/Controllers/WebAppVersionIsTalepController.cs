@@ -75,8 +75,22 @@ namespace WebApiNew.Controllers
 					counter = 0;
 					foreach (var property in filters["customfilters"] as JObject)
 					{
-						query += $" {property.Key} LIKE '%{property.Value}%' ";
-						toplamIsTalepSayisiQuery += $" {property.Key} LIKE '%{property.Value}%' ";
+						if (property.Key == "startDate")
+						{
+							query += $" IST_ACILIS_TARIHI >= '{property.Value}' ";
+							toplamIsTalepSayisiQuery += $" IST_ACILIS_TARIHI >= '{property.Value}' ";
+						}
+						else if (property.Key == "endDate")
+						{
+							query += $" IST_ACILIS_TARIHI <= '{property.Value}' ";
+							toplamIsTalepSayisiQuery += $" IST_ACILIS_TARIHI <= '{property.Value}' ";
+						}
+						else
+						{
+							query += $" {property.Key} LIKE '%{property.Value}%' ";
+							toplamIsTalepSayisiQuery += $" {property.Key} LIKE '%{property.Value}%' ";
+						}
+
 						if (counter < (filters["customfilters"] as JObject).Count - 1)
 						{
 							query += " and ";
