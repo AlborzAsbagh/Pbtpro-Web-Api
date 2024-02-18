@@ -857,77 +857,77 @@ namespace WebApiNew.Controllers
                     // Bildirim Gönder
 
                     // Istek Web'den geliyor ise
-                    if(isWeb)
-                    {
-						try
-						{
-							// Personel ekleme
-							if (entity.IsEmriPersonelList.Count > 0)
-							{
-								for (int i = 0; i < entity.IsEmriPersonelList.Count; i++)
-								{
-									Bildirim bildirimPersonel = PersonelListKaydetYeni(entity.IsEmriPersonelList[i], bildirimEntity.Id);
+     //               if(isWeb)
+     //               {
+					//	try
+					//	{
+					//		// Personel ekleme
+					//		if (entity.IsEmriPersonelList.Count > 0)
+					//		{
+					//			for (int i = 0; i < entity.IsEmriPersonelList.Count; i++)
+					//			{
+					//				Bildirim bildirimPersonel = PersonelListKaydetYeni(entity.IsEmriPersonelList[i], bildirimEntity.Id);
 
-									if (!bildirimPersonel.Durum) return bildirimPersonel;
-								}
-							}
-							// Durus ekleme
-							if (entity.IsEmriDurusList.Count > 0)
-							{
-								for (int i = 0; i < entity.IsEmriDurusList.Count; i++)
-								{
-									Bildirim bildirimDurus = IsEmriDurusKaydet(entity.IsEmriDurusList[i], bildirimEntity.Id);
+					//				if (!bildirimPersonel.Durum) return bildirimPersonel;
+					//			}
+					//		}
+					//		// Durus ekleme
+					//		if (entity.IsEmriDurusList.Count > 0)
+					//		{
+					//			for (int i = 0; i < entity.IsEmriDurusList.Count; i++)
+					//			{
+					//				Bildirim bildirimDurus = IsEmriDurusKaydet(entity.IsEmriDurusList[i], bildirimEntity.Id);
 
-									if (!bildirimDurus.Durum) return bildirimDurus;
-								}
-							}
-							// Arac Gerec ekleme
-							if (entity.IsEmriAracGerecList.Count > 0)
-							{
-								for (int i = 0; i < entity.IsEmriAracGerecList.Count; i++)
-								{
-									Bildirim bildirimAracGerec = AracGerecListKaydetYeni(entity.IsEmriAracGerecList[i], bildirimEntity.Id);
+					//				if (!bildirimDurus.Durum) return bildirimDurus;
+					//			}
+					//		}
+					//		// Arac Gerec ekleme
+					//		if (entity.IsEmriAracGerecList.Count > 0)
+					//		{
+					//			for (int i = 0; i < entity.IsEmriAracGerecList.Count; i++)
+					//			{
+					//				Bildirim bildirimAracGerec = AracGerecListKaydetYeni(entity.IsEmriAracGerecList[i], bildirimEntity.Id);
 
-									if (!bildirimAracGerec.Durum) return bildirimAracGerec;
-								}
-							}
-							// Malzeme ekleme
-							if (entity.IsEmriMalzemeList.Count > 0)
-							{
-								for (int i = 0; i < entity.IsEmriMalzemeList.Count; i++)
-								{
-									Bildirim bildirimMalzeme = MalzemeListKaydet(entity.IsEmriMalzemeList[i], bildirimEntity.Id);
+					//				if (!bildirimAracGerec.Durum) return bildirimAracGerec;
+					//			}
+					//		}
+					//		// Malzeme ekleme
+					//		if (entity.IsEmriMalzemeList.Count > 0)
+					//		{
+					//			for (int i = 0; i < entity.IsEmriMalzemeList.Count; i++)
+					//			{
+					//				Bildirim bildirimMalzeme = MalzemeListKaydet(entity.IsEmriMalzemeList[i], bildirimEntity.Id);
 
-									if (!bildirimMalzeme.Durum) return bildirimMalzeme;
-								}
-							}
-							// Olcum Degeri ekleme
-							if (entity.IsEmriOlcumDegeriList.Count > 0)
-							{
-								for (int i = 0; i < entity.IsEmriOlcumDegeriList.Count; i++)
-								{
-									Bildirim bildirimOlcumDeger = OlcumDegeriListKadetYeni(entity.IsEmriOlcumDegeriList[i], bildirimEntity.Id);
+					//				if (!bildirimMalzeme.Durum) return bildirimMalzeme;
+					//			}
+					//		}
+					//		// Olcum Degeri ekleme
+					//		if (entity.IsEmriOlcumDegeriList.Count > 0)
+					//		{
+					//			for (int i = 0; i < entity.IsEmriOlcumDegeriList.Count; i++)
+					//			{
+					//				Bildirim bildirimOlcumDeger = OlcumDegeriListKadetYeni(entity.IsEmriOlcumDegeriList[i], bildirimEntity.Id);
 
-									if (!bildirimOlcumDeger.Durum) return bildirimOlcumDeger;
-								}
-							}
-							// Kontrol List ekleme
-							if (entity.IsEmriKontrolList.Count > 0)
-							{
-								for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
-								{
-									Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], bildirimEntity.Id);
+					//				if (!bildirimOlcumDeger.Durum) return bildirimOlcumDeger;
+					//			}
+					//		}
+					//		// Kontrol List ekleme
+					//		if (entity.IsEmriKontrolList.Count > 0)
+					//		{
+					//			for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
+					//			{
+					//				Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], bildirimEntity.Id);
 
-									if (!bildirimKontrolList.Durum) return bildirimKontrolList;
-								}
-							}
+					//				if (!bildirimKontrolList.Durum) return bildirimKontrolList;
+					//			}
+					//		}
 
-						}
-						catch (Exception e)
-						{
-							_logger.Error(e);
-						}
-					}
+					//	}
+					//	catch (Exception e)
+					//	{
+					//		_logger.Error(e);
+					//	}
+					//}
                 }
                 catch (Exception e)
                 {

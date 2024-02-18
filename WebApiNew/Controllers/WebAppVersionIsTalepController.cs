@@ -368,9 +368,9 @@ namespace WebApiNew.Controllers
 
 
 		// Add one by one
-		public async void IsTalepToIsEmriProcess(IsTalepToIsEmriModel isTalepToIsEmriModel)
+		public async Task<String> IsTalepToIsEmriProcess(IsTalepToIsEmriModel isTalepToIsEmriModel)
 		{
-			
+
 			try
 			{
 				parametreler.Clear();
@@ -436,7 +436,7 @@ namespace WebApiNew.Controllers
 				parametreler.Add(new Prm("TB_IS_TALEP_ID", drTalep["TB_IS_TALEP_ID"]));
 				parametreler.Add(new Prm("IST_ISEMRI_ID", _isemriID));
 				klas.cmd("UPDATE orjin.TB_IS_TALEBI SET IST_ISEMRI_ID=@IST_ISEMRI_ID , IST_DURUM_ID=3 WHERE TB_IS_TALEP_ID= @TB_IS_TALEP_ID", parametreler);
-
+				
 				// iş talep personel ekleniyor
 				if(isTalepToIsEmriModel.TEKNISYEN_IDS.Count > 0)
 				{
@@ -444,8 +444,7 @@ namespace WebApiNew.Controllers
 					parametreler.Add(new Prm("TB_IS_TALEP_ID", drTalep["TB_IS_TALEP_ID"]));
 					foreach(int i in isTalepToIsEmriModel.TEKNISYEN_IDS)
 					{
-						parametreler.Add(new Prm("ITK_TEKNISYEN_ID", i));
-						klas.cmd("INSERT INTO orjin.TB_IS_TALEBI_TEKNISYEN (ITK_IS_TALEBI_ID,ITK_TEKNISYEN_ID,ITK_FAZLA_MESAI_VAR,ITK_MAIL_GONDERILDI) VALUES(@TB_IS_TALEP_ID,@ITK_TEKNISYEN_ID,0,0)", parametreler);
+						klas.cmd($"INSERT INTO orjin.TB_IS_TALEBI_TEKNISYEN (ITK_IS_TALEBI_ID,ITK_TEKNISYEN_ID,ITK_FAZLA_MESAI_VAR,ITK_MAIL_GONDERILDI) VALUES(@TB_IS_TALEP_ID,{i},0,0)", parametreler);
 						// iş emri personel i ekleniyor
 						IsEmriPersonel ismPersonel = new IsEmriPersonel();
 						ismPersonel.IDK_ISEMRI_ID = _isemriID;
@@ -481,15 +480,14 @@ namespace WebApiNew.Controllers
 				parametreler.Clear();
 				foreach (int i in isTalepToIsEmriModel.TEKNISYEN_IDS)
 				{
-					parametreler.Add(new Prm("TB_PERSONEL_ID", i));
-					string PRS_ISIM = klas.GetDataCell("select PRS_ISIM from orjin.TB_PERSONEL where TB_PERSONEL_ID=@TB_PERSONEL_ID", parametreler);
+					string PRS_ISIM = klas.GetDataCell($"select PRS_ISIM from orjin.TB_PERSONEL where TB_PERSONEL_ID={i}", parametreler);
 					prms.Clear();
 
 					prms.Add("ITL_IS_TANIM_ID", isTalepToIsEmriModel.TALEP_ID);
 					prms.Add("ITL_KULLANICI_ID", isTalepToIsEmriModel.USER_ID);
 					prms.Add("ITL_TARIH", DateTime.Now);
 					prms.Add("ITL_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));
-					if (isTalepToIsEmriModel.ATOLYE_ID > -1)
+					if (isTalepToIsEmriModel.ATOLYE_ID > 0)
 					{
 						AtolyeController atlCont = new AtolyeController();
 						string atolyeTanim = atlCont.AtolyeListesi(isTalepToIsEmriModel.USER_ID).FirstOrDefault(a => a.TB_ATOLYE_ID == isTalepToIsEmriModel.ATOLYE_ID).ATL_TANIM;
@@ -508,12 +506,12 @@ namespace WebApiNew.Controllers
 					prms.Add("ITL_OLUSTURMA_TARIH", DateTime.Now);
 					klas.cmd(query, prms.PARAMS);
 				}
-				
+				return "";
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				klas.kapat();
-				throw;
+				return e.Message;
 			}
 
 		}
@@ -522,19 +520,21 @@ namespace WebApiNew.Controllers
 		// Webden gelen istekte kaç tane teknesiyen seçilebilir
 		[Route("api/IsTalepToIsEmri")]
 		[HttpPost]
-		public object IsTalepToIsEmri([FromBody] List<IsTalepToIsEmriModel> entities)
+		public async Task<object> IsTalepToIsEmri([FromBody] List<IsTalepToIsEmriModel> entities)
 		{
+			string hasError = "";
 			try
 			{
 				if (entities != null && entities.Count != 0)
 				{
 					foreach (var entity in entities)
 					{
-						IsTalepToIsEmriProcess(entity);
+						hasError += await IsTalepToIsEmriProcess(entity);
 					}
-					return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully" });
+					if(hasError != "") return Json(new { has_error = true, status_code = 500, status = hasError });
+					return Json(new { has_error = false, status_code = 200, status = "Process completed successfully." });
 				}
-				else return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
+				else return Json(new { has_error = true, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
 			}
 			catch(Exception ex)
 			{
