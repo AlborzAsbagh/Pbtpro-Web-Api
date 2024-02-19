@@ -245,44 +245,7 @@ namespace WebApiNew.Controllers
 
 		}
 
-		[Route("api/GetMakineDurum")]
-		[HttpGet]
-		public Object GetMakineDurum()
-		{
-			List<Kod> listem = new List<Kod>();
-			query = $"SELECT * FROM [orjin].[TB_KOD] where KOD_GRUP = 32505";
-			using (var con = klas.baglan())
-			{
-				listem = con.Query<Kod>(query).ToList();
-			}
-			klas.kapat();
-			return Json(new { MAKINE_DURUM = listem });
-		}
-
-
-		[Route ("api/AddMakineDurum")]
-		[HttpPost]
-		public Object AddMakineDurum([FromUri] string yeniDurum) 
-		{
-			try
-			{
-				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) " ;
-				query += $" values ( 32505 , '{yeniDurum}' , 1 , 1 , 1 ,1) ";
-
-				using(var con = klas.baglan())
-				{
-					cmd = new SqlCommand(query, con);
-					cmd.ExecuteNonQuery();
-				}
-				klas.kapat();
-				return Json(new  { success = "Ekleme başarılı " });
-			} catch (Exception e)
-			{
-				klas.kapat();
-				return Json(new { error = " Ekleme başarısız " });
-			}
-		}
-
+		
 		[Route("api/AddMakineTip")]
 		[HttpPost]
 

@@ -103,26 +103,6 @@ namespace WebApiNew.Controllers
                 throw e;
             }
         }
-        [Route("api/OzelAlan")]
-        [HttpGet]
-        public OzelAlan Ozelalan(string form)
-        {
-            string query = @"SELECT * FROM orjin.TB_OZEL_ALAN WHERE OZL_FORM = @FORM";
-            var prms = new {@FORM = form};
-            try
-            {
-                var util = new Util();
-                using (var conn = util.baglan())
-                {
-                    var ozelAlan = conn.QueryFirst<OzelAlan>(query, prms);
-                    return ozelAlan;
-                }
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
 
         [Route("api/IsTipiList")]
         [HttpGet]

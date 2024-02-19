@@ -211,47 +211,6 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		[Route("api/GetIsEmriDurum")]
-		[HttpGet]
-		public Object GetIsEmriDurum()
-		{
-			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32801";
-			var klas = new Util();
-			List<Kod> listem = new List<Kod>();
-			using (var cnn = klas.baglan())
-			{
-				listem = cnn.Query<Kod>(query).ToList();
-			}
-
-			return Json(new { isEmriDurumlari = listem});
-		}
-
-
-
-		[Route("api/AddIsEmriDurum")]
-		[HttpPost]
-		public Object AddIsEmriDurum([FromUri] string yeniDurum)
-		{
-			try
-			{
-				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
-				query += $" values ( 32801 , '{yeniDurum}' , 1 , 1 , 1 ,1 ) ";
-
-				using (var con = klas.baglan())
-				{
-					cmd = new SqlCommand(query, con);
-					cmd.ExecuteNonQuery();
-				}
-				klas.kapat();
-				return Json(new { success = "Ekleme başarılı " });
-			}
-			catch (Exception e)
-			{
-				klas.kapat();
-				return Json(new { error = " Ekleme başarısız " });
-			}
-		}
-
 
 		[Route("api/IsEmriDurumVarsayilanYap")]
 		[HttpGet]
@@ -323,122 +282,34 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-
-		[Route("api/GetIsTipi")]
+		
+		[Route("api/IsEmriEkleVarsiylanlar")]
 		[HttpGet]
-		public Object GetIsTipi()
+		public Object IsEmriEkleVarsiylanlar()
 		{
-			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32440";
+			string query = @"SELECT TB_KOD_ID AS ID, KOD_TANIM AS TANIM, 'IS_EMRI_DURUM_VARSAYILAN' AS TABLO_TANIMI
+								FROM orjin.TB_KOD
+								WHERE KOD_ISM_DURUM_VARSAYILAN = 1 AND KOD_GRUP = 32801
+
+								UNION ALL
+
+								SELECT TB_ISEMRI_TIP_ID AS ID, IMT_TANIM AS TANIM, 'IS_EMRI_TIP_VARSAYILAN' AS TABLO_TANIMI
+								FROM orjin.TB_ISEMRI_TIP
+								WHERE IMT_VARSAYILAN = 1 
+
+								UNION ALL
+
+								SELECT TB_SERVIS_ONCELIK_ID AS ID, SOC_TANIM AS TANIM, 'SERVIS_ONCELIK' AS TABLO_TANIMI
+								FROM orjin.TB_SERVIS_ONCELIK
+								WHERE SOC_VARSAYILAN = 1";
 			var klas = new Util();
-			List<Kod> listem = new List<Kod>();
+			List<IsEmriEkleVarsayilanDegerler> listem = new List<IsEmriEkleVarsayilanDegerler>();
 			using (var cnn = klas.baglan())
 			{
-				listem = cnn.Query<Kod>(query).ToList();
+				listem = cnn.Query<IsEmriEkleVarsayilanDegerler>(query).ToList();
 			}
 
-			return Json(new { is_tipi = listem });
-		}
-
-		[Route("api/AddIsTipi")]
-		[HttpGet]
-		public Object AddIsTipi([FromUri] string isTipi)
-		{
-			try
-			{
-				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
-				query += $" values ( 32440 , '{isTipi}' , 1 , 1 , 1 ,1 ) ";
-
-				using (var con = klas.baglan())
-				{
-					cmd = new SqlCommand(query, con);
-					cmd.ExecuteNonQuery();
-				}
-				klas.kapat();
-				return Json(new { success = "Ekleme başarılı " });
-			}
-			catch (Exception e)
-			{
-				klas.kapat();
-				return Json(new { error = " Ekleme başarısız " });
-			}
-		}
-
-		[Route("api/GetIsEmriNedeni")]
-		[HttpGet]
-		public Object GetIsEmriNedeni()
-		{
-			string query = @"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP=32452";
-			var klas = new Util();
-			List<Kod> listem = new List<Kod>();
-			using (var cnn = klas.baglan())
-			{
-				listem = cnn.Query<Kod>(query).ToList();
-			}
-
-			return Json(new { is_emri_nedeni = listem });
-		}
-
-		[Route("api/AddIsEmriNedeni")]
-		[HttpGet]
-		public Object AddIsEmriNedeni([FromUri] string isNedeni)
-		{
-			try
-			{
-				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
-				query += $" values ( 32452 , '{isNedeni}' , 1 , 1 , 1 ,1 ) ";
-
-				using (var con = klas.baglan())
-				{
-					cmd = new SqlCommand(query, con);
-					cmd.ExecuteNonQuery();
-				}
-				klas.kapat();
-				return Json(new { success = "Ekleme başarılı " });
-			}
-			catch (Exception e)
-			{
-				klas.kapat();
-				return Json(new { error = " Ekleme başarısız " });
-			}
-		}
-
-		[Route("api/GetIsEmriOzelAlanlar")]
-		[HttpGet]
-		public Object GetIsEmriOzelAlanlar([FromUri] int KodGrup)
-		{
-			string query = $"SELECT * FROM orjin.TB_KOD WHERE KOD_GRUP={KodGrup}";
-			var klas = new Util();
-			List<Kod> listem = new List<Kod>();
-			using (var cnn = klas.baglan())
-			{
-				listem = cnn.Query<Kod>(query).ToList();
-			}
-
-			return Json(new { is_emri_ozel_alanlar = listem });
-		}
-
-		[Route("api/AddOzelAlanlarContent")]
-		[HttpGet]
-		public Object AddOzelAlanlarContent([FromUri] string content, [FromUri] int kodGrup)
-		{
-			try
-			{
-				query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
-				query += $" values ( {kodGrup} , '{content}' , 1 , 1 , 1 ,1 ) ";
-
-				using (var con = klas.baglan())
-				{
-					cmd = new SqlCommand(query, con);
-					cmd.ExecuteNonQuery();
-				}
-				klas.kapat();
-				return Json(new { success = "Ekleme başarılı " });
-			}
-			catch (Exception e)
-			{
-				klas.kapat();
-				return Json(new { error = " Ekleme başarısız " });
-			}
+			return Json(new { is_emri_varsayilanlar = listem });
 		}
 	}
 }

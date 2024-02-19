@@ -292,6 +292,7 @@
     <Compile Include="Controllers\AtolyeController.cs" />
     <Compile Include="Controllers\IsTalepParametreController.cs" />
     <Compile Include="Controllers\NumaratorController.cs" />
+    <Compile Include="Controllers\OzelAlanlarController.cs" />
     <Compile Include="Controllers\VardiyaController.cs" />
     <Compile Include="Controllers\WebAppVersionIsEmriController.cs" />
     <Compile Include="Controllers\OlcumController.cs" />
@@ -300,6 +301,7 @@
     <Compile Include="Controllers\OtonomBakimController.cs" />
     <Compile Include="Controllers\WebAppVersionIsTalepController.cs" />
     <Compile Include="Controllers\WebAppVersionMakineController.cs" />
+    <Compile Include="Controllers\WebDashboardController.cs" />
     <Compile Include="Filters\Authorization.cs" />
     <Compile Include="Controllers\MakineCalismaController.cs" />
     <Compile Include="Controllers\CipherController.cs" />
@@ -343,6 +345,7 @@
     <Compile Include="Models\AracGerec.cs" />
     <Compile Include="Models\CozumKatalogModel.cs" />
     <Compile Include="Models\IsEmriAracGerec.cs" />
+    <Compile Include="Models\IsEmriEkleVarsayilanDegerler.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
     <Compile Include="Models\IsTalebiTeknisyen.cs" />
     <Compile Include="Models\IsTalepIptalModel.cs" />
@@ -356,6 +359,7 @@
     <Compile Include="Models\PersonelSertifika.cs" />
     <Compile Include="Models\Takvim.cs" />
     <Compile Include="Models\Talimat.cs" />
+    <Compile Include="Models\WebDashboard.cs" />
     <Compile Include="Models\WebVersionIsEmriModel.cs" />
     <Compile Include="Models\MainModel.cs" />
     <Compile Include="Models\WebVersionMakineModel.cs" />
