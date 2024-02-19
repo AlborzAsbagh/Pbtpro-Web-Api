@@ -359,7 +359,10 @@ namespace WebApiNew.Models
 		public int GUNCEL_SAYAC_DEGER { get; set; } 
 
 		[DataMember]
-		public string ICERDEKI_NOT { get; set; } 
+		public string ICERDEKI_NOT { get; set; }
+
+		[DataMember]
+		public string ISM_TIP_RENK { get; set; }
 	}
 }
 

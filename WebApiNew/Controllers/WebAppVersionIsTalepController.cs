@@ -158,13 +158,13 @@ namespace WebApiNew.Controllers
 			int count = 0;
 			try
 			{
-			
+				
 				using (var cnn = klas.baglan())
 				{
-					
+					var isemritipId = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 ISP_ISEMRI_TIPI_ID FROM orjin.TB_IS_TALEBI_PARAMETRE");
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_IS_TALEBI  ( IST_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_IS_TALEBI  ( IST_OLUSTURMA_TARIH , IST_ISEMRI_TIP_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -172,7 +172,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {isemritipId} ,";
 						count = 0;
 
 						foreach (var item in entity)

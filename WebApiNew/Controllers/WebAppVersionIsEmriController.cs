@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web.Http;
@@ -29,7 +28,6 @@ namespace WebApiNew.Controllers
 	{
 		Util klas = new Util();
 		Parametreler prms = new Parametreler();
-		private readonly System.Windows.Forms.RichTextBox RTB = new System.Windows.Forms.RichTextBox();
 		private readonly ILogger _logger;
 		string query = "";
 		SqlCommand cmd = null;
