@@ -310,5 +310,11 @@ namespace WebApiNew.Models
         [DataMember]
         public int IMT_KATEGORI_ID { get; set; }
 
+        [DataMember]
+        public int IMT_TIP_GRUP { get; set; }
+
+        [DataMember]
+        public string IMT_RENK_WEB_VERSION { get; set; }
+
 	}
 }

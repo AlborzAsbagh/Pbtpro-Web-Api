@@ -232,10 +232,10 @@ namespace WebApiNew.Controllers
         //Get Prosedur Web App Version (Is Emri Ekleme Syafasi)
         [Route("api/GetProsedur")]
         [HttpGet]
-        public Object GetProsedur([FromUri] string tip)
+        public Object GetProsedur([FromUri] int tipId)
         {
-            if (tip == "ARIZA") return Json(new { PROSEDUR_LISTE = ArizaGetir() });
-            else if (tip == "BAKIM") return Json(new { PROSEDUR_LISTE = BakimGetir() });
+            if (tipId == 1) return Json(new { PROSEDUR_LISTE = ArizaGetir() });
+            else if (tipId == 2) return Json(new { PROSEDUR_LISTE = BakimGetir() });
             else return Json(new { error = "Tanimsiz !" });
 		}
 
@@ -616,7 +616,7 @@ namespace WebApiNew.Controllers
 		}
 
 
-		// Add Bakim Wep App
+		// Add Ariza Wep App
 		[Route("api/AddAriza")]
 		[HttpPost]
 		public async Task<object> AddAriza([FromBody] JObject entity)
@@ -659,7 +659,7 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		// Bakim Guncelle Web App 
+		// Ariza Guncelle Web App 
 		[Route("api/UpdateAriza")]
 		[HttpPost]
 		public async Task<Object> UpdateAriza([FromBody] JObject entity)
