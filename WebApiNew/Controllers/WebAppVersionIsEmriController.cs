@@ -218,8 +218,8 @@ namespace WebApiNew.Controllers
 		{
 			try
 			{
-				query = $" update orjin.TB_KOD set KOD_DURUM_VARSAYILAN = 0 where KOD_GRUP = 32801 ";
-				query += $" update orjin.TB_KOD set KOD_DURUM_VARSAYILAN = 1 where TB_KOD_ID = {kodId} and KOD_GRUP = 32801 ";
+				query = $" update orjin.TB_KOD set KOD_ISM_DURUM_VARSAYILAN = 0 where KOD_GRUP = 32801 ";
+				query += $" update orjin.TB_KOD set KOD_ISM_DURUM_VARSAYILAN = 1 where TB_KOD_ID = {kodId} and KOD_GRUP = 32801 ";
 
 				using (var con = klas.baglan())
 				{
@@ -227,12 +227,12 @@ namespace WebApiNew.Controllers
 					cmd.ExecuteNonQuery();
 				}
 				klas.kapat();
-				return Json(new { success = "Ayarlama başarılı ! " });
+				return Json(new { has_error = false , status_code = 200 ,  status = "Process completed successfully !" });
 			}
 			catch (Exception e)
 			{
 				klas.kapat();
-				return Json(new { error = " Ayarlama başarısız ! " });
+				return Json(new { has_error = true , status_code = 500 , status = e.Message });
 			}
 
 		}

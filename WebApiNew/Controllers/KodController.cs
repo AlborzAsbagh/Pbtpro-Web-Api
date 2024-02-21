@@ -32,6 +32,7 @@ namespace WebApiNew.Controllers
                 entity.TB_KOD_ID = (int)dt.Rows[i]["TB_KOD_ID"];
                 entity.KOD_GRUP = Util.getFieldString(dt.Rows[i],"KOD_GRUP");
                 entity.KOD_TANIM = Util.getFieldString(dt.Rows[i],"KOD_TANIM");
+                entity.KOD_ISM_DURUM_VARSAYILAN = Util.getFieldBool(dt.Rows[i], "KOD_ISM_DURUM_VARSAYILAN");
                 listem.Add(entity);
             }
             return listem;
