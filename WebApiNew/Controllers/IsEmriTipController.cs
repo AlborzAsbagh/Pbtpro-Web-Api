@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
 using Newtonsoft.Json.Linq;
@@ -39,55 +40,42 @@ namespace WebApiNew.Controllers
         //Update Is Emri Tipi For Web App Version
         [Route("api/UpdateIsEmriTipi")]
         [HttpPost]
-        public Object UpdateIsEmriTipi([FromBody] JObject isEmripTipiBody) 
+        public async Task<Object> UpdateIsEmriTipi([FromBody] JObject isEmripTipiBody) 
         {
-            JObject isEmriTipleri = isEmripTipiBody ;
-            int count = 0;
-            query = "";
-            try
-            {
-				if(isEmriTipleri != null && isEmriTipleri.Count > 0) 
-                {
-					foreach (var entity in isEmriTipleri)
+			int count = 0;
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					if (isEmripTipiBody != null && isEmripTipiBody.Count > 0 && Convert.ToInt32(isEmripTipiBody.GetValue("TB_ISEMRI_TIP_ID")) >= 1)
 					{
-						JObject isEmriTipiKey = isEmriTipleri[entity.Key] as JObject;
-                        count = 0;
-						query += " update orjin.TB_ISEMRI_TIP set ";
-						foreach (var item in isEmriTipiKey)
+						query = " update orjin.TB_ISEMRI_TIP set ";
+						foreach (var item in isEmripTipiBody)
 						{
+
 							if (item.Key.Equals("TB_ISEMRI_TIP_ID")) continue;
 
-							if(item.Value != null && !item.Value.ToString().Equals("")) query += $" {item.Key} = '{item.Value}' ";
-                            else query += $" {item.Key} = null ";
-
-							if (count < isEmriTipiKey.Count - 2) query += " , ";
-
+							if (count < isEmripTipiBody.Count - 2) query += $" {item.Key} = '{item.Value}', ";
+							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" where TB_ISEMRI_TIP_ID = {isEmriTipiKey["TB_ISEMRI_TIP_ID"]} ";
-					}
-					using(var cnn = klas.baglan())
-                    {
-                        cmd = new SqlCommand(query,cnn);
-                        cmd.ExecuteNonQuery();
-                        klas.baglan().Close();
-                    }
-					return Json(new { success = " Güncelleme başarılı şekilde gerçekleşti !" });
+						query += $" , IMT_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" where TB_ISEMRI_TIP_ID = {Convert.ToInt32(isEmripTipiBody.GetValue("TB_ISEMRI_TIP_ID"))}";
 
-				} 
-                else
-                {
-					klas.baglan().Close();
-					return Json(new { error = " İstemci hatası (Ekleme başarısız) !" });
+						await cnn.ExecuteAsync(query);
+
+					}
+					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
+
 				}
+				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
 			}
-            catch(Exception ex)
-            {
-		
-				klas.baglan().Close();
-				return Json(new { error = ex.ToString() } );
-            }
-        }
+			catch (Exception e)
+			{
+
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+		}
 
 
         //Add Is Emri Tip For Web App Version
