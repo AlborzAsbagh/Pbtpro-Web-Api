@@ -109,3 +109,48 @@ public class IsTalepDurumu
 		this.IS_TALEP_SAYISI = IS_TALEP_SAYISI;
 	}
 }
+
+public class TamamlanmisIsEmrileri
+{
+	[DataMember]
+	public int AY { get; set; }
+
+	[DataMember]
+	public int TAMAMLANAN_ISEMRI_SAYISI { get; set; }
+
+	public TamamlanmisIsEmrileri(int AY, int TAMAMLANAN_ISEMRI_SAYISI)
+	{
+		this.AY = AY;
+		this.TAMAMLANAN_ISEMRI_SAYISI = TAMAMLANAN_ISEMRI_SAYISI;
+	}
+}
+
+public class AylikBakimIsEmrileri
+{
+	[DataMember]
+	public int AY { get; set; }
+
+	[DataMember]
+	public int AYLIK_BAKIM_ISEMRI_MALIYET { get; set; }
+
+	public AylikBakimIsEmrileri(int AY, int AYLIK_BAKIM_ISEMRI_MALIYET)
+	{
+		this.AY = AY;
+		this.AYLIK_BAKIM_ISEMRI_MALIYET = AYLIK_BAKIM_ISEMRI_MALIYET;
+	}
+}
+
+public class TamamlanmisIsTalepleri
+{
+	[DataMember]
+	public int AY { get; set; }
+
+	[DataMember]
+	public int TAMAMLANAN_IS_TALEBI_SAYISI { get; set; }
+
+	public TamamlanmisIsTalepleri(int AY, int TAMAMLANAN_IS_TALEBI_SAYISI)
+	{
+		this.AY = AY;
+		this.TAMAMLANAN_IS_TALEBI_SAYISI = TAMAMLANAN_IS_TALEBI_SAYISI;
+	}
+}

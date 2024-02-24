@@ -53,7 +53,7 @@ namespace WebApiNew.Controllers
 			prms.Add("ISM_ID", ID);
 			try
 			{
-				query = " SELECT * FROM orjin.WEB_DASH_UDF_TIPE_GORE_MAKINE_SAYISI() ";
+				query = " SELECT * FROM orjin.UDF_WEB_DASH_TIPE_GORE_MAKINE_SAYISI() ";
 				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
@@ -84,7 +84,7 @@ namespace WebApiNew.Controllers
 			prms.Add("ISM_ID", ID);
 			try
 			{
-				query = " SELECT * FROM orjin.WEB_DASH_UDF_IS_TALEP_TIP_SAYISI() ";
+				query = " SELECT * FROM orjin.UDF_WEB_DASH_IS_TALEP_TIP_SAYISI() ";
 				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
@@ -115,7 +115,7 @@ namespace WebApiNew.Controllers
 			prms.Add("ISM_ID", ID);
 			try
 			{
-				query = " SELECT * FROM orjin.WEB_DASH_UDF_ISEMRI_TIP_SAYISI() ";
+				query = " SELECT * FROM orjin.UDF_WEB_DASH_ISEMRI_TIP_SAYISI() ";
 				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
@@ -146,7 +146,7 @@ namespace WebApiNew.Controllers
 			prms.Add("ISM_ID", ID);
 			try
 			{
-				query = " SELECT * FROM orjin.WEB_DASH_UDF_ISEMRI_DURUM_SAYISI() ";
+				query = " SELECT * FROM orjin.UDF_WEB_DASH_ISEMRI_DURUM_SAYISI() ";
 				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
@@ -177,7 +177,7 @@ namespace WebApiNew.Controllers
 			prms.Add("ISM_ID", ID);
 			try
 			{
-				query = " SELECT * FROM orjin.WEB_DASH_UDF_IS_TALEP_DURUM_SAYISI() ";
+				query = " SELECT * FROM orjin.UDF_WEB_DASH_IS_TALEP_DURUM_SAYISI() ";
 				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
@@ -191,6 +191,99 @@ namespace WebApiNew.Controllers
 						));
 				}
 				return isTalepDurumList;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetTamamlanmisIsEmirleri")]
+		[HttpGet]
+		public object GetTamamlanmisIsEmirleri([FromUri] int ID , [FromUri] int year)
+		{
+			List<TamamlanmisIsEmrileri> tamamlanmisIsEmrileri = new List<TamamlanmisIsEmrileri>();
+			prms.Clear();
+			prms.Add("ISM_ID", ID);
+			prms.Add("YEAR", year);
+			try
+			{
+				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_ISEMRI_SAYISI(@YEAR) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					tamamlanmisIsEmrileri.Add(new TamamlanmisIsEmrileri
+						(
+
+						Convert.ToInt32(dt.Rows[i]["AY"]),
+						Convert.ToInt32(dt.Rows[i]["TAMAMLANAN_ISEMRI_SAYISI"])
+
+						));
+				}
+				return tamamlanmisIsEmrileri;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetAylikBakimIsEmriMaliyet")]
+		[HttpGet]
+		public object GetAylikBakimIsEmriMaliyet([FromUri] int ID, [FromUri] int year)
+		{
+			List<AylikBakimIsEmrileri> aylikBakimIsEmriMaliyet = new List<AylikBakimIsEmrileri>();
+			prms.Clear();
+			prms.Add("ISM_ID", ID);
+			prms.Add("YEAR", year);
+			try
+			{
+				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_BAKIM_MALIYET(@YEAR) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					aylikBakimIsEmriMaliyet.Add(new AylikBakimIsEmrileri
+						(
+
+						Convert.ToInt32(dt.Rows[i]["AY"]),
+						Convert.ToInt32(dt.Rows[i]["AYLIK_BAKIM_ISEMRI_MALIYET"])
+
+						));
+				}
+				return aylikBakimIsEmriMaliyet;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetTamamlanmisIsTalepleri")]
+		[HttpGet]
+		public object GetTamamlanmisIsTalepleri([FromUri] int ID, [FromUri] int year)
+		{
+			List<TamamlanmisIsTalepleri> tamamlanmisIsTalebleri = new List<TamamlanmisIsTalepleri>();
+			prms.Clear();
+			prms.Add("ISM_ID", ID);
+			prms.Add("YEAR", year);
+			try
+			{
+				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_IS_TALEBI_SAYISI(@YEAR) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					tamamlanmisIsTalebleri.Add(new TamamlanmisIsTalepleri
+						(
+
+						Convert.ToInt32(dt.Rows[i]["AY"]),
+						Convert.ToInt32(dt.Rows[i]["TAMAMLANAN_IS_TALEBI_SAYISI"])
+
+						));
+				}
+				return tamamlanmisIsTalebleri;
 			}
 			catch (Exception ex)
 			{
