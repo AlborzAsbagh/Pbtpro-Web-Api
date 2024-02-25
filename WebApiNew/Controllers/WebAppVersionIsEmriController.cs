@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
 using Newtonsoft.Json.Linq;
@@ -285,7 +286,7 @@ namespace WebApiNew.Controllers
 		
 		[Route("api/IsEmriEkleVarsiylanlar")]
 		[HttpGet]
-		public Object IsEmriEkleVarsiylanlar()
+		public async Task<Object> IsEmriEkleVarsiylanlar()
 		{
 			string query = @"SELECT TB_KOD_ID AS ID, KOD_TANIM AS TANIM, 'IS_EMRI_DURUM_VARSAYILAN' AS TABLO_TANIMI
 								FROM orjin.TB_KOD
@@ -304,12 +305,17 @@ namespace WebApiNew.Controllers
 								WHERE SOC_VARSAYILAN = 1";
 			var klas = new Util();
 			List<IsEmriEkleVarsayilanDegerler> listem = new List<IsEmriEkleVarsayilanDegerler>();
+
+			string query2 = "  select * from orjin.TB_ISEMRI_TIP where IMT_VARSAYILAN = 1 ";
+
+			IsEmriTip entity = new IsEmriTip();
 			using (var cnn = klas.baglan())
 			{
 				listem = cnn.Query<IsEmriEkleVarsayilanDegerler>(query).ToList();
+				entity = await cnn.QueryFirstOrDefaultAsync<IsEmriTip>(query2);
 			}
 
-			return Json(new { is_emri_varsayilanlar = listem });
+			return Json(new { is_emri_varsayilanlar = listem , is_emri_tip_varsayilan = entity});
 		}
 	}
 }
