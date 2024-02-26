@@ -198,14 +198,17 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		[Route("api/GetTamamlanmisIsEmirleri")]
+		[Route("api/GetTamamlanmisIsEmirleriIsTalepleri")]
 		[HttpGet]
-		public object GetTamamlanmisIsEmirleri([FromUri] int ID , [FromUri] int year)
+		public object GetTamamlanmisIsEmirleriIsTalepleri([FromUri] int ID , [FromUri] int year)
 		{
 			List<TamamlanmisIsEmrileri> tamamlanmisIsEmrileri = new List<TamamlanmisIsEmrileri>();
+			List<TamamlanmisIsTalepleri> tamamlanmisIsTalebleri = new List<TamamlanmisIsTalepleri>();
+
 			prms.Clear();
 			prms.Add("ISM_ID", ID);
 			prms.Add("YEAR", year);
+
 			try
 			{
 				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_ISEMRI_SAYISI(@YEAR) ";
@@ -221,7 +224,21 @@ namespace WebApiNew.Controllers
 
 						));
 				}
-				return tamamlanmisIsEmrileri;
+
+				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_IS_TALEBI_SAYISI(@YEAR) ";
+				dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					tamamlanmisIsTalebleri.Add(new TamamlanmisIsTalepleri
+						(
+
+						Convert.ToInt32(dt.Rows[i]["AY"]),
+						Convert.ToInt32(dt.Rows[i]["TAMAMLANAN_IS_TALEBI_SAYISI"])
+
+						));
+				}
+				return Json(new {Tamamlanmis_Isemrileri = tamamlanmisIsEmrileri , Tamamlanmis_Is_Talepleri = tamamlanmisIsTalebleri });
 			}
 			catch (Exception ex)
 			{
@@ -260,35 +277,5 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		[Route("api/GetTamamlanmisIsTalepleri")]
-		[HttpGet]
-		public object GetTamamlanmisIsTalepleri([FromUri] int ID, [FromUri] int year)
-		{
-			List<TamamlanmisIsTalepleri> tamamlanmisIsTalebleri = new List<TamamlanmisIsTalepleri>();
-			prms.Clear();
-			prms.Add("ISM_ID", ID);
-			prms.Add("YEAR", year);
-			try
-			{
-				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_IS_TALEBI_SAYISI(@YEAR) ";
-				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
-
-				for (int i = 0; i < dt.Rows.Count; i++)
-				{
-					tamamlanmisIsTalebleri.Add(new TamamlanmisIsTalepleri
-						(
-
-						Convert.ToInt32(dt.Rows[i]["AY"]),
-						Convert.ToInt32(dt.Rows[i]["TAMAMLANAN_IS_TALEBI_SAYISI"])
-
-						));
-				}
-				return tamamlanmisIsTalebleri;
-			}
-			catch (Exception ex)
-			{
-				return Json(new { ex.Message });
-			}
-		}
 	}
 }

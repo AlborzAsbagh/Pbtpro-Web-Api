@@ -326,13 +326,13 @@ namespace WebApiNew.Controllers
 					else if(entity.ITL_ISLEM_ID == 4)
 					{
 						parametreler.Add("IS_TALEP_ID", entity.TB_IS_TALEP_ID);
-						parametreler.Add("IST_IPTAL_NEDEN", entity.IST_SONUC);
-						parametreler.Add("IST_IPTAL_TARIH", entity.IST_IPTAL_TARIH);
-						parametreler.Add("IST_IPTAL_SAAT", entity.IST_IPTAL_SAAT);
+						parametreler.Add("IST_SONUC", entity.IST_SONUC);
+						parametreler.Add("IST_KAPAMA_TARIHI", entity.IST_KAPAMA_TARIHI);
+						parametreler.Add("IST_KAPAMA_SAATI", entity.IST_KAPAMA_SAATI);
 
 						cnn.Execute("update orjin.TB_IS_TALEBI set IST_SONUC = @IST_SONUC , " +
-						"IST_IPTAL_TARIH = @IST_IPTAL_TARIH , " +
-						"IST_IPTAL_SAAT = @IST_IPTAL_SAAT " +
+						"IST_KAPAMA_TARIHI = @IST_KAPAMA_TARIHI , " +
+						"IST_KAPAMA_SAATI= @IST_KAPAMA_SAATI " +
 						" WHERE TB_IS_TALEP_ID = @IS_TALEP_ID", parametreler);
 					}
 					

@@ -29,6 +29,12 @@ public class IsTalepIptalKapatModel
 	public string IST_IPTAL_SAAT { get; set; }
 
 	[DataMember]
+	public DateTime? IST_KAPAMA_TARIHI { get; set; }
+
+	[DataMember]
+	public string IST_KAPAMA_SAATI { get; set; }
+
+	[DataMember]
 	public string ITL_TALEP_ISLEM { get; set; }
 
 	[DataMember]

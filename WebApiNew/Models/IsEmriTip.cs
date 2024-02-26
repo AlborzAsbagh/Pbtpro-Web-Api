@@ -316,5 +316,17 @@ namespace WebApiNew.Models
         [DataMember]
         public string IMT_RENK_WEB_VERSION { get; set; }
 
+		[DataMember]
+		public bool IMT_ACIKLAMA_KAPAT { get; set; }
+
+		[DataMember]
+		public bool IMT_NOTLAR { get; set; }
+
+		[DataMember]
+		public bool IMT_NOTLAR_TAB { get; set; }
+
+		[DataMember]
+		public bool IMT_NOTLAR_KAPAT { get; set; }
+
 	}
 }
