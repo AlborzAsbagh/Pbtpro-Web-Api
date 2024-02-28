@@ -328,7 +328,7 @@ namespace WebApiNew.Controllers
 			if(isTanimId == 0) { 
 				prms.Add("BKM_TIP", 32440); 
 				prms.Add("ARZ_TIP", 32401); 
-				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_TIP and KOD_GRUP = @ARZ_TIP ";
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_TIP or KOD_GRUP = @ARZ_TIP ";
 			}
 			if (isTanimId == 1)
 			{
@@ -365,7 +365,7 @@ namespace WebApiNew.Controllers
 			{
 				prms.Add("BKM_NEDEN", 32452);
 				prms.Add("ARZ_NEDEN", 32413);
-				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_NEDEN and KOD_GRUP = @ARZ_NEDEN ";
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_NEDEN or KOD_GRUP = @ARZ_NEDEN ";
 			}
 			if (isTanimId == 1)
 			{
@@ -390,6 +390,72 @@ namespace WebApiNew.Controllers
 				listem.Add(entity);
 			}
 			return listem;
+		}
+
+		[Route("api/AddIsTip")]
+		[HttpPost]
+		public Object AddIsTip([FromUri] string entity, [FromUri] int isTanimId)
+		{
+			try
+			{
+				if(isTanimId == 0 || isTanimId == 2)
+				{
+					query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+					query += $" values ( '32440' , '{entity}' , 1 , 1 , 1 ,1) ";
+				}
+				else if(isTanimId == 1) 
+				{
+					query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+					query += $" values ( '32401' , '{entity}' , 1 , 1 , 1 ,1) ";
+				}
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { status_code = 201, status = "Added Successfully" });
+
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { status_code = 500, status = ex.Message });
+			}
+		}
+
+		[Route("api/AddIsNeden")]
+		[HttpPost]
+		public Object AddIsNeden([FromUri] string entity, [FromUri] int isTanimId)
+		{
+			try
+			{
+				if (isTanimId == 0 || isTanimId == 2)
+				{
+					query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+					query += $" values ( '32452' , '{entity}' , 1 , 1 , 1 ,1) ";
+				}
+				else if (isTanimId == 1)
+				{
+					query = " insert into orjin.TB_KOD (KOD_GRUP , KOD_TANIM , KOD_AKTIF , KOD_GOR , KOD_DEGISTIR , KOD_SIL ) ";
+					query += $" values ( '32413' , '{entity}' , 1 , 1 , 1 ,1) ";
+				}
+
+				using (var con = klas.baglan())
+				{
+					cmd = new SqlCommand(query, con);
+					cmd.ExecuteNonQuery();
+				}
+				klas.kapat();
+				return Json(new { status_code = 201, status = "Added Successfully" });
+
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				return Json(new { status_code = 500, status = ex.Message });
+			}
 		}
 	}
 }

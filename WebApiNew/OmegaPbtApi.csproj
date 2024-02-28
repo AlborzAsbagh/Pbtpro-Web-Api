@@ -302,6 +302,7 @@
     <Compile Include="Controllers\WebAppVersionIsTalepController.cs" />
     <Compile Include="Controllers\WebAppVersionMakineController.cs" />
     <Compile Include="Controllers\WebDashboardController.cs" />
+    <Compile Include="Controllers\YetkiController.cs" />
     <Compile Include="Filters\Authorization.cs" />
     <Compile Include="Controllers\MakineCalismaController.cs" />
     <Compile Include="Controllers\CipherController.cs" />

@@ -78,7 +78,7 @@ namespace WebApiNew.Controllers
 			catch (Exception ex)
 			{
 				klas.kapat();
-				return Json(new { status_code = 201, status = ex.Message });
+				return Json(new { status_code = 500, status = ex.Message });
 			}
 		}
 	}
