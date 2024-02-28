@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -316,6 +317,79 @@ namespace WebApiNew.Controllers
 			}
 
 			return Json(new { is_emri_varsayilanlar = listem , is_emri_tip_varsayilan = entity});
+		}
+
+		[Route("api/GetIsTipi")]
+		[HttpGet]
+		public List<Kod> GetIsTipi(int? isTanimId = 0)
+		{
+			prms.Clear();
+
+			if(isTanimId == 0) { 
+				prms.Add("BKM_TIP", 32440); 
+				prms.Add("ARZ_TIP", 32401); 
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_TIP and KOD_GRUP = @ARZ_TIP ";
+			}
+			if (isTanimId == 1)
+			{
+				prms.Add("ARZ_TIP", 32401);
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @ARZ_TIP ";
+			}
+			if (isTanimId == 2)
+			{
+				prms.Add("BKM_TIP", 32440);
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_TIP ";
+			}
+
+			DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+			List<Kod> listem = new List<Kod>();
+			for (int i = 0; i < dt.Rows.Count; i++)
+			{
+				Kod entity = new Kod();
+				entity.TB_KOD_ID = (int)dt.Rows[i]["TB_KOD_ID"];
+				entity.KOD_GRUP = Util.getFieldString(dt.Rows[i], "KOD_GRUP");
+				entity.KOD_TANIM = Util.getFieldString(dt.Rows[i], "KOD_TANIM");
+				entity.KOD_ISM_DURUM_VARSAYILAN = Util.getFieldBool(dt.Rows[i], "KOD_ISM_DURUM_VARSAYILAN");
+				listem.Add(entity);
+			}
+			return listem;
+		}
+
+		[Route("api/GetIsNeden")]
+		[HttpGet]
+		public List<Kod> GetIsNeden(int? isTanimId = 0)
+		{
+			prms.Clear();
+
+			if (isTanimId == 0)
+			{
+				prms.Add("BKM_NEDEN", 32452);
+				prms.Add("ARZ_NEDEN", 32413);
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_NEDEN and KOD_GRUP = @ARZ_NEDEN ";
+			}
+			if (isTanimId == 1)
+			{
+				prms.Add("ARZ_NEDEN", 32413);
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @ARZ_NEDEN ";
+			}
+			if (isTanimId == 2)
+			{
+				prms.Add("BKM_NEDEN", 32452);
+				query = @"select * from orjin.TB_KOD where KOD_GRUP = @BKM_NEDEN ";
+			}
+
+			DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+			List<Kod> listem = new List<Kod>();
+			for (int i = 0; i < dt.Rows.Count; i++)
+			{
+				Kod entity = new Kod();
+				entity.TB_KOD_ID = (int)dt.Rows[i]["TB_KOD_ID"];
+				entity.KOD_GRUP = Util.getFieldString(dt.Rows[i], "KOD_GRUP");
+				entity.KOD_TANIM = Util.getFieldString(dt.Rows[i], "KOD_TANIM");
+				entity.KOD_ISM_DURUM_VARSAYILAN = Util.getFieldBool(dt.Rows[i], "KOD_ISM_DURUM_VARSAYILAN");
+				listem.Add(entity);
+			}
+			return listem;
 		}
 	}
 }

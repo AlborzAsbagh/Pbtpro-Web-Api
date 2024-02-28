@@ -37,49 +37,54 @@ namespace WebApiNew.Controllers
         }
 
 
-        //Update Is Emri Tipi For Web App Version
-        [Route("api/UpdateIsEmriTipi")]
-        [HttpPost]
-        public async Task<Object> UpdateIsEmriTipi([FromBody] JObject isEmripTipiBody) 
-        {
-			int count = 0;
+		// Update Is Emri Tipi For Web App Version
+		[Route("api/UpdateIsEmriTipi")]
+		[HttpPost]
+		public async Task<Object> UpdateIsEmriTipi([FromBody] JObject isEmripTipiBody)
+		{
 			try
 			{
 				using (var cnn = klas.baglan())
 				{
-					if (isEmripTipiBody != null && isEmripTipiBody.Count > 0 && Convert.ToInt32(isEmripTipiBody.GetValue("TB_ISEMRI_TIP_ID")) >= 1)
+					if (isEmripTipiBody != null && isEmripTipiBody.Count > 0 && Convert.ToInt32(isEmripTipiBody.GetValue("TB_ISEMRI_TIP_ID")) >= 0)
 					{
-						query = " update orjin.TB_ISEMRI_TIP set ";
+						// Check if IMT_VARSAYILAN is 1
+						if (isEmripTipiBody["IMT_VARSAYILAN"] != null && Convert.ToBoolean(isEmripTipiBody["IMT_VARSAYILAN"]) == true)
+						{
+							// Update existing record with IMT_VARSAYILAN = 1 to 0
+							string updateExistingQuery = "UPDATE orjin.TB_ISEMRI_TIP SET IMT_VARSAYILAN = 0 WHERE IMT_VARSAYILAN = 1";
+							await cnn.ExecuteAsync(updateExistingQuery);
+						}
+
+						// Build query for updating/inserting the new record
+						string query = "UPDATE orjin.TB_ISEMRI_TIP SET ";
+						int count = 0;
 						foreach (var item in isEmripTipiBody)
 						{
-
 							if (item.Key.Equals("TB_ISEMRI_TIP_ID")) continue;
 
-							if (count < isEmripTipiBody.Count - 2) query += $" {item.Key} = '{item.Value}', ";
-							else query += $" {item.Key} = '{item.Value}' ";
+							query += count < isEmripTipiBody.Count - 2 ? $"{item.Key} = '{item.Value}', " : $"{item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , IMT_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
-						query += $" where TB_ISEMRI_TIP_ID = {Convert.ToInt32(isEmripTipiBody.GetValue("TB_ISEMRI_TIP_ID"))}";
+						query += $", IMT_DEGISTIRME_TARIH = '{DateTime.Now:yyyy-MM-dd HH:mm:ss}' ";
+						query += $"WHERE TB_ISEMRI_TIP_ID = {Convert.ToInt32(isEmripTipiBody.GetValue("TB_ISEMRI_TIP_ID"))}";
 
 						await cnn.ExecuteAsync(query);
-
 					}
 					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
-
 				}
 				return Json(new { has_error = false, status_code = 200, status = "Entity has updated successfully." });
 			}
 			catch (Exception e)
 			{
-
 				return Json(new { has_error = true, status_code = 500, status = e.Message });
 			}
 		}
 
 
-        //Add Is Emri Tip For Web App Version
-        [Route("api/AddIsEmriTipi")]
+
+		//Add Is Emri Tip For Web App Version
+		[Route("api/AddIsEmriTipi")]
         [HttpGet]
         public Object AddIsEmriTipi([FromUri] string isEmriTipiKey)
         {

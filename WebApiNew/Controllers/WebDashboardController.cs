@@ -202,8 +202,7 @@ namespace WebApiNew.Controllers
 		[HttpGet]
 		public object GetTamamlanmisIsEmirleriIsTalepleri([FromUri] int ID , [FromUri] int year)
 		{
-			List<TamamlanmisIsEmrileri> tamamlanmisIsEmrileri = new List<TamamlanmisIsEmrileri>();
-			List<TamamlanmisIsTalepleri> tamamlanmisIsTalebleri = new List<TamamlanmisIsTalepleri>();
+			List<TamamlananIsEmrileriIsTalepleri> listem = new List<TamamlananIsEmrileriIsTalepleri> ();
 
 			prms.Clear();
 			prms.Add("ISM_ID", ID);
@@ -211,34 +210,19 @@ namespace WebApiNew.Controllers
 
 			try
 			{
-				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_ISEMRI_SAYISI(@YEAR) ";
+				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_GENEL(@YEAR) ";
 				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
 				{
-					tamamlanmisIsEmrileri.Add(new TamamlanmisIsEmrileri
-						(
-
-						Convert.ToInt32(dt.Rows[i]["AY"]),
-						Convert.ToInt32(dt.Rows[i]["TAMAMLANAN_ISEMRI_SAYISI"])
-
+					listem.Add(new TamamlananIsEmrileriIsTalepleri(
+							Convert.ToInt32(dt.Rows[i]["AY"]),
+							Convert.ToInt32(dt.Rows[i]["DEGER"]),
+							Convert.ToString(dt.Rows[i]["TIP"])
 						));
 				}
 
-				query = @" SELECT * FROM orjin.UDF_WEB_DASH_AYLIK_TAMAMLANAN_IS_TALEBI_SAYISI(@YEAR) ";
-				dt = klas.GetDataTable(query, prms.PARAMS);
-
-				for (int i = 0; i < dt.Rows.Count; i++)
-				{
-					tamamlanmisIsTalebleri.Add(new TamamlanmisIsTalepleri
-						(
-
-						Convert.ToInt32(dt.Rows[i]["AY"]),
-						Convert.ToInt32(dt.Rows[i]["TAMAMLANAN_IS_TALEBI_SAYISI"])
-
-						));
-				}
-				return Json(new {Tamamlanmis_Isemrileri = tamamlanmisIsEmrileri , Tamamlanmis_Is_Talepleri = tamamlanmisIsTalebleri });
+				return listem;
 			}
 			catch (Exception ex)
 			{

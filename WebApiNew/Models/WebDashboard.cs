@@ -110,20 +110,6 @@ public class IsTalepDurumu
 	}
 }
 
-public class TamamlanmisIsEmrileri
-{
-	[DataMember]
-	public int AY { get; set; }
-
-	[DataMember]
-	public int TAMAMLANAN_ISEMRI_SAYISI { get; set; }
-
-	public TamamlanmisIsEmrileri(int AY, int TAMAMLANAN_ISEMRI_SAYISI)
-	{
-		this.AY = AY;
-		this.TAMAMLANAN_ISEMRI_SAYISI = TAMAMLANAN_ISEMRI_SAYISI;
-	}
-}
 
 public class AylikBakimIsEmrileri
 {
@@ -140,17 +126,21 @@ public class AylikBakimIsEmrileri
 	}
 }
 
-public class TamamlanmisIsTalepleri
+public class TamamlananIsEmrileriIsTalepleri
 {
 	[DataMember]
 	public int AY { get; set; }
 
 	[DataMember]
-	public int TAMAMLANAN_IS_TALEBI_SAYISI { get; set; }
+	public int DEGER { get; set; }
 
-	public TamamlanmisIsTalepleri(int AY, int TAMAMLANAN_IS_TALEBI_SAYISI)
+	[DataMember]
+	public string TIP { get; set; }
+
+	public TamamlananIsEmrileriIsTalepleri(int aY, int dEGER, string tIP)
 	{
-		this.AY = AY;
-		this.TAMAMLANAN_IS_TALEBI_SAYISI = TAMAMLANAN_IS_TALEBI_SAYISI;
+		AY = aY;
+		DEGER = dEGER;
+		TIP = tIP;
 	}
 }
