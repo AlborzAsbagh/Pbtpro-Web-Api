@@ -261,5 +261,103 @@ namespace WebApiNew.Controllers
 			}
 		}
 
+		[Route("api/GetIsEmirleriByTarih")]
+		[HttpGet]
+		public object GetIsEmirleriByTarih([FromUri] DateTime startDate, [FromUri] DateTime endDate)
+		{
+			List<IsEmriByTarih> isEmirleriSayisi = new List<IsEmriByTarih>();
+
+			prms.Clear();
+			prms.Add("startDate", startDate);
+			prms.Add("endDate", endDate);
+
+			try
+			{
+				query = @"  SELECT * FROM orjin.UDF_WEB_DASH_ISEMRI_SAYISI_BY_TARIH(@startDate, @endDate) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					isEmirleriSayisi.Add(new IsEmriByTarih
+						(
+
+						Convert.ToDateTime(dt.Rows[i]["TARIH"]),
+						Convert.ToInt32(dt.Rows[i]["DEGER"])
+
+						));
+				}
+				return isEmirleriSayisi;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetPersonelBazindaHarcananGuc")]
+		[HttpGet]
+		public object GetPersonelBazindaHarcananGuc([FromUri] DateTime startDate, [FromUri] DateTime endDate)
+		{
+			List<PersonelBazindaHarcananGuc> harcananGuc = new List<PersonelBazindaHarcananGuc>();
+
+			prms.Clear();
+			prms.Add("startDate", startDate);
+			prms.Add("endDate", endDate);
+
+			try
+			{
+				query = @"  SELECT * FROM orjin.UDF_WEB_DASH_PERSONEL_BAZINDA_HARCAMA(@startDate, @endDate) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					harcananGuc.Add(new PersonelBazindaHarcananGuc
+						(
+
+						Convert.ToString(dt.Rows[i]["ISIM"]),
+						Convert.ToInt32(dt.Rows[i]["DAKIKA"])
+
+						));
+				}
+				return harcananGuc;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetToplamHarcananIsGuc")]
+		[HttpGet]
+		public object GetToplamHarcananIsGuc([FromUri] DateTime startDate, [FromUri] DateTime endDate)
+		{
+			List<ToplamHarcananIsGuc> harcananGuc = new List<ToplamHarcananIsGuc>();
+
+			prms.Clear();
+			prms.Add("startDate", startDate);
+			prms.Add("endDate", endDate);
+
+			try
+			{
+				query = @"  SELECT * FROM orjin.UDF_WEB_DASH_TOPLAM_IS_GUCU(@startDate, @endDate) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					harcananGuc.Add(new ToplamHarcananIsGuc
+						(
+
+						Convert.ToString(dt.Rows[i]["TANIM"]),
+						Convert.ToInt32(dt.Rows[i]["DAKIKA"])
+
+						));
+				}
+				return harcananGuc;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
 	}
 }

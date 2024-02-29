@@ -110,7 +110,6 @@ public class IsTalepDurumu
 	}
 }
 
-
 public class AylikBakimIsEmrileri
 {
 	[DataMember]
@@ -142,5 +141,50 @@ public class TamamlananIsEmrileriIsTalepleri
 		AY = aY;
 		DEGER = dEGER;
 		TIP = tIP;
+	}
+}
+
+public class IsEmriByTarih
+{
+	[DataMember]
+	public DateTime? TARIH { get; set; }
+
+	[DataMember]
+	public int DEGER { get; set; }
+
+	public IsEmriByTarih(DateTime TARIH, int DEGER)
+	{
+		this.TARIH = TARIH;
+		this.DEGER = DEGER;
+	}
+}
+
+public class PersonelBazindaHarcananGuc
+{
+	[DataMember]
+	public string ISIM { get; set; }
+
+	[DataMember]
+	public int DAKIKA { get; set; }
+
+	public PersonelBazindaHarcananGuc(string ISIM, int DAKIKA)
+	{
+		this.ISIM = ISIM;
+		this.DAKIKA = DAKIKA;
+	}
+}
+
+public class ToplamHarcananIsGuc
+{
+	[DataMember]
+	public string TANIM { get; set; }
+
+	[DataMember]
+	public int DAKIKA { get; set; }
+
+	public ToplamHarcananIsGuc(string TANIM, int DAKIKA)
+	{
+		this.TANIM = TANIM;
+		this.DAKIKA = DAKIKA;
 	}
 }
