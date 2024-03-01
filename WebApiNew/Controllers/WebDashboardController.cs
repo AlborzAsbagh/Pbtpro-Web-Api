@@ -248,7 +248,7 @@ namespace WebApiNew.Controllers
 					aylikBakimIsEmriMaliyet.Add(new AylikBakimIsEmrileri
 						(
 
-						Convert.ToInt32(dt.Rows[i]["AY"] != DBNull.Value ? dt.Rows[i]["AY "] : 0),
+						Convert.ToInt32(dt.Rows[i]["AY"] != DBNull.Value ? dt.Rows[i]["AY"] : 0),
 						Convert.ToInt32(dt.Rows[i]["AYLIK_BAKIM_ISEMRI_MALIYET"] != DBNull.Value ? dt.Rows[i]["AYLIK_BAKIM_ISEMRI_MALIYET"] : 0)
 
 						));
