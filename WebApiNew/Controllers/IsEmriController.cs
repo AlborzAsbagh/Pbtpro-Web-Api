@@ -684,8 +684,8 @@ namespace WebApiNew.Controllers
 )";
 
                         prms.Add("@ISM_ISEMRI_NO", entity.ISM_ISEMRI_NO);
-                        prms.Add("@ISM_DUZENLEME_TARIH", DateTime.Now.ToString("yyyy-MM-dd"));//DateTime.Now.ToString("yyyy-MM-dd"));
-                        prms.Add("@ISM_DUZENLEME_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));//DateTime.Now.ToString(C.DB_TIME_FORMAT));
+                        prms.Add("@ISM_DUZENLEME_TARIH", entity.ISM_DUZENLEME_TARIH);
+                        prms.Add("@ISM_DUZENLEME_SAAT", entity.ISM_DUZENLEME_SAAT);
                         prms.Add("@ISM_BASLAMA_TARIH", entity.ISM_BASLAMA_TARIH);
                         prms.Add("@ISM_BASLAMA_SAAT", string.IsNullOrWhiteSpace(entity.ISM_BASLAMA_SAAT) ? null : entity.ISM_BASLAMA_SAAT);
                         prms.Add("@ISM_BITIS_TARIH", entity.ISM_BITIS_TARIH);
@@ -854,80 +854,6 @@ namespace WebApiNew.Controllers
                     bildirimEntity.Aciklama = "İşlem başarılı bir şekilde gerçekleşti.";
                     bildirimEntity.MsgId = Bildirim.MSG_ISLEM_BASARILI;
                     bildirimEntity.Durum = true;
-                    // Bildirim Gönder
-
-                    // Istek Web'den geliyor ise
-     //               if(isWeb)
-     //               {
-					//	try
-					//	{
-					//		// Personel ekleme
-					//		if (entity.IsEmriPersonelList.Count > 0)
-					//		{
-					//			for (int i = 0; i < entity.IsEmriPersonelList.Count; i++)
-					//			{
-					//				Bildirim bildirimPersonel = PersonelListKaydetYeni(entity.IsEmriPersonelList[i], bildirimEntity.Id);
-
-					//				if (!bildirimPersonel.Durum) return bildirimPersonel;
-					//			}
-					//		}
-					//		// Durus ekleme
-					//		if (entity.IsEmriDurusList.Count > 0)
-					//		{
-					//			for (int i = 0; i < entity.IsEmriDurusList.Count; i++)
-					//			{
-					//				Bildirim bildirimDurus = IsEmriDurusKaydet(entity.IsEmriDurusList[i], bildirimEntity.Id);
-
-					//				if (!bildirimDurus.Durum) return bildirimDurus;
-					//			}
-					//		}
-					//		// Arac Gerec ekleme
-					//		if (entity.IsEmriAracGerecList.Count > 0)
-					//		{
-					//			for (int i = 0; i < entity.IsEmriAracGerecList.Count; i++)
-					//			{
-					//				Bildirim bildirimAracGerec = AracGerecListKaydetYeni(entity.IsEmriAracGerecList[i], bildirimEntity.Id);
-
-					//				if (!bildirimAracGerec.Durum) return bildirimAracGerec;
-					//			}
-					//		}
-					//		// Malzeme ekleme
-					//		if (entity.IsEmriMalzemeList.Count > 0)
-					//		{
-					//			for (int i = 0; i < entity.IsEmriMalzemeList.Count; i++)
-					//			{
-					//				Bildirim bildirimMalzeme = MalzemeListKaydet(entity.IsEmriMalzemeList[i], bildirimEntity.Id);
-
-					//				if (!bildirimMalzeme.Durum) return bildirimMalzeme;
-					//			}
-					//		}
-					//		// Olcum Degeri ekleme
-					//		if (entity.IsEmriOlcumDegeriList.Count > 0)
-					//		{
-					//			for (int i = 0; i < entity.IsEmriOlcumDegeriList.Count; i++)
-					//			{
-					//				Bildirim bildirimOlcumDeger = OlcumDegeriListKadetYeni(entity.IsEmriOlcumDegeriList[i], bildirimEntity.Id);
-
-					//				if (!bildirimOlcumDeger.Durum) return bildirimOlcumDeger;
-					//			}
-					//		}
-					//		// Kontrol List ekleme
-					//		if (entity.IsEmriKontrolList.Count > 0)
-					//		{
-					//			for (int i = 0; i < entity.IsEmriKontrolList.Count; i++)
-					//			{
-					//				Bildirim bildirimKontrolList = KontrolListKaydet(entity.IsEmriKontrolList[i], bildirimEntity.Id);
-
-					//				if (!bildirimKontrolList.Durum) return bildirimKontrolList;
-					//			}
-					//		}
-
-					//	}
-					//	catch (Exception e)
-					//	{
-					//		_logger.Error(e);
-					//	}
-					//}
                 }
                 catch (Exception e)
                 {
@@ -2768,7 +2694,7 @@ namespace WebApiNew.Controllers
         }
 
 
-		// Add Personel entity to Isemri when new Isemri created ( Web App Version )
+		// Add Personel  ( Web App Version )
 		public Bildirim PersonelListKaydetYeni(IsEmriPersonel entity , long isEmriId)
 		{
 			Bildirim bildirimEntity = new Bildirim();
@@ -2895,7 +2821,7 @@ namespace WebApiNew.Controllers
 			return bildirimEntity;
 		}
 
-		// Add AracGerec entity to Isemri when new Isemri created ( Web App Version )
+		// Add AracGerec  ( Web App Version )
 		public Bildirim AracGerecListKaydetYeni(IsEmriAracGerec entity , long isEmriId)
         {
             Bildirim bldr = new Bildirim();
@@ -2965,7 +2891,7 @@ namespace WebApiNew.Controllers
             return bldr;
         }
 
-		//Add Olcum Degeri entity to Isemri when new Isemri created ( Web App Version )
+		//Add Olcum Degeri  ( Web App Version )
         public Bildirim OlcumDegeriListKadetYeni(Olcum entity , long isEmriId)
         {
             Bildirim bldr = new Bildirim();

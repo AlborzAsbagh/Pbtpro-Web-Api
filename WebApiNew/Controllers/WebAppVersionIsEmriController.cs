@@ -213,6 +213,20 @@ namespace WebApiNew.Controllers
 			}
 		}
 
+		[Route("api/GetIsEmriById")]
+		[HttpGet]
+		public Object GetIsEmriById([FromUri] int isEmriId)
+		{
+			Util klas = new Util();
+			List<WebVersionIsEmriModel> listem = new List<WebVersionIsEmriModel>();
+			string query = @"select * from dbo.VW_WEB_VERSION_ISEMRI where TB_ISEMRI_ID = @TB_ISEMRI_ID";
+			using (var conn = klas.baglan())
+			{
+				listem = conn.Query<WebVersionIsEmriModel>(query, new { @TB_ISEMRI_ID = isEmriId }).ToList();
+			}
+			return listem;
+
+		}
 
 		[Route("api/IsEmriDurumVarsayilanYap")]
 		[HttpGet]

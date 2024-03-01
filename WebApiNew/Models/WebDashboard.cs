@@ -188,3 +188,76 @@ public class ToplamHarcananIsGuc
 		this.DAKIKA = DAKIKA;
 	}
 }
+
+public class ArizaliMakineler
+{
+	[DataMember]
+	public string MAKINE_KODU { get; set; }
+
+	[DataMember]
+	public string MAKINE_TANIMI { get; set; }
+
+	[DataMember]
+	public string MAKINE_TIPI { get; set; }
+
+	[DataMember]
+	public string LOKASYON { get; set; }
+
+	[DataMember]
+	public int IS_EMRI_SAYISI { get; set; }	
+
+	public ArizaliMakineler(string MAKINE_KODU, string MAKINE_TANIMI, string MAKINE_TIPI , string LOKASYON , int IS_EMRI_SAYISI)
+	{
+		this.MAKINE_KODU = MAKINE_KODU;
+		this.MAKINE_TANIMI = MAKINE_TANIMI;
+		this.MAKINE_TIPI = MAKINE_TIPI;
+		this.LOKASYON = LOKASYON;
+		this.IS_EMRI_SAYISI = IS_EMRI_SAYISI;
+	}
+}
+
+public class IsEmriOzetTable
+{
+	[DataMember]
+	public string IS_EMRI_TIPI { get; set; }
+
+	[DataMember]
+	public int IS_EMRI_SAYISI { get; set; }
+
+	[DataMember]
+	public int TOPLAM_MALIYET { get; set; }
+
+	[DataMember]
+	public int TOPLAM_CALISMA_SURESI { get; set; }
+
+	public IsEmriOzetTable(string IS_EMRI_TIPI, int IS_EMRI_SAYISI, int TOPLAM_MALIYET, int TOPLAM_CALISMA_SURESI)
+	{
+		this.IS_EMRI_TIPI = IS_EMRI_TIPI;
+		this.IS_EMRI_SAYISI = IS_EMRI_SAYISI;
+		this.TOPLAM_MALIYET = TOPLAM_MALIYET;
+		this.TOPLAM_CALISMA_SURESI = TOPLAM_CALISMA_SURESI;
+	}
+}
+
+public class LokasyonBazindaIsEmriTalebi
+{
+	[DataMember]
+	public string LOKASYON { get; set; }
+
+	[DataMember]
+	public int ID { get; set; }
+
+	[DataMember]
+	public int TOPLAM_IS_EMRI { get; set; }
+
+	[DataMember]
+	public int TOPLAM_IS_TALEBI { get; set; }
+
+	public LokasyonBazindaIsEmriTalebi(string LOKASYON, int ID, int TOPLAM_IS_EMRI, int TOPLAM_IS_TALEBI)
+	{
+		this.LOKASYON = LOKASYON;
+		this.ID = ID;
+		this.TOPLAM_IS_EMRI = TOPLAM_IS_EMRI;
+		this.TOPLAM_IS_TALEBI = TOPLAM_IS_TALEBI;
+	}
+}

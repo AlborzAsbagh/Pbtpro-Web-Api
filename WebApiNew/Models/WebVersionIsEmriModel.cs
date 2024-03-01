@@ -363,6 +363,9 @@ namespace WebApiNew.Models
 
 		[DataMember]
 		public string ISM_TIP_RENK { get; set; }
+
+		[DataMember]
+		public string ISM_IS_SONUC { get; set; }
 	}
 }
 

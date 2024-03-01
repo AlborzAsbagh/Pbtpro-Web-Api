@@ -1255,6 +1255,27 @@ namespace WebApiNew.Controllers
 
 				klas.cmd(query1, prms.PARAMS);
 
+				using(var cnn = klas.baglan())
+                {
+					int SonTalepId = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 TB_IS_TALEP_ID FROM orjin.TB_IS_TALEBI ORDER BY  TB_IS_TALEP_ID DESC");
+					if (SonTalepId > 0)
+					{
+						var itl = new IsTalebiLog
+						{
+							ITL_IS_TANIM_ID = SonTalepId,
+							ITL_KULLANICI_ID = talepEdenId,
+							ITL_TARIH = DateTime.Now,
+							ITL_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT),
+							ITL_ISLEM = "Yeni iş talebi",
+							ITL_ACIKLAMA = String.Format("Talep no: '{0}' - Konu :'{1}'", istKod,konu),
+							ITL_ISLEM_DURUM = "AÇIK",
+							ITL_TALEP_ISLEM = "Yeni İş Talebi",
+							ITL_OLUSTURAN_ID = talepEdenId,
+							ITL_OLUSTURMA_TARIH = DateTime.Now
+						};
+						cnn.Insert(itl);
+					}
+				}
 
 				string query2 = @" update orjin.TB_NUMARATOR set NMR_NUMARA = @NMR_NUMARA where NMR_KOD = 'IST_KOD' ";
 				prms.Clear();

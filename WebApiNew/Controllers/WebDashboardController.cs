@@ -61,9 +61,9 @@ namespace WebApiNew.Controllers
 					makineTipList.Add(new MakineTipEnvanteri
 						(
 
-						Convert.ToInt32(dt.Rows[i]["TB_KOD_ID"]),
-						Convert.ToString(dt.Rows[i]["MAKINE_TIPI"]),
-						Convert.ToInt32(dt.Rows[i]["MAKINE_SAYISI"])
+						Convert.ToInt32(dt.Rows[i]["TB_KOD_ID"] != DBNull.Value ? dt.Rows[i]["TB_KOD_ID"] : 0),
+						Convert.ToString(dt.Rows[i]["MAKINE_TIPI"] != DBNull.Value ? dt.Rows[i]["MAKINE_TIPI"] : "" ),
+						Convert.ToInt32(dt.Rows[i]["MAKINE_SAYISI"] != DBNull.Value ? dt.Rows[i]["MAKINE_SAYISI"] : 0 )
 
 						));
 				}
@@ -92,9 +92,9 @@ namespace WebApiNew.Controllers
 					isTalebiTipList.Add(new IsTalebiTipi
 						(
 
-						Convert.ToInt32(dt.Rows[i]["TB_KOD_ID"]),
-						Convert.ToString(dt.Rows[i]["TALEP_TIPI"]),
-						Convert.ToInt32(dt.Rows[i]["TALEP_SAYISI"])
+						Convert.ToInt32(dt.Rows[i]["TB_KOD_ID"] != DBNull.Value ? dt.Rows[i]["TB_KOD_ID"] : 0),
+						Convert.ToString(dt.Rows[i]["TALEP_TIPI"] != DBNull.Value ? dt.Rows[i]["TALEP_TIPI"] : ""),
+						Convert.ToInt32(dt.Rows[i]["TALEP_SAYISI"] != DBNull.Value ? dt.Rows[i]["TALEP_SAYISI"] : 0)
 
 						));
 				}
@@ -123,9 +123,9 @@ namespace WebApiNew.Controllers
 					isEmriTipList.Add(new IsEmriTipi
 						(
 
-						Convert.ToInt32(dt.Rows[i]["TB_ISEMRI_TIP_ID"]),
-						Convert.ToString(dt.Rows[i]["ISEMRI_TIPI"]),
-						Convert.ToInt32(dt.Rows[i]["ISEMRI_SAYISI"])
+						Convert.ToInt32(dt.Rows[i]["TB_ISEMRI_TIP_ID"] != DBNull.Value ? dt.Rows[i]["TB_ISEMRI_TIP_ID"] : 0),
+						Convert.ToString(dt.Rows[i]["ISEMRI_TIPI"] != DBNull.Value ? dt.Rows[i]["ISEMRI_TIPI"] : ""),
+						Convert.ToInt32(dt.Rows[i]["ISEMRI_SAYISI"] != DBNull.Value ? dt.Rows[i]["ISEMRI_SAYISI"] : 0)
 
 						));
 				}
@@ -154,9 +154,9 @@ namespace WebApiNew.Controllers
 					isEmriDurumList.Add(new IsEmriDurumu
 						(
 
-						Convert.ToInt32(dt.Rows[i]["TB_KOD_ID"]),
-						Convert.ToString(dt.Rows[i]["ISEMRI_DURUMU"]),
-						Convert.ToInt32(dt.Rows[i]["ISEMRI_SAYISI"])
+						Convert.ToInt32(dt.Rows[i]["TB_KOD_ID"] != DBNull.Value ? dt.Rows[i]["TB_KOD_ID"] : 0),
+						Convert.ToString(dt.Rows[i]["ISEMRI_DURUMU"] != DBNull.Value ? dt.Rows[i]["ISEMRI_DURUMU"] : ""),
+						Convert.ToInt32(dt.Rows[i]["ISEMRI_SAYISI"] != DBNull.Value ? dt.Rows[i]["ISEMRI_SAYISI"] : 0)
 
 						));
 				}
@@ -185,8 +185,8 @@ namespace WebApiNew.Controllers
 					isTalepDurumList.Add(new IsTalepDurumu
 						(
 
-						Convert.ToInt32(dt.Rows[i]["IST_DURUM_ID"]),
-						Convert.ToInt32(dt.Rows[i]["IS_TALEP_SAYISI"])
+						Convert.ToInt32(dt.Rows[i]["IST_DURUM_ID"] != DBNull.Value ? dt.Rows[i]["IST_DURUM_ID"] : 0),
+						Convert.ToInt32(dt.Rows[i]["IS_TALEP_SAYISI"] != DBNull.Value ? dt.Rows[i]["IS_TALEP_SAYISI"] : 0)
 
 						));
 				}
@@ -216,9 +216,9 @@ namespace WebApiNew.Controllers
 				for (int i = 0; i < dt.Rows.Count; i++)
 				{
 					listem.Add(new TamamlananIsEmrileriIsTalepleri(
-							Convert.ToInt32(dt.Rows[i]["AY"]),
-							Convert.ToInt32(dt.Rows[i]["DEGER"]),
-							Convert.ToString(dt.Rows[i]["TIP"])
+							Convert.ToInt32(dt.Rows[i]["AY"] != DBNull.Value ? dt.Rows[i]["AY"] : 0),
+							Convert.ToInt32(dt.Rows[i]["DEGER"] != DBNull.Value ? dt.Rows[i]["DEGER"] : 0),
+							Convert.ToString(dt.Rows[i]["TIP"] != DBNull.Value ? dt.Rows[i]["TIP"] : "")
 						));
 				}
 
@@ -248,8 +248,8 @@ namespace WebApiNew.Controllers
 					aylikBakimIsEmriMaliyet.Add(new AylikBakimIsEmrileri
 						(
 
-						Convert.ToInt32(dt.Rows[i]["AY"]),
-						Convert.ToInt32(dt.Rows[i]["AYLIK_BAKIM_ISEMRI_MALIYET"])
+						Convert.ToInt32(dt.Rows[i]["AY"] != DBNull.Value ? dt.Rows[i]["AY "] : 0),
+						Convert.ToInt32(dt.Rows[i]["AYLIK_BAKIM_ISEMRI_MALIYET"] != DBNull.Value ? dt.Rows[i]["AYLIK_BAKIM_ISEMRI_MALIYET"] : 0)
 
 						));
 				}
@@ -281,8 +281,8 @@ namespace WebApiNew.Controllers
 					isEmirleriSayisi.Add(new IsEmriByTarih
 						(
 
-						Convert.ToDateTime(dt.Rows[i]["TARIH"]),
-						Convert.ToInt32(dt.Rows[i]["DEGER"])
+						Convert.ToDateTime(dt.Rows[i]["TARIH"] != DBNull.Value ? dt.Rows[i]["TARIH"] : 0),
+						Convert.ToInt32(dt.Rows[i]["DEGER"] != DBNull.Value ? dt.Rows[i]["DEGER"] : 0)
 
 						));
 				}
@@ -314,8 +314,8 @@ namespace WebApiNew.Controllers
 					harcananGuc.Add(new PersonelBazindaHarcananGuc
 						(
 
-						Convert.ToString(dt.Rows[i]["ISIM"]),
-						Convert.ToInt32(dt.Rows[i]["DAKIKA"])
+						Convert.ToString(dt.Rows[i]["ISIM"] != DBNull.Value ? dt.Rows[i]["ISIM"] : ""),
+						Convert.ToInt32(dt.Rows[i]["DAKIKA"] != DBNull.Value ? dt.Rows[i]["DAKIKA"] : 0)
 
 						));
 				}
@@ -347,12 +347,116 @@ namespace WebApiNew.Controllers
 					harcananGuc.Add(new ToplamHarcananIsGuc
 						(
 
-						Convert.ToString(dt.Rows[i]["TANIM"]),
-						Convert.ToInt32(dt.Rows[i]["DAKIKA"])
+						Convert.ToString(dt.Rows[i]["TANIM"] != DBNull.Value ? dt.Rows[i]["TANIM"] : ""),
+						Convert.ToInt32(dt.Rows[i]["DAKIKA"] != DBNull.Value ? dt.Rows[i]["DAKIKA"] : 0)
 
 						));
 				}
 				return harcananGuc;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetArizaliMakineler")]
+		[HttpGet]
+		public object GetArizaliMakineler()
+		{
+			List<ArizaliMakineler> listem = new List<ArizaliMakineler>();
+
+			prms.Clear();
+			prms.Add("DummyPrms", 1);
+			try
+			{
+				query = @"  select * from orjin.UDF_WEB_DASH_ARIZALI_MAKINELER() where 1=@DummyPrms";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					listem.Add(new ArizaliMakineler
+						(
+
+						Convert.ToString(dt.Rows[i]["MAKINE_KODU"] != DBNull.Value ? dt.Rows[i]["MAKINE_KODU"] : ""),
+						Convert.ToString(dt.Rows[i]["MAKINE_TANIMI"] != DBNull.Value ? dt.Rows[i]["MAKINE_TANIMI"] : ""),
+						Convert.ToString(dt.Rows[i]["MAKINE_TIPI"] != DBNull.Value ? dt.Rows[i]["MAKINE_TIPI"] : ""),
+						Convert.ToString(dt.Rows[i]["LOKASYON"] != DBNull.Value ? dt.Rows[i]["LOKASYON"] : ""),
+						Convert.ToInt32(dt.Rows[i]["IS_EMRI_SAYISI"] != DBNull.Value ? dt.Rows[i]["IS_EMRI_SAYISI"] : 0)
+
+						));
+				}
+				return listem;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetIsEmriOzetTable")]
+		[HttpGet]
+		public object GetIsEmriOzetTable([FromUri] DateTime startDate, [FromUri] DateTime endDate)
+		{
+			List<IsEmriOzetTable> listem = new List<IsEmriOzetTable>();
+
+			prms.Clear();
+			prms.Add("startDate", startDate);
+			prms.Add("endDate", endDate);
+
+			try
+			{
+				query = @"  SELECT * FROM orjin.UDF_WEB_DASH_ISEMRI_OZET_TABLE(@startDate, @endDate) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					listem.Add(new IsEmriOzetTable
+						(
+
+						Convert.ToString(dt.Rows[i]["IS_EMRI_TIPI"] != DBNull.Value ? dt.Rows[i]["IS_EMRI_TIPI"] : ""),
+						Convert.ToInt32(dt.Rows[i]["IS_EMRI_SAYISI"] != DBNull.Value ? dt.Rows[i]["IS_EMRI_SAYISI"] : 0),
+						Convert.ToInt32(dt.Rows[i]["TOPLAM_MALIYET"] != DBNull.Value ? dt.Rows[i]["TOPLAM_MALIYET"] : 0),
+						Convert.ToInt32(dt.Rows[i]["TOPLAM_CALISMA_SURESI"] != DBNull.Value ? dt.Rows[i]["TOPLAM_CALISMA_SURESI"] : 0)
+
+						));
+				}
+				return listem;
+			}
+			catch (Exception ex)
+			{
+				return Json(new { ex.Message });
+			}
+		}
+
+		[Route("api/GetLokasyonBazindaIsEmriTalebi")]
+		[HttpGet]
+		public object GetLokasyonBazindaIsEmriTalebi([FromUri] DateTime startDate, [FromUri] DateTime endDate)
+		{
+			List<LokasyonBazindaIsEmriTalebi> listem = new List<LokasyonBazindaIsEmriTalebi>();
+
+			prms.Clear();
+			prms.Add("startDate", startDate);
+			prms.Add("endDate", endDate);
+
+			try
+			{
+				query = @"  SELECT * FROM orjin.UDF_WEB_DASH_LOKASYON_BAZINDA_ISEMRI_ISTALEBI(@startDate, @endDate) ";
+				DataTable dt = klas.GetDataTable(query, prms.PARAMS);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
+				{
+					listem.Add(new LokasyonBazindaIsEmriTalebi
+						(
+
+						Convert.ToString(dt.Rows[i]["LOKASYON"] != DBNull.Value ? dt.Rows[i]["LOKASYON"] : ""),
+						Convert.ToInt32(dt.Rows[i]["ID"] != DBNull.Value ? dt.Rows[i]["ID"] : 0),
+						Convert.ToInt32(dt.Rows[i]["TOPLAM_IS_EMRI"] != DBNull.Value ? dt.Rows[i]["TOPLAM_IS_EMRI"] : 0),
+						Convert.ToInt32(dt.Rows[i]["TOPLAM_IS_TALEBI"] != DBNull.Value ? dt.Rows[i]["TOPLAM_IS_TALEBI"] : 0)
+
+						));
+				}
+				return listem;
 			}
 			catch (Exception ex)
 			{
