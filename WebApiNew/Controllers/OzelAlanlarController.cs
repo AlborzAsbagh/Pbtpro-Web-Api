@@ -42,7 +42,7 @@ namespace WebApiNew.Controllers
 		}
 
 		[Route("api/OzelAlanTopicGuncelle")]
-		[HttpGet]
+		[HttpPost]
 		public async Task<object> OzelAlanTopicGuncelle([FromBody] JObject entity)
 		{
 			int count = 0;
@@ -50,20 +50,21 @@ namespace WebApiNew.Controllers
 			{
 				using (var cnn = klas.baglan())
 				{
-					if (entity != null && entity.Count > 0 && Convert.ToInt32(entity.GetValue("TB_OZEL_ALAN_ID")) >= 1)
+					if (entity != null && entity.Count > 0 && 
+						( Convert.ToString(entity.GetValue("OZL_FORM")) != "" && entity.GetValue("OZL_FORM") != null))
 					{
 						query = " update orjin.TB_OZEL_ALAN set ";
 						foreach (var item in entity)
 						{
 
-							if (item.Key.Equals("TB_OZEL_ALAN_ID")) continue;
+							if (item.Key.Equals("OZL_FORM")) continue;
 
 							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
 						query += $" , OZL_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
-						query += $" where TB_OZEL_ALAN_ID = {Convert.ToInt32(entity.GetValue("TB_OZEL_ALAN_ID"))}";
+						query += $" where OZL_FORM = '{Convert.ToString(entity.GetValue("OZL_FORM"))}'";
 
 						await cnn.ExecuteAsync(query);
 

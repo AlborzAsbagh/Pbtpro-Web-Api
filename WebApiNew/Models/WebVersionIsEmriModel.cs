@@ -104,7 +104,10 @@ namespace WebApiNew.Models
 		public string MAKINE_TIP { get; set; } 
 
 		[DataMember]
-		public string EKIPMAN { get; set; } 
+		public string EKIPMAN { get; set; }
+
+		[DataMember]
+		public string ISM_EKIPMAN_KOD { get; set; }
 
 		[DataMember]
 		public string IS_TIPI { get; set; } 
@@ -233,7 +236,10 @@ namespace WebApiNew.Models
 		public int ISM_MASRAF_MERKEZ_ID { get; set; } 
 
 		[DataMember]
-		public int ISM_PROJE_ID { get; set; } 
+		public int ISM_PROJE_ID { get; set; }
+
+		[DataMember]
+		public string ISM_PROJE { get; set; }
 
 		[DataMember]
 		public int ISM_FIRMA_ID { get; set; } 
