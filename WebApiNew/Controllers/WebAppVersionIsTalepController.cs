@@ -563,5 +563,45 @@ namespace WebApiNew.Controllers
 			}
 			return listem;
 		}
+
+		[Route("api/IsTalepTarihceByKod")]
+		[HttpGet]
+		public object GetIsTalepTarihceByID([FromUri] string talepKod)
+		{
+			try
+			{
+				using(var cnn = klas.baglan())
+				{
+					int talepID = -1;
+					talepID = cnn.QueryFirstOrDefault<int>($"SELECT TB_IS_TALEP_ID FROM orjin.TB_IS_TALEBI where IST_KOD = '{talepKod}'");
+					parametreler.Clear();
+					parametreler.Add(new Prm("ITL_IS_TANIM_ID", talepID));
+					string sql = "select * from orjin.TB_IS_TALEBI_LOG where ITL_IS_TANIM_ID=@ITL_IS_TANIM_ID";
+					List<IsTalebiLog> listem = new List<IsTalebiLog>();
+					DataTable dt = klas.GetDataTable(sql, parametreler);
+					for (int i = 0; i < dt.Rows.Count; i++)
+					{
+						IsTalebiLog entity = new IsTalebiLog();
+						entity.ITL_ACIKLAMA = dt.Rows[i]["ITL_ACIKLAMA"] != DBNull.Value ? dt.Rows[i]["ITL_ACIKLAMA"].ToString() : "";
+						entity.TB_IS_TALEP_LOG_ID = Util.getFieldInt(dt.Rows[i], "TB_IS_TALEP_LOG_ID");
+						entity.ITL_KULLANICI_ID = Util.getFieldInt(dt.Rows[i], "ITL_KULLANICI_ID");
+						entity.ITL_IS_TANIM_ID = Util.getFieldInt(dt.Rows[i], "ITL_IS_TANIM_ID");
+						entity.ITL_TARIH = Util.getFieldDateTime(dt.Rows[i], "ITL_TARIH");
+						entity.ITL_TALEP_ISLEM = Util.getFieldString(dt.Rows[i], "ITL_TALEP_ISLEM");
+						entity.ITL_SAAT = Util.getFieldString(dt.Rows[i], "ITL_SAAT");
+						entity.ITL_ISLEM_DURUM = Util.getFieldString(dt.Rows[i], "ITL_ISLEM_DURUM");
+						entity.ITL_ISLEM = Util.getFieldString(dt.Rows[i], "ITL_ISLEM");
+						entity.ITL_ACIKLAMA = Util.getFieldString(dt.Rows[i], "ITL_ACIKLAMA");
+						listem.Add(entity);
+					}
+
+					return listem;
+				}
+			}
+			catch(Exception e)
+			{
+				return Json(new { has_error = true, status_code = 500, status = e.Message });
+			}
+		}
 	}
 }
