@@ -595,7 +595,7 @@ namespace WebApiNew.Controllers
 
 		}
 
-		[Route("api/AddUpdateIsemriMalzemeKaydet")]
+		[Route("api/AddUpdateIsemriMalzeme")]
 		[HttpPost]
 		public object MalzemeListKaydet(IsEmriMalzeme entity, long isEmriId = 0)
 		{
@@ -1365,7 +1365,6 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		// Is Emri Web App Update Web App
 		[HttpPost]
 		[Route("api/UpdateIsEmri")]
 		public object UpdateIsEmri([FromBody] IsEmri entity)
