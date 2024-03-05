@@ -270,6 +270,9 @@ namespace WebApiNew.Controllers
 					klas.baglan();
 					query += @" (@ISL_ISEMRI_ID , @ISL_KULLANICI_ID , @ISL_TARIH , @ISL_SAAT , @ISL_ISLEM , @ISL_ACIKLAMA , @ISL_DURUM_ESKI_KOD_ID ,
 						@ISL_DURUM_YENI_KOD_ID , @ISL_OLUSTURAN_ID , @ISL_OLUSTURMA_TARIH , @ISL_DEGISTIRME_TARIH ) ";
+
+					query += @" update orjin.TB_ISEMRI set ISM_DURUM_KOD_ID = @ISM_DURUM_KOD_ID where TB_ISEMRI_ID = @TB_ISEMRI_ID ";
+
 					prms.Clear();
 					prms.Add("ISL_ISEMRI_ID", entity.ISL_ISEMRI_ID);
 					prms.Add("ISL_KULLANICI_ID", entity.ISL_KULLANICI_ID);
@@ -282,21 +285,23 @@ namespace WebApiNew.Controllers
 					prms.Add("ISL_OLUSTURAN_ID", entity.ISL_OLUSTURAN_ID);
 					prms.Add("ISL_OLUSTURMA_TARIH", DateTime.Now);
 					prms.Add("ISL_DEGISTIRME_TARIH", DateTime.Now);
+					prms.Add("TB_ISEMRI_ID", entity.ISL_ISEMRI_ID);
+					prms.Add("ISM_DURUM_KOD_ID", entity.ISL_DURUM_YENI_KOD_ID);
 
 					klas.cmd(query, prms.PARAMS);
 					klas.kapat();
-					return Json(new { success = "Ekleme başarılı " });
+					return Json(new { has_error = false, status_code = 200, status = "Entity Updated Successfully" });
 				}
 				else
 				{
-					return null;
+					return Json(new { has_error = false, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
 
 				}
 			} 
 			catch (Exception ex) 
 			{
 				klas.kapat();
-				return Json(new { error = " Ekleme başarısız " });
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
 			}
 		}
 
