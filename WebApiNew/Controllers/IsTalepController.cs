@@ -955,7 +955,7 @@ namespace WebApiNew.Controllers
         [HttpGet]
         public async Task<string> IsEmriOlustur([FromUri] int talepID, [FromUri] int userId, [FromUri] int teknisyenId, [FromUri] int atolyeId)
         {
-            string isemriNo = "";
+			string isemriNo = "";
             try
             {
                 parametreler.Clear();
@@ -979,8 +979,8 @@ namespace WebApiNew.Controllers
                 entity.ISM_DUZENLEME_TARIH = DateTime.Now;
                 entity.ISM_DUZENLEME_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT);
                 entity.ISM_TIP_ID = Util.getFieldInt(drTalep, "IST_ISEMRI_TIP_ID");
-                entity.ISM_BASLAMA_TARIH = null;
-                entity.ISM_BASLAMA_SAAT = "";
+                entity.ISM_BASLAMA_TARIH = DateTime.Now;
+                entity.ISM_BASLAMA_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT);
                 entity.ISM_BITIS_TARIH = null;
                 entity.ISM_BITIS_SAAT = "";
                 entity.ISM_REF_ID = -1;
