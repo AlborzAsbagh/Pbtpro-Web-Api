@@ -592,6 +592,7 @@ namespace WebApiNew.Controllers
 						entity.ITL_ISLEM_DURUM = Util.getFieldString(dt.Rows[i], "ITL_ISLEM_DURUM");
 						entity.ITL_ISLEM = Util.getFieldString(dt.Rows[i], "ITL_ISLEM");
 						entity.ITL_ACIKLAMA = Util.getFieldString(dt.Rows[i], "ITL_ACIKLAMA");
+						entity.ITL_OLUSTURMA_TARIH = DateTime.Now;
 						listem.Add(entity);
 					}
 

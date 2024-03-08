@@ -1250,6 +1250,8 @@ namespace WebApiNew.Controllers
 				entity.DKN_ISEMRI_ID = Convert.ToInt32(dt.Rows[i]["DKN_ISEMRI_ID"]);
 				entity.DKN_YAPILDI = Convert.ToBoolean(dt.Rows[i]["DKN_YAPILDI"]);
 				entity.DKN_YAPILDI_SURE = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_SURE"]);
+				entity.DKN_YAPILDI_PERSONEL_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_PERSONEL_ID"]);
+				entity.DKN_YAPILDI_ATOLYE_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_ATOLYE_ID"]);
 
 				if (dt.Rows[i]["DKN_YAPILDI_TARIH"] != DBNull.Value)
 					entity.DKN_YAPILDI_TARIH = (DateTime)dt.Rows[i]["DKN_YAPILDI_TARIH"];
@@ -1263,6 +1265,7 @@ namespace WebApiNew.Controllers
 
 				entity.DKN_YAPILDI_SAAT = dt.Rows[i]["DKN_YAPILDI_SAAT"] != DBNull.Value ? dt.Rows[i]["DKN_YAPILDI_SAAT"].ToString() : "";
 				entity.DKN_PERSONEL_ISIM = dt.Rows[i]["DKN_PERSONEL_ISIM"] != DBNull.Value ? dt.Rows[i]["DKN_PERSONEL_ISIM"].ToString() : "";
+				entity.DKN_ATOLYE_TANIM = dt.Rows[i]["DKN_ATOLYE_TANIM"] != DBNull.Value ? dt.Rows[i]["DKN_ATOLYE_TANIM"].ToString() : "";
 				entity.DKN_BITIS_SAAT = dt.Rows[i]["DKN_BITIS_SAAT"] != DBNull.Value ? dt.Rows[i]["DKN_BITIS_SAAT"].ToString() : "";
 
 				if (dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value && dt.Rows[i]["DKN_ACIKLAMA"].ToString().StartsWith(@"{\rtf"))
@@ -1309,7 +1312,7 @@ namespace WebApiNew.Controllers
 		[HttpGet]
 		public Object FetchIsEmriOlcumDegeri([FromUri] int isemriID)
 		{
-			string query = " select ido.*, kod.KOD_TANIM from orjin.TB_ISEMRI_OLCUM ido " +
+			string query = " select ido.*, kod.KOD_TANIM as IDO_BIRIM from orjin.TB_ISEMRI_OLCUM ido " +
 				$" left join orjin.TB_KOD kod on kod.TB_KOD_ID = ido.IDO_BIRIM_KOD_ID where IDO_ISEMRI_ID = {isemriID} ";
 			List<Olcum> listem = new List<Olcum>();
 			try

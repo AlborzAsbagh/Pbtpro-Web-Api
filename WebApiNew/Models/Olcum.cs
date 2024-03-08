@@ -15,6 +15,7 @@ namespace WebApiNew.Models
         public int IDO_ISEMRI_ID { get; set; }
         public int IDO_OLCUM_PARAMETRE_ID { get; set; }
         public int IDO_BIRIM_KOD_ID { get; set; }
+        public string IDO_BIRIM { get; set; }
         public double IDO_HEDEF_DEGER { get; set; }
         public double IDO_MIN_DEGER { get; set; }
         public double IDO_MAX_DEGER { get; set; }
