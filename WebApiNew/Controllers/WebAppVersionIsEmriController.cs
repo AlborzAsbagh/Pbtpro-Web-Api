@@ -1031,13 +1031,11 @@ namespace WebApiNew.Controllers
 
 		[Route("api/AddUpdateIsEmriAracGerec")]
 		[HttpPost]
-		public object AracGerecListKaydetYeni(IsEmriAracGerec entity, long isEmriId)
+		public object AracGerecListKaydetYeni(List<IsEmriAracGerec> lsitem, long isEmriId)
 		{
-			string durum = "";
-			string query = "";
 			try
 			{
-				if (entity.TB_ISEMRI_ARAC_GEREC_ID < 1)
+				foreach(var  item in lsitem) 
 				{
 					#region Kaydet
 					query = @" insert into orjin.TB_ISEMRI_ARAC_GEREC 
@@ -1045,49 +1043,27 @@ namespace WebApiNew.Controllers
                             IAG_ARAC_GEREC_ID , 
                             IAG_OLUSTURAN_ID , 
                             IAG_OLUSTURMA_TARIH , 
-                            IAG_DEGISTIREN_ID , 
                             IAG_DEGISTIRME_TARIH ) 
                             values (
                                 @IAG_ISEMRI_ID ,
                                 @IAG_ARAC_GEREC_ID , 
                                 @IAG_OLUSTURAN_ID , 
                                 @IAG_OLUSTURMA_TARIH , 
-                                @IAG_DEGISTIREN_ID , 
                                 @IAG_DEGISTIRME_TARIH) ";
 					prms.Clear();
 					prms.Add("@IAG_ISEMRI_ID", isEmriId);
-					prms.Add("@IAG_ARAC_GEREC_ID", entity.IAG_ARAC_GEREC_ID);
-					prms.Add("@IAG_OLUSTURAN_ID", entity.IAG_OLUSTURAN_ID);
+					prms.Add("@IAG_ARAC_GEREC_ID", item.IAG_ARAC_GEREC_ID);
+					prms.Add("@IAG_OLUSTURAN_ID", item.IAG_OLUSTURAN_ID);
 					prms.Add("@IAG_OLUSTURMA_TARIH", DateTime.Now);
-					prms.Add("@IAG_DEGISTIREN_ID", entity.IAG_DEGISTIREN_ID);
 					prms.Add("@IAG_DEGISTIRME_TARIH", DateTime.Now);
 					#endregion
 					klas.baglan();
 					klas.cmd(query, prms.PARAMS);
-					durum = "Entity Added Successfully !";
-				}
-				else
-				{
-					#region Guncelle
-					query = @" update orjin.TB_ISEMRI_ARAC_GEREC set
-                              IAG_ARAC_GEREC_ID = @IAG_ARAC_GEREC_ID 
-                            , IAG_DEGISTIREN_ID = @IAG_DEGISTIREN_ID 
-                            , IAG_DEGISTIRME_TARIH = @IAG_DEGISTIRME_TARIH 
-                            where TB_ISEMRI_ARAC_GEREC_ID = @TB_ISEMRI_ARAC_GEREC_ID
-                        ";
-
-					prms.Clear();
-					prms.Add("@TB_ISEMRI_ARAC_GEREC_ID", entity.TB_ISEMRI_ARAC_GEREC_ID);
-					prms.Add("@IAG_ARAC_GEREC_ID", entity.IAG_ARAC_GEREC_ID);
-					prms.Add("@IAG_DEGISTIREN_ID", entity.IAG_DEGISTIREN_ID);
-					prms.Add("@IAG_DEGISTIRME_TARIH", DateTime.Now);
-					#endregion
-					klas.baglan();
-					klas.cmd(query, prms.PARAMS);
-					durum = "Entity Updated Successfully ! ";
 
 				}
-				return Json(new { has_error = false, status_code = 200, status = durum });
+
+				return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully !" });
+
 			}
 			catch (Exception ex)
 			{

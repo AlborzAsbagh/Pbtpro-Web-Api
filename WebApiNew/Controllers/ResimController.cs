@@ -477,15 +477,16 @@ namespace WebApiNew.Controllers
 
                 HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
                 result.Content = new ByteArrayContent(ms.ToArray());
-                if (extension.ToLower().Equals("jpg") || extension.ToLower().Equals("jpeg"))
-                    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpg");
-                else
-                if (extension.ToLower().Equals("png"))
-                    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                else
-                if (extension.ToLower().Equals("gif"))
-                    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/gif");
-                ms.Close();
+                //if (extension.ToLower().Equals("jpg") || extension.ToLower().Equals("jpeg"))
+                //    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpg");
+                //else
+                //if (extension.ToLower().Equals("png"))
+                //    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+                //else
+                //if (extension.ToLower().Equals("gif"))
+                //    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/gif");
+				result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+				ms.Close();
                 ms.Dispose();
                 return result;
             }

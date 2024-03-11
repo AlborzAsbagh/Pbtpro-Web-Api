@@ -659,15 +659,16 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 		//Get Arac Gerec List For Web App Version
 		[Route("api/GetAracGerec")]
 		[HttpGet]
-		public Object GetAracGerec()
+		public Object GetAracGerec([FromUri] int isEmrId)
 		{
-			string query = "select * from orjin.VW_ARAC_GEREC";
+			string query = @"select * from orjin.VW_ARAC_GEREC where TB_ARAC_GEREC_ID not in
+                            (select IAG_ARAC_GEREC_ID from orjin.TB_ISEMRI_ARAC_GEREC where IAG_ISEMRI_ID = @isEmrId)";
 			List<AracGerec> listem = new List<AracGerec>();
 			try
 			{
 				using (var cnn = klas.baglan())
 				{
-					listem = cnn.Query<AracGerec>(query).ToList();
+					listem = cnn.Query<AracGerec>(query,new { @isEmrId = isEmrId }).ToList();
 				}
 				return Json(new { ARAC_GEREC_LISTE = listem });
 			}
