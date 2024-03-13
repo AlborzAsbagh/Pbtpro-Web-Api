@@ -44,6 +44,8 @@ namespace WebApiNew.Models
 
          [DataMember] public string DKN_ATOLYE_TANIM { get; set; }
 
+         [DataMember] public string DKN_VARDIYA_TANIM { get; set; }
+
          [DataMember] public int DKN_OLUSTURAN_ID { get; set; }
 
          [DataMember] public DateTime? DKN_OLUSTURMA_TARIH { get; set; }

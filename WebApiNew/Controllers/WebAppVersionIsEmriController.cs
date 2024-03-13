@@ -1228,6 +1228,8 @@ namespace WebApiNew.Controllers
 				entity.DKN_YAPILDI_SURE = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_SURE"]);
 				entity.DKN_YAPILDI_PERSONEL_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_PERSONEL_ID"]);
 				entity.DKN_YAPILDI_ATOLYE_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_ATOLYE_ID"]);
+				entity.DKN_YAPILDI_MESAI_KOD_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_MESAI_KOD_ID"]);
+				entity.DKN_VARDIYA_TANIM = (dt.Rows[i]["DKN_VARDIYA_TANIM"]).ToString();
 
 				if (dt.Rows[i]["DKN_YAPILDI_TARIH"] != DBNull.Value)
 					entity.DKN_YAPILDI_TARIH = (DateTime)dt.Rows[i]["DKN_YAPILDI_TARIH"];

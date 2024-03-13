@@ -701,5 +701,214 @@ namespace WebApiNew.Controllers
 		}
 
 
+		//Add Prosedur Property To Isemri When Isemri Tipi Changes (Web App)
+		[Route("api/ChangeIsEmriTipiProperty")]
+		[HttpGet]
+		public object ChangeIsEmriTipiProperty([FromUri] int isEmriTipId, [FromUri] int isTanimId, [FromUri] int isEmriId)
+		{
+			try
+			{
+				using(var cnn = klas.baglan())
+				{
+					cnn.Query(@"delete 
+							orjin.TB_ISEMRI_KONTROLLIST 
+							where DKN_REF_ID = @isTanimId and  
+							DKN_ISEMRI_ID = @isEmriId ", new { @isTanimId = isTanimId, @isEmriId = isEmriId });
+
+					cnn.Query(@"delete 
+							orjin.TB_ISEMRI_OLCUM 
+							where IDO_REF_ID = @isTanimId and  
+							IDO_ISEMRI_ID = @isEmriId ", new { @isTanimId = isTanimId, @isEmriId = isEmriId });
+
+					query = @"update orjin.TB_ISEMRI set 
+							ISM_KONU = '' , 
+							ISM_NEDEN_KOD_ID = -1 , 
+							ISM_TIP_KOD_ID = -1 , 
+							ISM_TIP_ID = @isEmriTipId , 
+							ISM_REF_ID = -1 
+
+							where TB_ISEMRI_ID = @isEmriId ";
+
+					cnn.Query(query, new { @isEmriTipId = isEmriTipId, @isEmriId = isEmriId });
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully !" });
+			}
+			catch(Exception ex) 
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		//Add Prosedur Property To Isemri When Prosedur Changes (Web App)
+		[Route("api/AddProsedurPropertyToIsEmri")]
+		[HttpGet]
+		public object AddProsedurPropertyToIsEmri([FromUri]int yeniIsTanimId , [FromUri] int isEmriId, [FromUri] int? eskiIsTanimId = 0)
+		{
+			List<IsTanimKontrol> kontrolListesi = new List<IsTanimKontrol> ();
+			List<OlcumParametreWebApp> olcumListesi = new List<OlcumParametreWebApp> ();
+
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					// Add Presedur Kontrol List Start -----
+					query = @" select ISK_SIRANO , 
+								  ISK_YAPILDI,
+								  ISK_TANIM,
+								  ISK_MALIYET,
+                                  ISK_ACIKLAMA ,
+                                  ISK_OLUSTURAN_ID ,
+                                  ISK_OLUSTURMA_TARIH ,
+                                  ISK_DEGISTIREN_ID ,
+                                  ISK_DEGISTIRME_TARIH 
+									from orjin.TB_IS_TANIM_KONTROLLIST where ISK_IS_TANIM_ID = @isTanimId ";
+
+					kontrolListesi = cnn.Query<IsTanimKontrol>(query, new { @isTanimId = yeniIsTanimId }).ToList();
+
+					cnn.Query(@"delete 
+							orjin.TB_ISEMRI_KONTROLLIST 
+							where DKN_REF_ID = @isTanimId and  
+							DKN_ISEMRI_ID = @isEmriId ", new { @isTanimId = eskiIsTanimId, @isEmriId = isEmriId });
+
+					query = @" insert into orjin.TB_ISEMRI_KONTROLLIST 
+							(
+								DKN_SIRANO,
+								DKN_YAPILDI,
+								DKN_TANIM,
+								DKN_MALIYET,
+								DKN_ACIKLAMA,
+								DKN_OLUSTURAN_ID,
+								DKN_OLUSTURMA_TARIH,
+								DKN_DEGISTIREN_ID,
+								DKN_DEGISTIRME_TARIH,
+								DKN_ISEMRI_ID,
+								DKN_REF_ID
+							) values	
+							(
+								@DKN_SIRANO,
+								@DKN_YAPILDI,
+								@DKN_TANIM,
+								@DKN_MALIYET,
+								@DKN_ACIKLAMA,
+								@DKN_OLUSTURAN_ID,
+								@DKN_OLUSTURMA_TARIH,
+								@DKN_DEGISTIREN_ID,
+								@DKN_DEGISTIRME_TARIH,
+								@DKN_ISEMRI_ID,
+								@DKN_REF_ID
+
+							)";
+					foreach (var item in kontrolListesi)
+					{
+						var prms = new
+						{
+							@DKN_SIRANO = item.ISK_SIRANO,
+							@DKN_YAPILDI = item.ISK_YAPILDI,
+							@DKN_TANIM = item.ISK_TANIM,
+							@DKN_MALIYET = item.ISK_MALIYET,
+							@DKN_ACIKLAMA = item.ISK_ACIKLAMA,
+							@DKN_OLUSTURAN_ID = item.ISK_OLUSTURAN_ID,
+							@DKN_OLUSTURMA_TARIH = item.ISK_OLUSTURMA_TARIH,
+							@DKN_DEGISTIREN_ID = item.ISK_DEGISTIREN_ID,
+							@DKN_DEGISTIRME_TARIH = item.ISK_DEGISTIRME_TARIH,
+							@DKN_ISEMRI_ID = isEmriId,
+							@DKN_REF_ID = yeniIsTanimId
+						};
+						cnn.Query(query, prms) ;
+					}
+
+					// Add Presedur Kontrol List Finish -----------------------------------
+
+					// Add Presedur Olcum List Start -----
+					query = @"select IOC_SIRA_NO , 
+								  IOC_TANIM,
+								  IOC_BIRIM_KOD_ID,
+								  orjin.UDF_KOD_TANIM(IOC_BIRIM_KOD_ID) as IOC_BIRIM_TANIM,
+                                  IOC_OLUSTURMA_TARIH ,
+                                  IOC_HEDEF_DEGER ,
+                                  IOC_FORMAT ,
+                                  IOC_MIN_DEGER ,
+                                  IOC_MAX_DEGER ,
+								  IOC_MIN_MAX_DEGER
+									from orjin.TB_IS_TANIM_OLCUM_PARAMETRE where IOC_IS_TANIM_ID = @isTanimId  ";
+
+					olcumListesi = cnn.Query<OlcumParametreWebApp>(query, new { @isTanimId = yeniIsTanimId }).ToList();
+
+					cnn.Query(@"delete 
+							orjin.TB_ISEMRI_OLCUM 
+							where IDO_REF_ID = @isTanimId and  
+							IDO_ISEMRI_ID = @isEmriId ", new { @isTanimId = eskiIsTanimId, @isEmriId = isEmriId });
+
+					query = @" insert into orjin.TB_ISEMRI_OLCUM 
+							(
+								IDO_SIRANO,
+								IDO_TANIM,
+								IDO_BIRIM_KOD_ID,
+								IDO_OLUSTURMA_TARIH,
+								IDO_HEDEF_DEGER,
+								IDO_FORMAT,
+								IDO_MIN_DEGER,
+								IDO_MAX_DEGER,
+								IDO_MIN_MAX_DEGER,
+								IDO_ISEMRI_ID,
+								IDO_REF_ID
+							) values	
+							(
+								@IDO_SIRANO,
+								@IDO_TANIM,
+								@IDO_BIRIM_KOD_ID,
+								@IDO_OLUSTURMA_TARIH,
+								@IDO_HEDEF_DEGER,
+								@IDO_FORMAT,
+								@IDO_MIN_DEGER,
+								@IDO_MAX_DEGER,
+								@IDO_MIN_MAX_DEGER,
+								@IDO_ISEMRI_ID,
+								@IDO_REF_ID
+
+							)";
+					foreach (var item in olcumListesi)
+					{
+						var prms = new
+						{
+							@IDO_SIRANO = item.IOC_SIRA_NO,
+							@IDO_TANIM = item.IOC_TANIM,
+							@IDO_BIRIM_KOD_ID = item.IOC_BIRIM_KOD_ID,
+							@IDO_OLUSTURMA_TARIH = item.IOC_OLUSTURMA_TARIH,
+							@IDO_HEDEF_DEGER = item.IOC_HEDEF_DEGER,
+							@IDO_FORMAT = item.IOC_FORMAT,
+							@IDO_MIN_DEGER = item.IOC_MIN_DEGER,
+							@IDO_MAX_DEGER = item.IOC_MAX_DEGER,
+							@IDO_MIN_MAX_DEGER = item.IOC_MIN_MAX_DEGER,
+							@IDO_ISEMRI_ID = isEmriId,
+							@IDO_REF_ID = yeniIsTanimId
+						};
+						cnn.Query(query, prms);
+					}
+
+					// Add Presedur Olcum List Finish -----------------------------------
+
+					// Update Isemri Konu , TipId , NedenId Start -----
+
+					query = @"update orjin.TB_ISEMRI set 
+							ISM_KONU = CAST((SELECT IST_TANIM FROM orjin.TB_IS_TANIM WHERE TB_IS_TANIM_ID = @isTanimId) AS VARCHAR) , 
+							ISM_NEDEN_KOD_ID = (select IST_NEDEN_KOD_ID from orjin.TB_IS_TANIM where TB_IS_TANIM_ID = @isTanimId) , 
+							ISM_TIP_KOD_ID = (select IST_TIP_KOD_ID from orjin.TB_IS_TANIM where TB_IS_TANIM_ID = @isTanimId),
+							ISM_REF_ID = @isTanimId
+
+							where TB_ISEMRI_ID = @isEmriId ";
+
+					cnn.Query(query,new { @isTanimId = yeniIsTanimId, @isEmriId = isEmriId });
+
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully !" });
+			}
+			catch (Exception ex) 
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+		
 	}
 }
+  
