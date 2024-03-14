@@ -908,7 +908,43 @@ namespace WebApiNew.Controllers
 				return Json(new { has_error = true, status_code = 500, status = ex.Message });
 			}
 		}
-		
+
+		//Remove Prosedur From Isemri (Web App)
+		[Route("api/RevmoveProsedurFromIsEmri")]
+		[HttpGet]
+		public object RevmoveProsedurFromIsEmri([FromUri] int isEmriId, [FromUri] int isTanimId)
+		{
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					cnn.Query(@"delete 
+							orjin.TB_ISEMRI_KONTROLLIST 
+							where DKN_REF_ID = @isTanimId and  
+							DKN_ISEMRI_ID = @isEmriId ", new { @isTanimId = isTanimId, @isEmriId = isEmriId });
+
+					cnn.Query(@"delete 
+							orjin.TB_ISEMRI_OLCUM 
+							where IDO_REF_ID = @isTanimId and  
+							IDO_ISEMRI_ID = @isEmriId ", new { @isTanimId = isTanimId, @isEmriId = isEmriId });
+
+					query = @"update orjin.TB_ISEMRI set 
+							ISM_KONU = '' , 
+							ISM_NEDEN_KOD_ID = -1 , 
+							ISM_TIP_KOD_ID = -1 , 
+							ISM_REF_ID = -1 
+
+							where TB_ISEMRI_ID = @isEmriId ";
+
+					cnn.Query(query, new { @isEmriId = isEmriId });
+				}
+				return Json(new { has_error = false, status_code = 200, status = "Process Completed Successfully !" });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
 	}
 }
   

@@ -1446,6 +1446,7 @@ namespace WebApiNew.Controllers
                                       ,ISM_OZEL_ALAN_18 =@ISM_OZEL_ALAN_18
                                       ,ISM_OZEL_ALAN_19 =@ISM_OZEL_ALAN_19
                                       ,ISM_OZEL_ALAN_20 =@ISM_OZEL_ALAN_20
+                                      ,ISM_NOT =@ISM_NOT
                                        WHERE TB_ISEMRI_ID = @TB_ISEMRI_ID";
 						prms.Clear();
 						prms.Add("@TB_ISEMRI_ID", entity.TB_ISEMRI_ID);
@@ -1530,6 +1531,7 @@ namespace WebApiNew.Controllers
 						prms.Add("@ISM_OZEL_ALAN_18", entity.ISM_OZEL_ALAN_18);
 						prms.Add("@ISM_OZEL_ALAN_19", entity.ISM_OZEL_ALAN_19);
 						prms.Add("@ISM_OZEL_ALAN_20", entity.ISM_OZEL_ALAN_20);
+						prms.Add("@ISM_NOT", entity.ISM_NOT);
 						klas.cmd(query, prms.PARAMS);
 
 						#endregion
