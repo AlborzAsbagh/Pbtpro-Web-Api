@@ -481,7 +481,7 @@ namespace WebApiNew.Controllers
 
 		[Route("api/AddUpdateIsEmriKontrolList")]
 		[HttpPost]
-		public object KontrolListKaydet([FromBody] IsEmriKontrolList entity, long isEmriId = 0)
+		public object KontrolListKaydet([FromBody] IsEmriKontrolListWebVersion entity, long isEmriId = 0)
 		{
 			string plainText, rtfText;
 			string durum = "";
@@ -1206,61 +1206,14 @@ namespace WebApiNew.Controllers
 
 		[Route("api/FetchIsEmriKontrolList")]
 		[HttpGet]
-		public List<IsEmriKontrolList> FetchIsEmriKontrolList([FromUri] int isemriID)
+		public List<IsEmriKontrolListWebVersion> FetchIsEmriKontrolList([FromUri] int isemriID)
 		{
-			string rtfText, plainText;
-
-			prms.Clear();
-			prms.Add("ISM_ID", isemriID);
-			string sql = "select * from orjin.VW_ISEMRI_KONTROLLIST where DKN_ISEMRI_ID = @ISM_ID";
-			List<IsEmriKontrolList> listem = new List<IsEmriKontrolList>();
-			DataTable dt = klas.GetDataTable(sql, prms.PARAMS);
-
-			for (int i = 0; i < dt.Rows.Count; i++)
+			string sql = "select * from orjin.VW_ISEMRI_KONTROLLIST where DKN_ISEMRI_ID = @isemriID";
+			List<IsEmriKontrolListWebVersion> listem = new List<IsEmriKontrolListWebVersion>();
+			using (var cnn = klas.baglan())
 			{
-				IsEmriKontrolList entity = new IsEmriKontrolList();
-				entity.TB_ISEMRI_KONTROLLIST_ID = Convert.ToInt32(dt.Rows[i]["TB_ISEMRI_KONTROLLIST_ID"]);
-				entity.DKN_SIRANO = dt.Rows[i]["DKN_SIRANO"] != DBNull.Value ? dt.Rows[i]["DKN_SIRANO"].ToString() : "";
-				entity.DKN_TANIM = dt.Rows[i]["DKN_TANIM"] != DBNull.Value ? dt.Rows[i]["DKN_TANIM"].ToString() : "";
-				entity.DKN_MALIYET = Convert.ToDouble(dt.Rows[i]["DKN_MALIYET"]);
-				entity.DKN_ISEMRI_ID = Convert.ToInt32(dt.Rows[i]["DKN_ISEMRI_ID"]);
-				entity.DKN_YAPILDI = Convert.ToBoolean(dt.Rows[i]["DKN_YAPILDI"]);
-				entity.DKN_YAPILDI_SURE = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_SURE"]);
-				entity.DKN_YAPILDI_PERSONEL_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_PERSONEL_ID"]);
-				entity.DKN_YAPILDI_ATOLYE_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_ATOLYE_ID"]);
-				entity.DKN_YAPILDI_MESAI_KOD_ID = Convert.ToInt32(dt.Rows[i]["DKN_YAPILDI_MESAI_KOD_ID"]);
-				entity.DKN_VARDIYA_TANIM = (dt.Rows[i]["DKN_VARDIYA_TANIM"]).ToString();
-
-				if (dt.Rows[i]["DKN_YAPILDI_TARIH"] != DBNull.Value)
-					entity.DKN_YAPILDI_TARIH = (DateTime)dt.Rows[i]["DKN_YAPILDI_TARIH"];
-				else
-					entity.DKN_YAPILDI_TARIH = null;
-
-				if (dt.Rows[i]["DKN_BITIS_TARIH"] != DBNull.Value)
-					entity.DKN_BITIS_TARIH = (DateTime)dt.Rows[i]["DKN_BITIS_TARIH"];
-				else
-					entity.DKN_BITIS_TARIH = null;
-
-				entity.DKN_YAPILDI_SAAT = dt.Rows[i]["DKN_YAPILDI_SAAT"] != DBNull.Value ? dt.Rows[i]["DKN_YAPILDI_SAAT"].ToString() : "";
-				entity.DKN_PERSONEL_ISIM = dt.Rows[i]["DKN_PERSONEL_ISIM"] != DBNull.Value ? dt.Rows[i]["DKN_PERSONEL_ISIM"].ToString() : "";
-				entity.DKN_ATOLYE_TANIM = dt.Rows[i]["DKN_ATOLYE_TANIM"] != DBNull.Value ? dt.Rows[i]["DKN_ATOLYE_TANIM"].ToString() : "";
-				entity.DKN_BITIS_SAAT = dt.Rows[i]["DKN_BITIS_SAAT"] != DBNull.Value ? dt.Rows[i]["DKN_BITIS_SAAT"].ToString() : "";
-
-				if (dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value && dt.Rows[i]["DKN_ACIKLAMA"].ToString().StartsWith(@"{\rtf"))
-				{
-
-					System.Windows.Forms.RichTextBox rtBox = new System.Windows.Forms.RichTextBox();
-					rtfText = dt.Rows[i]["DKN_ACIKLAMA"].ToString();
-					rtBox.Rtf = rtfText;
-					plainText = rtBox.Text;
-					entity.DKN_ACIKLAMA = plainText;
-				}
-				else { entity.DKN_ACIKLAMA = dt.Rows[i]["DKN_ACIKLAMA"] != DBNull.Value ? dt.Rows[i]["DKN_ACIKLAMA"].ToString() : ""; }
-
-
-				listem.Add(entity);
+				listem = cnn.Query<IsEmriKontrolListWebVersion>(sql, new { @isemriID = isemriID }).ToList();
 			}
-
 			return listem;
 		}
 
