@@ -601,6 +601,7 @@ namespace WebApiNew.Controllers
                                       ,ISM_OZEL_ALAN_20
                                       ,ISM_IS_SONUC
                                       ,ISM_NOT
+                                      ,ISM_MAKINE_GUVENLIK_NOTU
 )
                                     VALUES( @ISM_ISEMRI_NO
                                       ,@ISM_MAKINE_ID   
@@ -685,6 +686,7 @@ namespace WebApiNew.Controllers
                                       ,@ISM_OZEL_ALAN_20
                                       ,@ISM_IS_SONUC
                                       ,@ISM_NOT
+                                      ,@ISM_MAKINE_GUVENLIK_NOTU
 )";
 
                         prms.Add("@ISM_ISEMRI_NO", entity.ISM_ISEMRI_NO);
@@ -770,6 +772,7 @@ namespace WebApiNew.Controllers
                         prms.Add("ISM_OZEL_ALAN_20", entity.ISM_OZEL_ALAN_20);
                         prms.Add("ISM_IS_SONUC", entity.ISM_IS_SONUC);
                         prms.Add("ISM_NOT", entity.ISM_NOT);
+                        prms.Add("ISM_MAKINE_GUVENLIK_NOTU", entity.ISM_MAKINE_GUVENLIK_NOTU);
                         await cnn.ExecuteAsync(sql, prms);
 
                         IsEmri drSonIsEmri = await cnn.QueryFirstAsync<IsEmri>("SELECT TOP 1 * FROM orjin.TB_ISEMRI ORDER BY TB_ISEMRI_ID DESC");

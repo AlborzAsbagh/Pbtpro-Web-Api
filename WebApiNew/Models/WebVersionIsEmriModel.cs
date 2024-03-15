@@ -35,7 +35,7 @@ namespace WebApiNew.Models
 		public int DURUS { get; set; } 
 
 		[DataMember]
-		public string ISM_NOT { get; set; } 
+		public string ISM_IC_NOT { get; set; } 
 
 		[DataMember]
 		public DateTime? DUZENLEME_TARIH { get; set; } 
@@ -365,7 +365,7 @@ namespace WebApiNew.Models
 		public int GUNCEL_SAYAC_DEGER { get; set; } 
 
 		[DataMember]
-		public string ISM_ICERDEKI_NOT { get; set; }
+		public string ISM_DIS_NOT { get; set; }
 
 		[DataMember]
 		public string ISM_TIP_RENK { get; set; }
