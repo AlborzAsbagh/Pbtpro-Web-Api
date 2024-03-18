@@ -10,7 +10,7 @@ using WebApiNew.Models;
 
 namespace WebApiNew.Controllers
 {
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class IsTalepParametreController : ApiController
 	{
 		Util klas = new Util();

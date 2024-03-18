@@ -13,7 +13,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class GenelListeController : ApiController
     {
         List<Prm> parametreler = new List<Prm>();
@@ -137,9 +137,10 @@ namespace WebApiNew.Controllers
         }
         [Route("api/Vardiyalar")]
         [HttpGet]
-        public IEnumerable<Vardiya> Vardiyalar([FromUri]int userId)
+        public IEnumerable<Vardiya> Vardiyalar()
         {
-            var klas = new Util();
+            int userId = UserInfo.USER_ID;
+			var klas = new Util();
             using (var conn=klas.baglan())
             {
                return conn.Query<Vardiya>("SELECT * FROM orjin.TB_VARDIYA WHERE orjin.UDF_LOKASYON_YETKI_KONTROL(VAR_LOKASYON_ID, @KULLANICI_ID) = 1 ", new {KULLANICI_ID = userId});
@@ -571,8 +572,9 @@ SELECT * FROM MTABLE WHERE RN > @FROM AND RN <= @TO;
 
         [Route("api/GetFirmaList")]
         [HttpGet]
-        public Object GetFirmaList([FromUri] int userId, [FromUri] int pagingDeger, [FromUri] string search = "")
+        public Object GetFirmaList([FromUri] int pagingDeger, [FromUri] string search = "")
         {
+            int userId = UserInfo.USER_ID;
 			var util = new Util();
             int pageSize = 0;
 			int pagingIlkDeger = pagingDeger == 1 ? 1 : ((pagingDeger * 10) - 9);

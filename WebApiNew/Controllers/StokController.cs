@@ -15,7 +15,7 @@ using System.Data.SqlClient;
 namespace WebApiNew.Controllers
 {
 
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class StokController : ApiController
     {
         Parametreler prms = new Parametreler();

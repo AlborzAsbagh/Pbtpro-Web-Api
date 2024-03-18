@@ -13,7 +13,7 @@ using WebApiNew.Utility.Abstract;
 namespace WebApiNew.Controllers
 {
 
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class OtonomBakimController : ApiController
     {
         private readonly ILogger _logger;
@@ -25,10 +25,11 @@ namespace WebApiNew.Controllers
 
         [HttpGet]
         [Route("api/MakineBakim/GetByMakine")]
-        public List<MakineBakim> GetMakineBakims([FromUri] int kllId, [FromUri] int makineId ,[FromUri] int? prsId=0)
+        public List<MakineBakim> GetMakineBakims( [FromUri] int makineId ,[FromUri] int? prsId=0)
         {
-            #region sql
-            var sql = @"SELECT TB_MAKINE_BAKIM_ID
+            int kllId = UserInfo.USER_ID;
+			#region sql
+			var sql = @"SELECT TB_MAKINE_BAKIM_ID
       ,MAB_MAKINE_ID
       ,MAB_BAKIM_ID
       ,MAB_DEGISTIREN_ID

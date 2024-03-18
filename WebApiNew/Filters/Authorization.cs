@@ -1,165 +1,96 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using WebApiNew.Controllers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WebApiNew.Filters
 {
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
-    public class BasicAuthenticationFilter : AuthorizationFilterAttribute
-    {
-        bool Active = true;
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+	public class JwtAuthenticationFilter : AuthorizationFilterAttribute
+	{
+		public override void OnAuthorization(HttpActionContext actionContext)
+		{
+			if (SkipAuthorization(actionContext)) return;
 
-        public BasicAuthenticationFilter()
-        { }
+			var principal = ParseJwtToken(actionContext);
+			if (principal == null)
+			{
+				actionContext.Response = actionContext.Request.CreateResponse(System.Net.HttpStatusCode.Unauthorized , new {status_code = 401 , 
+					status = "Token has expired or is not valid ! "});
+				return;
+			}
 
-        /// <summary>
-        /// Overriden constructor to allow explicit disabling of this
-        /// filter's behavior. Pass false to disable (same as no filter
-        /// but declarative)
-        /// </summary>
-        /// <param name="active"></param>
-        public BasicAuthenticationFilter(bool active)
-        {
-            Active = active;
-        }
+			Thread.CurrentPrincipal = principal;
+			if (HttpContext.Current != null)
+			{
+				HttpContext.Current.User = principal;
+			}
 
+			base.OnAuthorization(actionContext);
+		}
 
-        /// <summary>
-        /// Override to Web API filter method to handle Basic Auth check
-        /// </summary>
-        /// <param name="actionContext"></param>
-        public override void OnAuthorization(HttpActionContext actionContext)
-        {
-            if (SkipAuthorization(actionContext)) return;
-            if (Active)
-            {
-                var identity = ParseAuthorizationHeader(actionContext);
-                if (identity == null)
-                {
-                    Challenge(actionContext);
-                    return;
-                }
+		protected virtual ClaimsPrincipal ParseJwtToken(HttpActionContext actionContext)
+		{
+			var authHeader = actionContext.Request.Headers.Authorization;
+			if (authHeader == null || authHeader.Scheme != "Bearer")
+				return null;
 
+			var token = authHeader.Parameter;
+			if (string.IsNullOrEmpty(token))
+				return null;
 
-                if (!OnAuthorizeUser(identity.Name, identity.Password, actionContext))
-                {
-                    Challenge(actionContext);
-                    return;
-                }
+			try
+			{
+				var tokenHandler = new JwtSecurityTokenHandler();
+				var validationParameters = new TokenValidationParameters
+				{
+					ValidateIssuer = true,
+					ValidIssuer = "PbtProIssuer", 
+					ValidateAudience = true,
+					ValidAudience = "PbtProAudience", 
+					ValidateLifetime = true,
+					ValidateIssuerSigningKey = true,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is my custom Secret key for authentication")), 
+					ClockSkew = TimeSpan.Zero
+				};
 
-                var principal = new GenericPrincipal(identity, null);
+				SecurityToken validatedToken;
+				var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
 
-                Thread.CurrentPrincipal = principal;
+				return principal;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
 
-                // inside of ASP.NET this is required
-                //if (HttpContext.Current != null)
-                //    HttpContext.Current.User = principal;
+		private static bool SkipAuthorization(HttpActionContext actionContext)
+		{
+			return actionContext.ActionDescriptor.GetCustomAttributes<System.Web.Http.AllowAnonymousAttribute>().Any()
+				   || actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<System.Web.Http.AllowAnonymousAttribute>().Any();
+		}
 
-                base.OnAuthorization(actionContext);
-            }
-        }
-
-        /// <summary>
-        /// Base implementation for user authentication - you probably will
-        /// want to override this method for application specific logic.
-        /// 
-        /// The base implementation merely checks for username and password
-        /// present and set the Thread principal.
-        /// 
-        /// Override this method if you want to customize Authentication
-        /// and store user data as needed in a Thread Principle or other
-        /// Request specific storage.
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
-        /// <param name="actionContext"></param>
-        /// <returns></returns>
-        protected virtual bool OnAuthorizeUser(string username, string password, HttpActionContext actionContext)
-        {
-            if (string.IsNullOrEmpty(username))
-                return false;
-
-            return true;
-        }
-
-        /// <summary>
-        /// Parses the Authorization header and creates user credentials
-        /// </summary>
-        /// <param name="actionContext"></param>
-        protected virtual BasicAuthenticationIdentity ParseAuthorizationHeader(HttpActionContext actionContext)
-        {
-            string authHeader = null;
-            var auth = actionContext.Request.Headers.Authorization;
-            if (auth != null && auth.Scheme == "Basic")
-                authHeader = auth.Parameter;
-
-            if (string.IsNullOrEmpty(authHeader))
-                return null;
-
-            authHeader = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader));
-
-            var tokens = authHeader.Split(':');
-            if (tokens.Length < 2)
-                return null;
-
-            return new BasicAuthenticationIdentity(tokens[0], tokens[1]);
-        }
-
-
-        /// <summary>
-        /// Send the Authentication Challenge request
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="actionContext"></param>
-        void Challenge(HttpActionContext actionContext)
-        {
-            var host = actionContext.Request.RequestUri.DnsSafeHost;
-            actionContext.Response = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized);
-            actionContext.Response.Headers.Add("WWW-Authenticate", $"Basic realm=\"{host}\"");
-        }
-        private static bool SkipAuthorization(HttpActionContext actionContext)
-        {
-            Contract.Assert(actionContext != null);
-            return actionContext.ActionDescriptor.GetCustomAttributes<System.Web.Http.AllowAnonymousAttribute>().Any()
-                       || actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<System.Web.Http.AllowAnonymousAttribute>().Any();
-        }
-
-    }
-
-    public class MyBasicAuthenticationFilter : BasicAuthenticationFilter
-    {
-
-        public MyBasicAuthenticationFilter()
-        { }
-
-        public MyBasicAuthenticationFilter(bool active) : base(active)
-        { }
-
-
-        protected override bool OnAuthorizeUser(string username, string password, HttpActionContext actionContext)
-        {
-            var user= new LoginController().CheckUser(username,password);
-            actionContext.ActionArguments.Add(C.KEY_USER,user);
-            return user != null;
-        }
-    }
-    public class BasicAuthenticationIdentity : GenericIdentity
-    {
-        public BasicAuthenticationIdentity(string name, string password)
-
-:           base(name, "Basic")
-        {
-            this.Password = password;
-        } /// 
-
-        /// Basic Auth Password for custom authentication ///  
-        public string Password { get; set; }
-    }   
-
+		public static string GetUserIdFromClaims()
+		{
+			var identity = HttpContext.Current.User.Identity as ClaimsIdentity;
+			if (identity != null)
+			{
+				var userIdClaim = identity.FindFirst("User Id");
+				if (userIdClaim != null)
+				{
+					return userIdClaim.Value;
+				}
+			}
+			return null;
+		}
+	}
 }

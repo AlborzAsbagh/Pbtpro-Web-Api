@@ -13,7 +13,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class SayimController : ApiController
     {
         Util _util = new Util();

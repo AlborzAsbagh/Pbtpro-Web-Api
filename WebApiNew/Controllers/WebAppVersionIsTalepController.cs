@@ -28,7 +28,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
 
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class WebAppVersionIsTalepController : ApiController
 	{
 		private readonly ILogger _logger;
@@ -37,6 +37,7 @@ namespace WebApiNew.Controllers
 		SqlCommand cmd = null;
 		Parametreler prms = new Parametreler();
 		List<Prm> parametreler = new List<Prm>();
+		YetkiController yetki = new YetkiController();
 
 		public WebAppVersionIsTalepController(ILogger logger)
 		{
@@ -155,6 +156,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddIsTalep([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.IS_TALEPLERI_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -164,7 +168,7 @@ namespace WebApiNew.Controllers
 					var isemritipId = cnn.QueryFirstOrDefault<int>("SELECT TOP 1 ISP_ISEMRI_TIPI_ID FROM orjin.TB_IS_TALEBI_PARAMETRE");
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_IS_TALEBI  ( IST_OLUSTURMA_TARIH , IST_ISEMRI_TIP_ID , ";
+						query = " insert into orjin.TB_IS_TALEBI  ( IST_OLUSTURMA_TARIH , IST_ISEMRI_TIP_ID , IST_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -172,7 +176,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {isemritipId} ,";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {isemritipId} , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -221,6 +225,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateIsTalep([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.IS_TALEPLERI_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -238,7 +245,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , IST_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_IS_TALEP_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TALEP_ID"))}";
 
 						await cnn.ExecuteAsync(query);
@@ -290,14 +297,14 @@ namespace WebApiNew.Controllers
                     ITL_OLUSTURAN_ID ) values (";
 
 			isTalepLogQuery += $" {entity.TB_IS_TALEP_ID} , ";
-			isTalepLogQuery += $" {entity.KLL_ID} , ";
+			isTalepLogQuery += $" {UserInfo.USER_ID} , ";
 			isTalepLogQuery += $" '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , "; // Changed date format
 			isTalepLogQuery += $" '{DateTime.Now.ToString("HH:mm:ss")}' , ";
 			isTalepLogQuery += $" '{entity.ITL_ISLEM}' , ";
 			isTalepLogQuery += $" '{entity.ITL_ACIKLAMA}' , ";
 			isTalepLogQuery += $" '{entity.ITL_ISLEM_DURUM}' , ";
 			isTalepLogQuery += $" '{entity.ITL_TALEP_ISLEM}' , ";
-			isTalepLogQuery += $" {entity.KLL_ID} )";
+			isTalepLogQuery += $" {UserInfo.USER_ID} )";
 
 			try
 			{
@@ -426,9 +433,9 @@ namespace WebApiNew.Controllers
 				entity.ISM_KONU = Util.getFieldString(drTalep, "IST_TANIMI");
 				entity.ISM_ATOLYE_ID = isTalepToIsEmriModel.ATOLYE_ID;
 
-				entity.ISM_OLUSTURAN_ID = isTalepToIsEmriModel.USER_ID;
+				entity.ISM_OLUSTURAN_ID = UserInfo.USER_ID;
 				entity.ISM_ACIKLAMA = String.Format("'{0}' koldu iş talebi", drTalep["IST_KOD"].ToString());
-				await ismCont.Post(entity, isTalepToIsEmriModel.USER_ID);
+				await ismCont.Post(entity, UserInfo.USER_ID);
 				parametreler.Clear();
 				int _isemriID = Convert.ToInt32(klas.GetDataCell("SELECT MAX(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI", parametreler));
 				// iş talep durumu değiştiriliyor.
@@ -449,7 +456,7 @@ namespace WebApiNew.Controllers
 						IsEmriPersonel ismPersonel = new IsEmriPersonel();
 						ismPersonel.IDK_ISEMRI_ID = _isemriID;
 						ismPersonel.IDK_REF_ID = i;
-						ismPersonel.IDK_OLUSTURAN_ID = isTalepToIsEmriModel.USER_ID;
+						ismPersonel.IDK_OLUSTURAN_ID = UserInfo.USER_ID;
 						ismCont.PersonelListKaydet(ismPersonel);
 					}
 				}
@@ -484,13 +491,13 @@ namespace WebApiNew.Controllers
 					prms.Clear();
 
 					prms.Add("ITL_IS_TANIM_ID", isTalepToIsEmriModel.TALEP_ID);
-					prms.Add("ITL_KULLANICI_ID", isTalepToIsEmriModel.USER_ID);
+					prms.Add("ITL_KULLANICI_ID", UserInfo.USER_ID);
 					prms.Add("ITL_TARIH", DateTime.Now);
 					prms.Add("ITL_SAAT", DateTime.Now.ToString(C.DB_TIME_FORMAT));
 					if (isTalepToIsEmriModel.ATOLYE_ID > 0)
 					{
 						AtolyeController atlCont = new AtolyeController();
-						string atolyeTanim = atlCont.AtolyeListesi(isTalepToIsEmriModel.USER_ID).FirstOrDefault(a => a.TB_ATOLYE_ID == isTalepToIsEmriModel.ATOLYE_ID).ATL_TANIM;
+						string atolyeTanim = atlCont.AtolyeListesi().FirstOrDefault(a => a.TB_ATOLYE_ID == isTalepToIsEmriModel.ATOLYE_ID).ATL_TANIM;
 						prms.Add("ITL_ISLEM", "Atölye Ataması");
 						prms.Add("ITL_TALEP_ISLEM", "Atölye Ataması");
 						prms.Add("ITL_ACIKLAMA", String.Format("Atölye: {0}  İş Emri Numarası: {1}", atolyeTanim, entity.ISM_ISEMRI_NO));
@@ -502,7 +509,7 @@ namespace WebApiNew.Controllers
 						prms.Add("ITL_ACIKLAMA", String.Format("Teknisyen : {0} İş Emri Numarası: {1}", PRS_ISIM, entity.ISM_ISEMRI_NO));
 					}
 					prms.Add("ITL_ISLEM_DURUM", "DEVAM EDIYOR");
-					prms.Add("ITL_OLUSTURAN_ID", isTalepToIsEmriModel.USER_ID);
+					prms.Add("ITL_OLUSTURAN_ID", UserInfo.USER_ID);
 					prms.Add("ITL_OLUSTURMA_TARIH", DateTime.Now);
 					klas.cmd(query, prms.PARAMS);
 				}

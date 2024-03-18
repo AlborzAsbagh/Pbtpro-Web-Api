@@ -7,7 +7,7 @@ using WebApiNew.Filters;
 
 namespace WebApiNew.Controllers
 {
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class WebDashboardController : ApiController
 	{
 		Util klas = new Util();

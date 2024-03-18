@@ -12,7 +12,7 @@ using WebApiNew.Filters;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class MknLokasyonLogController : ApiController
     {
         private static readonly int TAB_ONAYLANAN = 1, TAB_ONAY_BEKLEYEN = 0;

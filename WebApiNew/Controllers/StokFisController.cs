@@ -19,7 +19,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class StokFisController : ApiController
     {
         Util klas = new Util();

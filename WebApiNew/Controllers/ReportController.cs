@@ -14,11 +14,11 @@ using WebApiNew.Filters;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class ReportController : Controller
     {       
 
-        [MyBasicAuthenticationFilter]
+        [JwtAuthenticationFilter]
         public ActionResult Index(string ismno, int frmid = 1)
         {
 

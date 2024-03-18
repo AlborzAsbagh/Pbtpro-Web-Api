@@ -11,7 +11,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class MakineController : ApiController
     {
         Util klas = new Util();

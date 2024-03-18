@@ -10,10 +10,11 @@ using WebApiNew.Models;
 
 namespace WebApiNew.Controllers
 {
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class LokasyonController : ApiController
 	{
 		Util klas = new Util();
+		YetkiController yetki = new YetkiController();
 		string query = "";
 		public List<Lokasyon> Get([FromUri] int ID)
 		{
@@ -110,6 +111,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddLokasyon([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.LOKASYON_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -117,7 +121,7 @@ namespace WebApiNew.Controllers
 				{
 					if(entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_LOKASYON  ( LOK_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_LOKASYON  ( LOK_OLUSTURMA_TARIH , LOK_OLUSTURAN_ID , ";
 						foreach(var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -125,7 +129,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -153,6 +157,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> LokasyonGuncelle([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.LOKASYON_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -170,7 +177,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , LOK_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , LOK_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , LOK_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_LOKASYON_ID = {Convert.ToInt32(entity.GetValue("TB_LOKASYON_ID"))}";
 
 						await cnn.ExecuteAsync(query);
@@ -192,14 +199,14 @@ namespace WebApiNew.Controllers
 		//Get Lokasyon List For Web App ( Lokasyon Sayfasi Icin )
 		[Route("api/GetLokasyonList")]
 		[HttpGet]
-		public object GetLokasyonList([FromUri] int ID)
+		public object GetLokasyonList()
 		{
 			Util klas = new Util();
 			List<LokasyonWebAppModel> listem = new List<LokasyonWebAppModel>();
 			string query = @"select * from orjin.VW_LOKASYON where orjin.UDF_LOKASYON_YETKI_KONTROL(TB_LOKASYON_ID,@KUL_ID) = 1";
 			using (var conn = klas.baglan())
 			{
-				listem = conn.Query<LokasyonWebAppModel>(query, new { @KUL_ID = ID }).ToList();
+				listem = conn.Query<LokasyonWebAppModel>(query, new { @KUL_ID = UserInfo.USER_ID }).ToList();
 			}
 			return listem;
 		}
@@ -231,7 +238,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_LOKASYON_TIP  ( LOT_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_LOKASYON_TIP  ( LOT_OLUSTURMA_TARIH , LOT_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -239,7 +246,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID} ,";
 						count = 0;
 
 						foreach (var item in entity)
@@ -285,7 +292,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , LOT_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , LOT_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , LOT_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_LOKASYON_TIP_ID = {Convert.ToInt32(entity.GetValue("TB_LOKASYON_TIP_ID"))}";
 
 						await cnn.ExecuteAsync(query);

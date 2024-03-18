@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
@@ -26,14 +28,14 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
 
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class WebAppVersionMakineController : ApiController
 	{
 		Util klas = new Util();
 		string query = "";
 		SqlCommand cmd = null;
 		Parametreler prms = new Parametreler();
-
+		YetkiController yetki = new YetkiController();
 
 		[Route("api/GetMakineFullList")]
 		[HttpPost]
@@ -123,8 +125,12 @@ namespace WebApiNew.Controllers
 		//Makine Ekle 
 		[Route("api/AddMakine")]
 		[HttpPost]
-		public async Task<Object> Post([FromBody] JObject entity , [FromUri] int ID)
+		public async Task<Object> Post([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.MAKINE_TANIMLARI))
+			
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add !" });
+			
 			int count = 0;
 			try
 			{
@@ -132,26 +138,20 @@ namespace WebApiNew.Controllers
 				{
 					if(entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_MAKINE ( MKN_OLUSTURMA_TARIH ,";
+						query = " insert into orjin.TB_MAKINE ( MKN_OLUSTURMA_TARIH , MKN_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
-							//if (item.Key.Equals("MakineSayacList") ||
-							//		item.Key.Equals("MakineOtonomBakimList") ||
-							//			item.Key.Equals("MakinePeriyodikBakimList")) continue;
 
 							if (count < entity.Count-1) query += $" {item.Key} , ";
 							else query += $" {item.Key} ";
 							count ++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID},";
 						count = 0;
 
 						foreach (var item in entity)
 						{
-							//if (item.Key.Equals("MakineSayacList") || 
-							//		item.Key.Equals("MakineOtonomBakimList") || 
-							//			item.Key.Equals("MakinePeriyodikBakimList")) continue;
 
 							if (count < entity.Count - 1) query += $" '{item.Value}' , ";
 							else query += $" '{item.Value}' ";
@@ -159,21 +159,6 @@ namespace WebApiNew.Controllers
 						}
 						query += " ) ";
 						await cnn.ExecuteAsync(query);
-						//int makineId = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_MAKINE_ID) FROM orjin.TB_MAKINE");
-
-
-						//if (entity["MakineSayacList"] is JArray makineSayacList && makineSayacList.Count > 0)
-						//{
-						//	Bildirim bldr = new Bildirim();
-
-						//	for(int i = 0; i < makineSayacList.Count; i++) 
-						//	{
-						//		Sayac sayac = JsonConvert.DeserializeObject<Sayac>(makineSayacList[i].ToString());
-						//		bldr = YeniSayacEkle(sayac, makineId);
-						//		if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
-						//	}
-							
-						//}
 						
 					}
 				}
@@ -190,8 +175,12 @@ namespace WebApiNew.Controllers
 		//Makine Guncelle 
 		[Route("api/UpdateMakine")]
 		[HttpPost]
-		public async Task<Object> MakineGuncelle([FromBody] JObject entity, [FromUri] int ID)
+		public async Task<Object> MakineGuncelle([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.MAKINE_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -202,34 +191,17 @@ namespace WebApiNew.Controllers
 						query = " update orjin.TB_MAKINE set ";
 						foreach (var item in entity)
 						{
-							//if (item.Key.Equals("MakineSayacList") ||
-							//		item.Key.Equals("MakineOtonomBakimList") ||
-							//			item.Key.Equals("MakinePeriyodikBakimList") || 
-													if(item.Key.Equals("TB_MAKINE_ID")) continue;
+							
+							if(item.Key.Equals("TB_MAKINE_ID")) continue;
 
 							if (count < entity.Count - 2) query += $" {item.Key} = '{item.Value}', ";
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , MKN_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , MKN_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , MKN_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_MAKINE_ID = {Convert.ToInt32(entity.GetValue("TB_MAKINE_ID"))}";
 
 						await cnn.ExecuteAsync(query);
-						//int makineId = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_MAKINE_ID) FROM orjin.TB_MAKINE");
-
-
-						//if (entity["MakineSayacList"] is JArray makineSayacList && makineSayacList.Count > 0)
-						//{
-						//	Bildirim bldr = new Bildirim();
-
-						//	for (int i = 0; i < makineSayacList.Count; i++)
-						//	{
-						//		Sayac sayac = JsonConvert.DeserializeObject<Sayac>(makineSayacList[i].ToString());
-						//		bldr = YeniSayacEkle(sayac, makineId);
-						//		if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
-						//	}
-
-						//}
 
 					}
 					else return Json(new { has_error = true, status_code = 400, status = "Missing coming data." });
@@ -389,7 +361,7 @@ namespace WebApiNew.Controllers
 				prms.Clear();
 				prms.Add("@MDL_MARKA_ID",entity.MDL_MARKA_ID);
 				prms.Add("@MDL_MODEL",entity.MDL_MODEL);
-				prms.Add("@MDL_OLUSTURAN_ID",entity.MDL_OLUSTURAN_ID);
+				prms.Add("@MDL_OLUSTURAN_ID", UserInfo.USER_ID);
 				prms.Add("@MDL_OLUSTURMA_TARIH",DateTime.Now);
 				prms.Add("@MDL_DEGISTIREN_ID",0);
 				prms.Add("@MDL_DEGISTIRME_TARIH",null);
@@ -427,7 +399,7 @@ namespace WebApiNew.Controllers
 							";
 				prms.Clear();
 				prms.Add("@MRK_MARKA", entity.MRK_MARKA);
-				prms.Add("@MRK_OLUSTURAN_ID", entity.MRK_OLUSTURAN_ID);
+				prms.Add("@MRK_OLUSTURAN_ID", UserInfo.USER_ID);
 				prms.Add("@MRK_OLUSTURMA_TARIH", DateTime.Now);
 				prms.Add("@MRK_DEGISTIREN_ID", 0);
 				prms.Add("@MRK_DEGISTIRME_TARIH", null);

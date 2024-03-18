@@ -11,7 +11,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
 
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class OzelAlanlarController : ApiController
 	{
 		List<Prm> parametreler = new List<Prm>();

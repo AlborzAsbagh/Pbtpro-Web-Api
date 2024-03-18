@@ -14,7 +14,7 @@ using WebApiNew.Filters;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class DosyaController : ApiController
     {
         public IEnumerable<Dosya> Get([FromUri] int start, [FromUri] int end)

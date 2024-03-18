@@ -9,7 +9,7 @@ using WebApiNew.Models;
 
 namespace WebApiNew.Controllers
 {
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class KodController : ApiController
     {
         Util klas = new Util();
@@ -54,7 +54,6 @@ namespace WebApiNew.Controllers
             
             return listem;
         }
-
 
 		[Route("api/AddKodList")]
 		[HttpPost]

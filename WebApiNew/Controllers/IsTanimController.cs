@@ -14,12 +14,13 @@ using System.Threading.Tasks;
 namespace WebApiNew.Controllers
 {
 
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class IsTanimController : ApiController
     {
         Util klas = new Util();
         Parametreler prms = new Parametreler();
         String query = "";
+		YetkiController yetki = new YetkiController();
 
         private readonly ILogger _logger;
         private readonly System.Windows.Forms.RichTextBox RTB = new System.Windows.Forms.RichTextBox();
@@ -244,6 +245,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddBakim([FromBody] JObject entity)
 		{
+			if(!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.BAKIM_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -251,7 +256,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_IS_TANIM  ( IST_OLUSTURMA_TARIH , IST_DURUM , ";
+						query = " insert into orjin.TB_IS_TANIM  ( IST_OLUSTURMA_TARIH , IST_DURUM , IST_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -259,7 +264,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , 'BAKIM' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , 'BAKIM' , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -287,6 +292,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateBakim([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -304,7 +313,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , IST_DEGISTIREN_ID = {UserInfo.USER_ID}";
 						query += $" where TB_IS_TANIM_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_ID"))}";
 
 						await cnn.ExecuteAsync(query);
@@ -621,6 +630,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddAriza([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -628,7 +641,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_IS_TANIM  ( IST_OLUSTURMA_TARIH , IST_DURUM , ";
+						query = " insert into orjin.TB_IS_TANIM  ( IST_OLUSTURMA_TARIH , IST_DURUM , IST_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -636,7 +649,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , 'ARIZA' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , 'ARIZA' , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -664,6 +677,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateAriza([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -681,7 +698,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , IST_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , IST_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_IS_TANIM_ID = {Convert.ToInt32(entity.GetValue("TB_IS_TANIM_ID"))}";
 
 						await cnn.ExecuteAsync(query);

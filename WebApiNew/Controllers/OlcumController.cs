@@ -12,7 +12,7 @@ using WebApiNew.Models;
 
 namespace WebApiNew.Controllers
 {
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class OlcumController : ApiController
     {
 

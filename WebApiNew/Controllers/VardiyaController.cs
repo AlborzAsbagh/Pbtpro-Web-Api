@@ -16,11 +16,12 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
 
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class VardiyaController : ApiController
 	{
 		Util klas = new Util();
 		string query = "";
+		YetkiController yetki = new YetkiController();
 
 		[HttpGet]
 		[Route("api/GetVardiyaList")]
@@ -51,6 +52,9 @@ namespace WebApiNew.Controllers
 		[Route("api/AddVardiya")]
 		public async Task<object> AddVardiya(JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.VARDIYA_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -58,7 +62,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_VARDIYA ( VAR_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_VARDIYA ( VAR_OLUSTURMA_TARIH , VAR_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -66,7 +70,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID} ,";
 						count = 0;
 
 						foreach (var item in entity)
@@ -94,6 +98,9 @@ namespace WebApiNew.Controllers
 		[Route("api/UpdateVardiya")]
 		public async Task<object> UpdateVardiya(JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.VARDIYA_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -111,7 +118,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , VAR_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , VAR_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , VAR_DEGISTIREN_ID = {UserInfo.USER_ID}";
 						query += $" where TB_VARDIYA_ID = {Convert.ToInt32(entity.GetValue("TB_VARDIYA_ID"))}";
 
 						await cnn.ExecuteAsync(query);

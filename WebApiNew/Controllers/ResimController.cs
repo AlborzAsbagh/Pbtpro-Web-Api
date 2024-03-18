@@ -24,7 +24,7 @@ using WebApiNew.Utility.Abstract;
 namespace WebApiNew.Controllers
 {
 
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class ResimController : ApiController
     {
         private readonly ILogger _logger;

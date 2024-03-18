@@ -12,16 +12,18 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
 
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class AtolyeController : ApiController
 	{
 		Util klas = new Util();
+		YetkiController yetki = new YetkiController();
 		string query = "";
 
 		[Route("api/AtolyeList")]
 		[HttpGet]
-		public List<Atolye> AtolyeListesi(int kulID)
+		public List<Atolye> AtolyeListesi()
 		{
+			int kulID = UserInfo.USER_ID;
 			string query =
 				$" select * , orjin.UDF_KOD_TANIM(atl.ATL_ATOLYE_GRUP_ID) as ATL_GRUP_TANIM from orjin.TB_ATOLYE atl where orjin.UDF_ATOLYE_YETKI_KONTROL(TB_ATOLYE_ID, {kulID}) = 1 ";
 			List<Atolye> listem = new List<Atolye>();
@@ -44,6 +46,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddAtolye([FromBody] JObject entity)
 		{
+			if(!(Boolean) yetki.isAuthorizedToAdd(PagesAuthCodes.ATOLYE_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -51,7 +56,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_ATOLYE  ( ATL_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_ATOLYE  ( ATL_OLUSTURMA_TARIH , ATL_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -59,7 +64,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -87,6 +92,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateAtolye([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ATOLYE_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -104,7 +112,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , ATL_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , ATL_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ATL_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_ATOLYE_ID = {Convert.ToInt32(entity.GetValue("TB_ATOLYE_ID"))}";
 
 						await cnn.ExecuteAsync(query);

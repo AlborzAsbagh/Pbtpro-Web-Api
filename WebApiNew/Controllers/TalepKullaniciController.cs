@@ -7,7 +7,7 @@ using WebApiNew.Models;
 
 namespace WebApiNew.Controllers
 {
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class TalepKullaniciController : ApiController
     {
         Util klas = new Util();

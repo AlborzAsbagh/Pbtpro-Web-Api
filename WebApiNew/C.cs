@@ -1,5 +1,8 @@
 ﻿
 
+using System;
+using WebApiNew.Filters;
+
 namespace WebApiNew
 {
     public class C
@@ -27,4 +30,23 @@ namespace WebApiNew
         public static readonly int PERSONEL_BAKIM = 4;
         public static readonly int PERSONEL_SANTIYE = 5;
     }
+
+    public class UserInfo
+    {
+        public static readonly int USER_ID = Convert.ToInt32(JwtAuthenticationFilter.GetUserIdFromClaims());
+    }
+
+    public class PagesAuthCodes
+    {
+        public static readonly int MAKINE_TANIMLARI = 1001;
+        public static readonly int BAKIM_TANIMLARI = 2001;
+        public static readonly int ARIZA_TANIMLARI = 2002;
+        public static readonly int ISEMIRLERI_TANIMLARI = 2003;
+        public static readonly int ATOLYE_TANIMLARI = 9002;
+        public static readonly int PERSONEL_TANIMLARI = 9001;
+        public static readonly int IS_TALEPLERI_TANIMLARI = 10001;
+        public static readonly int LOKASYON_TANIMLARI = 1003;
+        public static readonly int VARDIYA_TANIMLARI = 30014;
+	}
+
 }

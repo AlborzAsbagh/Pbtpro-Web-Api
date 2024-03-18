@@ -10,7 +10,7 @@ using Dapper;
 
 namespace WebApiNew.Controllers
 {
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class indexController : ApiController
     {
         private readonly string key = "exp";

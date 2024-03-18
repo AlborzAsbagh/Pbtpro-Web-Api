@@ -16,7 +16,7 @@ using WebApiNew.Filters;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class MakineCalismaController : ApiController
     {
         [Route("api/getSantiyeCalismaAyarlari")]

@@ -12,12 +12,13 @@ using WebApiNew.Utility.Abstract;
 
 namespace WebApiNew.Controllers
 {
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class IsEmriController : ApiController
     {
         Util klas = new Util();
         List<Prm> parametreler = new List<Prm>();
         Parametreler prms = new Parametreler();
+        YetkiController yetki = new YetkiController();
         private readonly System.Windows.Forms.RichTextBox RTB = new System.Windows.Forms.RichTextBox();
         private readonly ILogger _logger;
 
@@ -501,9 +502,13 @@ namespace WebApiNew.Controllers
         }
 
         // iş emri ekle
-        public async Task<Bildirim> Post([FromBody] IsEmri entity, [FromUri] int ID , [FromUri] bool isWeb = false)
+        public async Task<object> Post([FromBody] IsEmri entity, [FromUri] int ID , [FromUri] bool isWeb = false)
         {
-            Bildirim bildirimEntity = new Bildirim();
+            if(!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add !" });
+
+			Bildirim bildirimEntity = new Bildirim();
             var util = new Util();
             var prms = new DynamicParameters();
             using (var cnn = util.baglan())
@@ -711,7 +716,7 @@ namespace WebApiNew.Controllers
                         prms.Add("@ISM_REF_ID", entity.ISM_REF_ID);
                         prms.Add("@ISM_REF_GRUP", entity.ISM_REF_GRUP);
                         prms.Add("@ISM_TIP_ID", entity.ISM_TIP_ID);
-                        prms.Add("@ISM_OLUSTURAN_ID", entity.ISM_OLUSTURAN_ID);
+                        prms.Add("@ISM_OLUSTURAN_ID", UserInfo.USER_ID);
                         prms.Add("@ISM_SURE_CALISMA", entity.ISM_SURE_CALISMA);
                         prms.Add("@ISM_OLUSTURMA_TARIH", DateTime.Now);
                         prms.Add("@ISM_DURUM_KOD_ID", entity.ISM_DURUM_KOD_ID);

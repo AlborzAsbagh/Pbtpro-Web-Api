@@ -11,10 +11,11 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class PersonelController : ApiController
     {
         Util klas = new Util();
+        YetkiController yetki = new YetkiController();
         string query = "";
 
         public List<Personel> Get([FromUri] int? lokasyonId = 0 , [FromUri] int? atolyeId = 0 , [FromUri] int? personelRol = 0)
@@ -101,6 +102,9 @@ namespace WebApiNew.Controllers
         [Route("api/AddPersonel")]
         public async Task<object> AddPersonel([FromBody] JObject entity) 
         {
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.PERSONEL_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add !" });
+
 			int count = 0;
 			try
 			{
@@ -108,7 +112,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_PERSONEL  ( PRS_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_PERSONEL  ( PRS_OLUSTURMA_TARIH , PRS_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -116,7 +120,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -143,6 +147,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> UpdatePersonel([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.PERSONEL_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -160,7 +167,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , PRS_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , PRS_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , PRS_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_PERSONEL_ID = {Convert.ToInt32(entity.GetValue("TB_PERSONEL_ID"))}";
 
 						await cnn.ExecuteAsync(query);
@@ -204,7 +211,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_PERSONEL_SERTIFIKA  ( PSE_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_PERSONEL_SERTIFIKA  ( PSE_OLUSTURMA_TARIH , PSE_OLUSTURAN_ID , ";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -212,7 +219,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , {UserInfo.USER_ID} , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -256,7 +263,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , PSE_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , PSE_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , PSE_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_PERSONEL_SERTIFIKA_ID = {Convert.ToInt32(entity.GetValue("TB_PERSONEL_SERTIFIKA_ID"))}";
 
 						await cnn.ExecuteAsync(query);
@@ -301,7 +308,7 @@ namespace WebApiNew.Controllers
 				{
 					if (entity != null && entity.Count > 0)
 					{
-						query = " insert into orjin.TB_PERSONEL_SANTIYE  ( PSS_OLUSTURMA_TARIH , ";
+						query = " insert into orjin.TB_PERSONEL_SANTIYE  ( PSS_OLUSTURMA_TARIH , PSS_OLUSTURAN_ID ,";
 						foreach (var item in entity)
 						{
 							if (count < entity.Count - 1) query += $" {item.Key} , ";
@@ -309,7 +316,7 @@ namespace WebApiNew.Controllers
 							count++;
 						}
 
-						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , ";
+						query += $" ) values ( '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , '{UserInfo.USER_ID}' , ";
 						count = 0;
 
 						foreach (var item in entity)
@@ -353,7 +360,7 @@ namespace WebApiNew.Controllers
 							else query += $" {item.Key} = '{item.Value}' ";
 							count++;
 						}
-						query += $" , PSS_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' ";
+						query += $" , PSS_DEGISTIRME_TARIH = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' , PSS_DEGISTIREN_ID = {UserInfo.USER_ID} ";
 						query += $" where TB_PERSONEL_SANTIYE_ID = {Convert.ToInt32(entity.GetValue("TB_PERSONEL_SANTIYE_ID"))}";
 
 						await cnn.ExecuteAsync(query);

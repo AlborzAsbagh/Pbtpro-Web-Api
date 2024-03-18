@@ -26,7 +26,7 @@ using WebApiNew.Utility.Abstract;
 
 namespace WebApiNew.Controllers
 {
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class WebAppVersionIsEmriController : ApiController
 	{
 		Util klas = new Util();
@@ -35,6 +35,7 @@ namespace WebApiNew.Controllers
 		string query = "";
 		SqlCommand cmd = null;
 		List<Prm> parametreler = new List<Prm>();
+		YetkiController yetki = new YetkiController();
 
 		public WebAppVersionIsEmriController(ILogger logger)
 		{
@@ -275,14 +276,14 @@ namespace WebApiNew.Controllers
 
 					prms.Clear();
 					prms.Add("ISL_ISEMRI_ID", entity.ISL_ISEMRI_ID);
-					prms.Add("ISL_KULLANICI_ID", entity.ISL_KULLANICI_ID);
+					prms.Add("ISL_KULLANICI_ID", UserInfo.USER_ID);
 					prms.Add("ISL_TARIH", DateTime.Now);
 					prms.Add("ISL_SAAT", DateTime.Now.ToString("HH:mm:ss"));
 					prms.Add("ISL_ISLEM", entity.ISL_ISLEM);
 					prms.Add("ISL_ACIKLAMA", entity.ISL_ACIKLAMA);
 					prms.Add("ISL_DURUM_ESKI_KOD_ID", entity.ISL_DURUM_ESKI_KOD_ID);
 					prms.Add("ISL_DURUM_YENI_KOD_ID", entity.ISL_DURUM_YENI_KOD_ID);
-					prms.Add("ISL_OLUSTURAN_ID", entity.ISL_OLUSTURAN_ID);
+					prms.Add("ISL_OLUSTURAN_ID", UserInfo.USER_ID);
 					prms.Add("ISL_OLUSTURMA_TARIH", DateTime.Now);
 					prms.Add("ISL_DEGISTIRME_TARIH", DateTime.Now);
 					prms.Add("TB_ISEMRI_ID", entity.ISL_ISEMRI_ID);
@@ -542,7 +543,7 @@ namespace WebApiNew.Controllers
 					prms.Add("DKN_SIRANO", entity.DKN_SIRANO);
 					prms.Add("DKN_YAPILDI", entity.DKN_YAPILDI);
 					prms.Add("DKN_TANIM", entity.DKN_TANIM);
-					prms.Add("DKN_OLUSTURAN_ID", entity.DKN_OLUSTURAN_ID);
+					prms.Add("DKN_OLUSTURAN_ID", UserInfo.USER_ID);
 					prms.Add("DKN_OLUSTURMA_TARIH", DateTime.Now);
 					prms.Add("DKN_YAPILDI_TARIH", entity.DKN_YAPILDI_TARIH);
 					prms.Add("DKN_BITIS_TARIH", entity.DKN_BITIS_TARIH);
@@ -579,7 +580,7 @@ namespace WebApiNew.Controllers
 					prms.Add("DKN_YAPILDI", entity.DKN_YAPILDI);
 					prms.Add("DKN_SIRANO", entity.DKN_SIRANO);
 					prms.Add("DKN_TANIM", entity.DKN_TANIM);
-					prms.Add("DKN_DEGISTIREN_ID", entity.DKN_OLUSTURAN_ID);
+					prms.Add("DKN_DEGISTIREN_ID", UserInfo.USER_ID);
 					prms.Add("DKN_DEGISTIRME_TARIH", DateTime.Now);
 					prms.Add("DKN_ACIKLAMA", plainText);
 					prms.Add("DKN_YAPILDI_MESAI_KOD_ID", entity.DKN_YAPILDI_MESAI_KOD_ID);
@@ -1053,7 +1054,7 @@ namespace WebApiNew.Controllers
 					prms.Clear();
 					prms.Add("@IAG_ISEMRI_ID", isEmriId);
 					prms.Add("@IAG_ARAC_GEREC_ID", item.IAG_ARAC_GEREC_ID);
-					prms.Add("@IAG_OLUSTURAN_ID", item.IAG_OLUSTURAN_ID);
+					prms.Add("@IAG_OLUSTURAN_ID", UserInfo.USER_ID);
 					prms.Add("@IAG_OLUSTURMA_TARIH", DateTime.Now);
 					prms.Add("@IAG_DEGISTIRME_TARIH", DateTime.Now);
 					#endregion
@@ -1308,6 +1309,10 @@ namespace WebApiNew.Controllers
 		[Route("api/UpdateIsEmri")]
 		public object UpdateIsEmri([FromBody] IsEmri entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			var util = new Util();
 			using (var cnn = util.baglan())
 			{
@@ -1426,7 +1431,7 @@ namespace WebApiNew.Controllers
 						prms.Add("@ISM_REF_ID", entity.ISM_REF_ID);
 						prms.Add("@ISM_REF_GRUP", entity.ISM_REF_GRUP);
 						prms.Add("@ISM_TIP_ID", entity.ISM_TIP_ID);
-						prms.Add("@ISM_DEGISTIREN_ID", entity.ISM_DEGISTIREN_ID);
+						prms.Add("@ISM_DEGISTIREN_ID", UserInfo.USER_ID);
 						prms.Add("@ISM_SURE_CALISMA", entity.ISM_SURE_CALISMA);
 						prms.Add("@ISM_DEGISTIRME_TARIH", DateTime.Now);
 						prms.Add("@ISM_DURUM_KOD_ID", entity.ISM_DURUM_KOD_ID);

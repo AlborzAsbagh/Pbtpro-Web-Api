@@ -16,7 +16,7 @@ namespace WebApiNew.Controllers
 	 */
 
 
-	[MyBasicAuthenticationFilter]
+	[JwtAuthenticationFilter]
 	public class NumaratorController : ApiController
 	{
 		Util klas = new Util();

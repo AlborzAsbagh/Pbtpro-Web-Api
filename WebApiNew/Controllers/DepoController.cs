@@ -8,7 +8,7 @@ using WebApiNew.Models;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class DepoController : ApiController
     {
         Util klas = new Util();
@@ -191,9 +191,10 @@ namespace WebApiNew.Controllers
 
 		[Route("api/GetDepo")]
 		[HttpGet]
-		public Object GetDepo([FromUri] int ID, [FromUri] int DEP_MODUL_NO)
+		public Object GetDepo([FromUri] int DEP_MODUL_NO)
 		{
 			List<DeopWebApp> listem = new List<DeopWebApp>();
+            int ID = UserInfo.USER_ID;
 			parametreler.Clear();
 			parametreler.Add(new Prm("TB_KULLANICI_ID", ID));
 			parametreler.Add(new Prm("DEP_MODUL_NO", DEP_MODUL_NO));

@@ -15,7 +15,7 @@ using WebApiNew.Filters;
 namespace WebApiNew.Controllers
 {
     
-    [MyBasicAuthenticationFilter]
+    [JwtAuthenticationFilter]
     public class YakitController : ApiController
     {
         Util klas = new Util();

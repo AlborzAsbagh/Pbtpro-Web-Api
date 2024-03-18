@@ -11,7 +11,10 @@ namespace WebApiNew.Models
         [DataMember]
         public int TB_KULLANICI_ID { get; set; }
 
-        [DataMember]
+		[DataMember]
+		public string AUTH_TOKEN { get; set; }
+
+		[DataMember]
         public int KLL_PERSONEL_ID { get; set; }
 
         [DataMember]
