@@ -502,7 +502,7 @@ namespace WebApiNew.Controllers
         }
 
         // iş emri ekle
-        public async Task<object> Post([FromBody] IsEmri entity, [FromUri] int ID , [FromUri] bool isWeb = false)
+        public async Task<object> Post([FromBody] IsEmri entity, [FromUri] bool isWeb = false)
         {
             if(!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
@@ -552,7 +552,6 @@ namespace WebApiNew.Controllers
                                       ,ISM_SAYAC_DEGER
                                       ,ISM_BILDIREN
                                       ,ISM_MAKINE_DURUM_KOD_ID
-                                      ,ISM_MAKINE_GUVENLIK_NOTU
                                       ,ISM_ACIKLAMA
                                       ,ISM_IS_TARIH
                                       ,ISM_IS_SAAT
@@ -637,7 +636,6 @@ namespace WebApiNew.Controllers
                                       ,@ISM_SAYAC_DEGER
                                       ,@ISM_BILDIREN
                                       ,@ISM_MAKINE_DURUM_KOD_ID
-                                      ,@ISM_MAKINE_GUVENLIK_NOTU
                                       ,@ISM_ACIKLAMA
                                       ,@ISM_IS_TARIH
                                       ,@ISM_IS_SAAT
@@ -777,7 +775,6 @@ namespace WebApiNew.Controllers
                         prms.Add("ISM_OZEL_ALAN_20", entity.ISM_OZEL_ALAN_20);
                         prms.Add("ISM_IS_SONUC", entity.ISM_IS_SONUC);
                         prms.Add("ISM_NOT", entity.ISM_NOT);
-                        prms.Add("ISM_MAKINE_GUVENLIK_NOTU", entity.ISM_MAKINE_GUVENLIK_NOTU);
                         await cnn.ExecuteAsync(sql, prms);
 
                         IsEmri drSonIsEmri = await cnn.QueryFirstAsync<IsEmri>("SELECT TOP 1 * FROM orjin.TB_ISEMRI ORDER BY TB_ISEMRI_ID DESC");
@@ -814,7 +811,7 @@ namespace WebApiNew.Controllers
 										isEmriMalzeme.IDM_TARIH = DateTime.Now;
 										isEmriMalzeme.IDM_SAAT = DateTime.Now.ToString(C.DB_TIME_FORMAT);
 										isEmriMalzeme.IDM_OLUSTURMA_TARIH = DateTime.Now;
-										isEmriMalzeme.IDM_OLUSTURAN_ID = ID;
+										isEmriMalzeme.IDM_OLUSTURAN_ID = UserInfo.USER_ID;
 										MalzemeListKaydet(isEmriMalzeme);
 									}
 								}

@@ -16,14 +16,14 @@ namespace WebApiNew.Controllers
 		Util klas = new Util();
 		YetkiController yetki = new YetkiController();
 		string query = "";
-		public List<Lokasyon> Get([FromUri] int ID)
+		public List<Lokasyon> Get()
 		{
 			Util klas = new Util();
 			List<Lokasyon> listem = new List<Lokasyon>();
 			string query = @"select * from orjin.TB_LOKASYON where orjin.UDF_LOKASYON_YETKI_KONTROL(TB_LOKASYON_ID,@KUL_ID) = 1";
 			using (var conn = klas.baglan())
 			{
-				listem = conn.Query<Lokasyon>(query, new { @KUL_ID = ID }).ToList();
+				listem = conn.Query<Lokasyon>(query, new { @KUL_ID = UserInfo.USER_ID }).ToList();
 			}
 			return listem;
 		}
@@ -231,6 +231,11 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddLokasyonTip([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.LOKASYON_TANIMLARI) || 
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.LOKASYON_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update or add !" });
+
 			int count = 0;
 			try
 			{
@@ -275,6 +280,11 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateLokasyonTip([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.LOKASYON_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.LOKASYON_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update or add !" });
+
 			int count = 0;
 			try
 			{

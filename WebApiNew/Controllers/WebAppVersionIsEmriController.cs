@@ -45,7 +45,7 @@ namespace WebApiNew.Controllers
 
 		[Route("api/GetIsEmriFullList")]
 		[HttpPost]
-		public Object GetIsEmriFullList([FromUri] int id, [FromUri] string parametre, [FromBody] JObject filtreler, [FromUri] int pagingDeger = 1)
+		public Object GetIsEmriFullList([FromUri] string parametre, [FromBody] JObject filtreler, [FromUri] int pagingDeger = 1)
 		{
 
 			List<WebVersionIsEmriModel> listem = new List<WebVersionIsEmriModel>();
@@ -484,6 +484,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object KontrolListKaydet([FromBody] IsEmriKontrolListWebVersion entity, long isEmriId = 0)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			string plainText, rtfText;
 			string durum = "";
 			try
@@ -605,6 +609,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object MalzemeListKaydet(IsEmriMalzeme entity, long isEmriId = 0)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			string durum = "";
 			try
 			{
@@ -787,6 +794,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object IsEmriDurusKaydet([FromBody] IsEmriDurus entity, long isEmriId = 0)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			string durum = "";
 			try
 			{
@@ -910,6 +920,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object PersonelListKaydetYeni(IsEmriPersonel entity, long isEmriId)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			string durum = "";
 			parametreler.Clear();
 			parametreler.Add(new Prm("IDK_ISEMRI_ID", isEmriId));
@@ -1034,6 +1047,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object AracGerecListKaydetYeni(List<IsEmriAracGerec> lsitem, long isEmriId)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			try
 			{
 				foreach(var  item in lsitem) 
@@ -1077,6 +1093,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object OlcumDegeriListKadetYeni(Olcum entity, long isEmriId)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			string durum = "";
 			string query = "";
 			try
@@ -1505,7 +1524,8 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-
+		[HttpPost]
+		[Route("api/StokHareketIslemi")]
 		private void StokHareketIslemi(IsEmriMalzeme entity)
 		{
 			try

@@ -14,6 +14,7 @@ namespace WebApiNew.Controllers
 	public class IsTalepParametreController : ApiController
 	{
 		Util klas = new Util();
+		YetkiController yetki = new YetkiController();
 		string query = "";
 		public List<IsTalepParametre> Get()
 		{
@@ -35,6 +36,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateIsTalepParametre([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.IS_TALEPLERI_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.IS_TALEPLERI_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add or update !" });
+
 			int count = 0;
 			try
 			{

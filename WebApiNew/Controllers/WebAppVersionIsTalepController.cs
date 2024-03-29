@@ -355,6 +355,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public object IsTalepIptalEtKapat([FromBody] List<IsTalepIptalKapatModel> entities)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.IS_TALEPLERI_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.IS_TALEPLERI_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add or update !" });
 			try
 			{
 				if(entities != null && entities.Count != 0)
@@ -435,7 +438,7 @@ namespace WebApiNew.Controllers
 
 				entity.ISM_OLUSTURAN_ID = UserInfo.USER_ID;
 				entity.ISM_ACIKLAMA = String.Format("'{0}' koldu iş talebi", drTalep["IST_KOD"].ToString());
-				await ismCont.Post(entity, UserInfo.USER_ID);
+				await ismCont.Post(entity);
 				parametreler.Clear();
 				int _isemriID = Convert.ToInt32(klas.GetDataCell("SELECT MAX(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI", parametreler));
 				// iş talep durumu değiştiriliyor.
@@ -529,6 +532,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> IsTalepToIsEmri([FromBody] List<IsTalepToIsEmriModel> entities)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.IS_TALEPLERI_TANIMLARI) || 
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.IS_TALEPLERI_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add or update !" });
+
 			string hasError = "";
 			try
 			{

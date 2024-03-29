@@ -9,6 +9,7 @@ namespace WebApiNew.Models
     {
         public int TB_DOSYA_ID { get; set; }
         public string DSY_TANIM { get; set; }
+        public string DSY_DOSYA_TIP { get; set; }
         public int DSY_DOSYA_TIP_ID { get; set; }
         public bool DSY_AKTIF { get; set; }
         public bool DSY_SURELI { get; set; }

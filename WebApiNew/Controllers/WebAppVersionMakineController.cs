@@ -341,6 +341,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public Object AddMakineModel([FromBody] Model entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.MAKINE_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.MAKINE_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add or update!" });
 			try
 			{
 				query = @" insert into orjin.TB_MODEL 
@@ -382,6 +386,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public Object AddMakineMarka([FromBody] Marka entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.MAKINE_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.MAKINE_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add or update!" });
 			try
 			{
 				query = @" insert into orjin.TB_MARKA 

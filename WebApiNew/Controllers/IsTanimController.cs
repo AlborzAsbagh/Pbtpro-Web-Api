@@ -358,6 +358,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddIsTanimMalzeme([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			int count = 0;
 			try
 			{
@@ -401,6 +405,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateIsTanimMalzeme([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			int count = 0;
 			try
 			{
@@ -461,6 +469,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddIsTanimOlcum([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			int count = 0;
 			try
 			{
@@ -504,6 +516,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateIsTanimOlcum([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			int count = 0;
 			try
 			{
@@ -545,6 +561,11 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> AddIsTanimKontrolList([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -588,6 +609,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateIsTanimKontrolList([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.BAKIM_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ARIZA_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			int count = 0;
 			try
 			{
@@ -723,6 +748,10 @@ namespace WebApiNew.Controllers
 		[HttpGet]
 		public object ChangeIsEmriTipiProperty([FromUri] int isEmriTipId, [FromUri] int isTanimId, [FromUri] int isEmriId)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update or add !" });
 			try
 			{
 				using(var cnn = klas.baglan())
@@ -761,6 +790,11 @@ namespace WebApiNew.Controllers
 		[HttpGet]
 		public object AddProsedurPropertyToIsEmri([FromUri]int yeniIsTanimId , [FromUri] int isEmriId, [FromUri] int? eskiIsTanimId = 0)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update or add !" });
+
 			List<IsTanimKontrol> kontrolListesi = new List<IsTanimKontrol> ();
 			List<OlcumParametreWebApp> olcumListesi = new List<OlcumParametreWebApp> ();
 
@@ -931,6 +965,10 @@ namespace WebApiNew.Controllers
 		[HttpGet]
 		public object RevmoveProsedurFromIsEmri([FromUri] int isEmriId, [FromUri] int isTanimId)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI) ||
+				!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update or add !" });
 			try
 			{
 				using (var cnn = klas.baglan())

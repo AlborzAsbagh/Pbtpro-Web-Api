@@ -37,18 +37,15 @@ namespace WebApiNew.Controllers
             _logger = logger;
         }
 
-        [Route("api/ResimListesi")]
+        [Route("api/GetResimIds")]
         [HttpGet]
-        public List<Resim> Get([FromUri] int RefID, [FromUri] int RefGrup)
+        public List<Int32> Get([FromUri] int RefID, [FromUri] string RefGrup)
         {
-            prms.Clear();
-            prms.Add("REF_ID", RefID);
-            prms.Add("REF_GRUP", RefGrup);
-            string query = @"select * from orjin.TB_RESIM where RSM_REF_ID= @REF_ID and RSM_REF_GRUP=@REF_GRUP";
-            DataTable dt = klas.GetDataTable(query, prms.PARAMS);
-            List<Resim> listem = new List<Resim>();
-            for (int i = 0; i < dt.Rows.Count; i++)
+            string query = @"select TB_RESIM_ID from orjin.TB_RESIM where RSM_REF_ID = @RefID and RSM_REF_GRUP = @RefGrup";
+            List<Int32> listem = new List<Int32>();
+            using(var cnn = klas.baglan())
             {
+                listem = cnn.Query<Int32>(query,new {  RefID, RefGrup }).ToList();
             }
             return listem;
         }
@@ -300,9 +297,9 @@ namespace WebApiNew.Controllers
             }
             return bildirimEntity;
         }
-        [Route("api/ResimYukle")]
+        [Route("api/UploadPhoto")]
         [HttpPost]
-        public Bildirim ResimYukle([FromUri] int kulid, [FromUri] int refid, [FromUri] string refGrup)
+        public Object UploadPhoto( [FromUri] int refid, [FromUri] string refGrup)
         {
             Dictionary<string, object> dict = new Dictionary<string, object>();
             Bildirim bldrm = new Bildirim();
@@ -330,20 +327,8 @@ namespace WebApiNew.Controllers
                             var ext = postedFile.FileName.Substring(postedFile.FileName.LastIndexOf('.'));
                             extension = ext.ToLower();
                             if (!AllowedFileExtensions.Contains(extension))
-                            {
-                                bldrm.Durum = false;
-                                bldrm.Aciklama = "Lütfen uygun formatta resim yükleyiniz.(.jpg,.gif,.png)";
-                                bldrm.MsgId = Bildirim.MSG_UYGUN_FORMATTA_RESIM_YUKLE_UYARI;
-                                return bldrm;
-                            }
-                            //else if (postedFile.ContentLength > MaxContentLength)
-                            //{
-
-                            //    var message = string.Format("Please Upload a file upto 1 mb.");
-
-                            //    dict.Add("error", message);
-                            //    return Request.CreateResponse(HttpStatusCode.BadRequest, dict);
-                            //}
+                                return Json(new {has_error = true , status_code = 400 , status = "Please upload images with (.jpg,.gif,.png) formats" });
+                            
                             else
                             {
                                 var filePath = resimYolu + "\\" + yeniResimAdi + extension;
@@ -356,7 +341,7 @@ namespace WebApiNew.Controllers
                                 entity.RSM_ARSIV_AD = yeniResimAdi + extension;
                                 entity.RSM_ARSIV_YOL = resimYolu + "\\" + entity.RSM_ARSIV_AD;
                                 entity.RSM_BOYUT = postedFile.ContentLength;
-                                entity.RSM_OLUSTURAN_ID = kulid;
+                                entity.RSM_OLUSTURAN_ID = UserInfo.USER_ID;
                                 entity.RSM_OLUSTURMA_TARIH = DateTime.Now;
                                 entity.RSM_REF_GRUP = refGrup;
                                 entity.RSM_REF_ID = refid;
@@ -367,132 +352,101 @@ namespace WebApiNew.Controllers
                                 entity.RSM_YOL = "";
                                 ResimKayit(entity);
                                 bldrm.Durum = true;
-                                bldrm.Aciklama = "Resim başarılı bir şekilde yüklendi.";
                                 bldrm.MsgId = Bildirim.MSG_ISLEM_BASARILI;
                                 bldrm.Id = Convert.ToInt32(klas.GetDataCell("select max(TB_RESIM_ID) from orjin.TB_RESIM", prms.PARAMS));
                                 idlistt.Add(bldrm.Id);
                             }
                         }
                     }
-                }
+					return Json(new { has_error = true, status_code = 201, status = " Image uploaded successfully !"  });
+				}
                 else
                 {
-                    bldrm.Durum = false;
-                    bldrm.Aciklama = Localization.AccessImagePathFail;
-                    bldrm.MsgId = Bildirim.SHOW_MAIN_DESCRIPTION;
                     _logger.Info("ResimYukle");
                     _logger.Error(bldrm.Aciklama);
-                }
+					return Json(new { has_error = true, status_code = 400, status = Localization.AccessImagePathFail });
+				}
             }
             catch (Exception ex)
             {
-                var res = string.Format(Localization.errorFormatted, ex.Message);
-                bldrm.MsgId = Bildirim.MSG_ISLEM_HATA;
-                bldrm.Durum = false;
-                bldrm.Aciklama = res;
-                _logger.Error(res);
+                _logger.Error(ex.Message);
                 _logger.Error(ex);
-            }
-            bldrm.Idlist = idlistt;
-            return bldrm;
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
         }
 
-        [Route("api/ResimGetirByID")]
-        [HttpGet]
-        [AllowAnonymous]
-        public HttpResponseMessage ResimGetirByID(int id)
-        {
-            Bitmap incomingBitmap = null;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                HttpContext context = HttpContext.Current;
-                //Limit access only to images folder at root level  
-                Util klas = new Util();
-                prms.Clear();
-                string prmresimYolu = klas.GetDataCell("select PRM_DEGER from orjin.TB_PARAMETRE where PRM_KOD = '000004'", prms.PARAMS);
-                prms.Add("@ID", id);
-                string ResimYolu = klas.GetDataCell("select RSM_ARSIV_AD from orjin.TB_RESIM where TB_RESIM_ID=@ID", prms.PARAMS);
-                string filePath = prmresimYolu + "\\" + ResimYolu;
-                string extension = Path.GetExtension("jpg");
+		[Route("api/ResimGetirByID")]
+		[HttpGet]
+		[AllowAnonymous]
+		public HttpResponseMessage ResimGetirByID(int id)
+		{
+			using (MemoryStream ms = new MemoryStream())
+			{
+				HttpContext context = HttpContext.Current;
+				Util klas = new Util();
+				prms.Clear();
+				string prmresimYolu = klas.GetDataCell("select PRM_DEGER from orjin.TB_PARAMETRE where PRM_KOD = '000004'", prms.PARAMS);
+				prms.Add("@ID", id);
+				string ResimYolu = klas.GetDataCell("select RSM_ARSIV_AD from orjin.TB_RESIM where TB_RESIM_ID=@ID", prms.PARAMS);
+				string filePath = prmresimYolu + "\\" + ResimYolu;
+				string extension = Path.GetExtension(filePath).ToLower();
+
+				if (!File.Exists(filePath))
+				{
+					filePath = context.Server.MapPath("/content/images/fallback.png");
+					extension = ".png"; 
+				}
+
+				try
+				{
+					using (Image image = Image.FromFile(filePath))
+					{
+						ImageFormat format = GetImageFormat(extension);
+						image.Save(ms, format != null ? format : ImageFormat.Png);
+					}
+				}
+				catch (Exception e)
+				{
+					_logger.Error(e);
+					
+					throw;
+				}
+
+				HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
+				result.Content = new ByteArrayContent(ms.ToArray());
+				result.Content.Headers.ContentType = new MediaTypeHeaderValue(GetMimeType(extension));
+				return result;
+			}
+		}
+
+		private static string GetMimeType(string extension)
+		{
+			switch (extension)
+			{
+				case ".bmp": return "image/bmp";
+				case ".gif": return "image/gif";
+				case ".jpg":
+				case ".jpeg": return "image/jpeg";
+				case ".png": return "image/png";
+				default: return "application/octet-stream"; 
+			}
+		}
+
+		private static ImageFormat GetImageFormat(string extension)
+		{
+			switch (extension)
+			{
+				case ".bmp": return ImageFormat.Bmp;
+				case ".gif": return ImageFormat.Gif;
+				case ".jpg":
+				case ".jpeg": return ImageFormat.Jpeg;
+				case ".png": return ImageFormat.Png;
+				default: return null; // You may want to handle this case differently
+			}
+		}
 
 
-                if (File.Exists(filePath))
-                {
-
-                    try
-                    {
-
-                        if (!string.IsNullOrWhiteSpace(extension))
-                        {
-                            extension = extension.Substring(extension.IndexOf(".") + 1);
-                        }
-                        ImageFormat format = GetImageFormat(extension);
-                        //If invalid image file is requested the following line wil throw an exception  
-                        using (incomingBitmap = (Bitmap)Image.FromFile(filePath))
-                        {
-                            if (incomingBitmap != null)
-                            {
-                                incomingBitmap = new Bitmap(filePath);
-                                incomingBitmap.Save(ms, format != null ? format as ImageFormat : ImageFormat.Bmp);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e);
-                        incomingBitmap?.Dispose();
-                        throw;
-                    }
-                    finally
-                    {
-                        incomingBitmap?.Dispose();
-                    }
-
-                }
-                else
-                {
-                    try
-                    {
-                        using (incomingBitmap = (Bitmap)Image.FromFile(filePath))
-                        {
-                            if (incomingBitmap != null)
-                            {
-                                incomingBitmap = new Bitmap(context.Server.MapPath("/content/images/fallback.png"));
-                                incomingBitmap.Save(ms, ImageFormat.Png);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error(e);
-                        incomingBitmap?.Dispose();
-                        //throw;
-                    }
-                    finally
-                    {
-                        incomingBitmap?.Dispose();
-                    }
-
-                }
-
-                HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new ByteArrayContent(ms.ToArray());
-                //if (extension.ToLower().Equals("jpg") || extension.ToLower().Equals("jpeg"))
-                //    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpg");
-                //else
-                //if (extension.ToLower().Equals("png"))
-                //    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-                //else
-                //if (extension.ToLower().Equals("gif"))
-                //    result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/gif");
-				result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-				ms.Close();
-                ms.Dispose();
-                return result;
-            }
-        }
-
-        public static ImageFormat GetImageFormat(string extension)
+		/* public static ImageFormat GetImageFormat(string extension)
         {
             ImageFormat result = null;
             PropertyInfo prop = typeof(ImageFormat).GetProperties().FirstOrDefault(p => p.Name.Equals(extension, StringComparison.InvariantCultureIgnoreCase));
@@ -501,7 +455,8 @@ namespace WebApiNew.Controllers
                 result = prop.GetValue(prop) as ImageFormat;
             }
             return result;
-        }
+        } */
+
        [Route("api/ResimSirasiGuncelle")]
         [HttpGet]
         public Bildirim ResimSirasiGuncelle([FromUri]String refGrup, [FromUri] int refId,[FromUri] int id_1, [FromUri] int id_2)

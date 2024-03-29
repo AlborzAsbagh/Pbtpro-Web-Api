@@ -204,6 +204,9 @@ namespace WebApiNew.Controllers
 		[Route("api/AddPersonelSertifika")]
 		public async Task<object> AddPersonelSertifika([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.PERSONEL_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -246,6 +249,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> UpdatePersonelSertifika([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.PERSONEL_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
+
 			int count = 0;
 			try
 			{
@@ -301,6 +307,8 @@ namespace WebApiNew.Controllers
 		[Route("api/AddPersonelSantiye")]
 		public async Task<object> AddPersonelSantiye([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.PERSONEL_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
 			int count = 0;
 			try
 			{
@@ -343,6 +351,8 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<object> UpdatePersonelSantiye([FromBody] JObject entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.PERSONEL_TANIMLARI))
+				return Json(new { has_error = true, status_code = 401, status = "Unathorized to update !" });
 			int count = 0;
 			try
 			{

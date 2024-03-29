@@ -18,6 +18,7 @@ namespace WebApiNew.Controllers
 		Util klas = new Util();
 		string query = "";
 		SqlCommand cmd = null;
+		YetkiController yetki = new YetkiController();
 
 		public List<IsEmriTip> Get()
         {
@@ -42,6 +43,9 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public async Task<Object> UpdateIsEmriTipi([FromBody] JObject isEmripTipiBody)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMRI_TIPLERI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
 			try
 			{
 				using (var cnn = klas.baglan())
@@ -88,8 +92,12 @@ namespace WebApiNew.Controllers
         [HttpGet]
         public Object AddIsEmriTipi([FromUri] string isEmriTipiKey)
         {
-            //Default olarak bu alanlar 'false' olmalidir web'de hata verdigi icin. Sebep Belirsiz :( 
-            query = @"insert into orjin.TB_ISEMRI_TIP (IMT_TANIM,
+			if (!(Boolean)yetki.isAuthorizedToAdd(PagesAuthCodes.ISEMRI_TIPLERI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to add !" });
+
+			//Default olarak bu alanlar 'false' olmalidir web'de hata verdigi icin. Sebep Belirsiz :( 
+			query = @"insert into orjin.TB_ISEMRI_TIP (IMT_TANIM,
                     IMT_RENK,
                     IMT_MALZEME_FIYAT_TIP,
                     IMT_VARSAYILAN_MALZEME_MIKTAR,

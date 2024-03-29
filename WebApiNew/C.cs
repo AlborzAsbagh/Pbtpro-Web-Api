@@ -47,6 +47,7 @@ namespace WebApiNew
         public static readonly int IS_TALEPLERI_TANIMLARI = 10001;
         public static readonly int LOKASYON_TANIMLARI = 1003;
         public static readonly int VARDIYA_TANIMLARI = 30014;
+        public static readonly int ISEMRI_TIPLERI = 30007;
 	}
 
 }

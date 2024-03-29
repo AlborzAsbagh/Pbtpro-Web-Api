@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 4px;
+        }
+
+        th {
+            width: 140px;
+            background-color: rgba(200, 200, 200, 0.807);
+        }
+    </style>
+</head>
+<body>
+    <div class="flex-container">
+        <div class="content">
+            <div>
+                <h1 style="text-align: right; font-size: 14px">
+                    İş Emri (@Model.ISM_TIP) / İş Emri No: @Model.ISM_ISEMRI_NO
+                </h1>
+                <div style="margin-bottom: 10px">
+                    <div style="width: calc(50% - 16px); float: left; margin-right: 16px">
+                        <h2 style="font-size: 14px; border-bottom: 2px solid black">İş Emri Bilgileri</h2>
+                        <table border="1" style="border-collapse: collapse; width: 100%">
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807); width: 140px">
+                                    Tarih
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_BASLAMA_TARIH</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Iş Emri Tipi
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_TIP</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    İş Emri Durumu
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_DURUM</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Bağlı İş Emri
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_BAGLI_ISEMRI</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Talep Eden
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_TALEP_EDEN</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Talep Tarihi
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_TALEP_TARIH</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">Atölye</th>
+                                <td style="padding: 4px">@Model.ISM_ATOLYE</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="width: 50%; float: right">
+                        <h2 style="font-size: 14px; border-bottom: 2px solid black">Makine Bilgileri</h2>
+                        <table border="1" style="border-collapse: collapse; width: 100%">
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807); width: 140px">
+                                    Lokasyon
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_LOKASYON</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Makine Kodu
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_MAKINE_KOD</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Makine Tanımı
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_MAKINE_TANIM</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Ekipman Kodu
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_EKIPMAN_KOD</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Ekipman Tanımı
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_EKIPMAN_TANIM</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                    Makine Durumu
+                                </th>
+                                <td style="padding: 4px">@Model.ISM_MAKINE_DURUM</td>
+                            </tr>
+                            <tr>
+                                <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">Öncelik</th>
+                                <td style="padding: 4px">@Model.ISM_ONCELIK</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="content: ''; display: block; clear: both"></div>
+                </div>
+                <div style="margin: 10px 0">
+                    <table border="1" style="border-collapse: collapse; width: 100%; margin-top: 10px">
+                        <tr>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807); width: 140px">
+                                Teknisyen Notları
+                            </th>
+                            <td style="padding: 4px">@Model.ISM_MAKINE_GUVENLIK_NOTU</td>
+                        </tr>
+                    </table>
+                </div>
+                <div>
+                    <table border="1" style="border-collapse: collapse; width: 100%">
+                        <tr>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807); width: 140px">
+                                Açıklama
+                            </th>
+                            <td style="padding: 4px">@Model.ISM_ACIKLAMA</td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="margin: 10px 0">
+                    <h2 style="font-size: 14px; border-bottom: 2px solid black">İş Bilgileri</h2>
+                    <table style="border: 1px solid black; border-collapse: collapse; width: 100%">
+                        <tr style="border: 1px solid black">
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">Prosedür</th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">Açıklama</th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">İş Tipi</th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                Başlama Tarihi / Saati
+                            </th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                Bitiş Tarihi / Saati
+                            </th>
+                        </tr>
+                        <tr style="border: 1px solid black">
+                            <td style="padding: 4px"></td>
+                            <td style="padding: 4px"></td>
+                            <td style="padding: 4px"></td>
+                            <td style="padding: 4px"></td>
+                            <td style="padding: 4px"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="margin: 10px 0">
+                    <h2 style="font-size: 14px; border-bottom: 2px solid black">Çalışan Personel</h2>
+                    <table style="border: 1px solid black; border-collapse: collapse; width: 100%">
+                        <tr style="border: 1px solid black">
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                Personel Kodu
+                            </th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                Personel İsim
+                            </th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">Süre (dk.)</th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">
+                                F.Mesai (dk)
+                            </th>
+                            <th style="text-align: left; padding: 4px; background-color: rgba(200, 200, 200, 0.807)">Maliyet</th>
+                        </tr>
+                        <tr style="border: 1px solid black">
+                            <td style="padding: 4px">PERS00011</td>
+                            <td style="padding: 4px">Kenan MERTTÜRK</td>
+                            <td style="padding: 4px"></td>
+                            <td style="padding: 4px"></td>
+                            <td style="padding: 4px"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div style="width: 160px; float: left">
+                <h2 style="font-size: 14px; border-bottom: 2px solid black">Personel İmza</h2>
+            </div>
+            <div style="width: 160px; float: left; margin-left: 30px">
+                <h2 style="font-size: 14px; border-bottom: 2px solid black">Tarih</h2>
+                <p>@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")</p>
+            </div>
+            <div style="content: ''; display: block; clear: both"></div>
+        </div>
+    </div>
+</body>
+</html>
