@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Dapper;
 using Newtonsoft.Json.Linq;
 using WebApiNew.App_GlobalResources;
@@ -1703,6 +1704,142 @@ namespace WebApiNew.Controllers
 			catch (Exception)
 			{
 				throw;
+			}
+		}
+
+		public Bildirim CloseWorkOrderProcess([FromBody] WebVersionIsEmriModel entity)
+		{
+			Bildirim bildirimEntity = new Bildirim();
+			try
+			{
+				string qu1 = @"UPDATE orjin.TB_ISEMRI SET
+                                     ISM_BILDIRIM_TARIH = @ISM_BILDIRIM_TARIH
+                                      ,ISM_BILDIRIM_SAAT= @ISM_BILDIRIM_SAAT 
+                                      ,ISM_KAPATILDI = @ISM_KAPATILDI                                      
+                                      ,ISM_PUAN = @ISM_PUAN
+                                      ,ISM_SONUC = @ISM_SONUC
+                                      ,ISM_DURUM_KOD_ID = 3
+                                      ,ISM_TAMAMLANMA_ORAN = 100
+                                      ,ISM_KAPAT_MAKINE_DURUM_KOD_ID = @ISM_KAPAT_MAKINE_DURUM_KOD_ID
+                                      ,ISM_SONUC_KOD_ID = @ISM_SONUC_KOD_ID                                    
+                                      ,ISM_DEGISTIREN_ID=@ISM_DEGISTIREN_ID
+                                      ,ISM_DEGISTIRME_TARIH=@ISM_DEGISTIRME_TARIH                                   
+                                      ,ISM_BITIS_TARIH=@ISM_BITIS_TARIH                                   
+                                      ,ISM_BITIS_SAAT=@ISM_BITIS_SAAT                                   
+                                       WHERE TB_ISEMRI_ID = @TB_ISEMRI_ID";
+				prms.Clear();
+				prms.Add("@TB_ISEMRI_ID", entity.TB_ISEMRI_ID);
+				if (entity.ISM_BILDIRIM_TARIH != null)
+					prms.Add("@ISM_BILDIRIM_TARIH", entity.ISM_BILDIRIM_TARIH);
+				else
+					prms.Add("@ISM_BILDIRIM_TARIH", null);
+				if (entity.ISM_BILDIRIM_SAAT != null)
+					prms.Add("@ISM_BILDIRIM_SAAT", entity.ISM_BILDIRIM_SAAT);
+				else
+					prms.Add("@ISM_BILDIRIM_SAAT", null);
+				prms.Add("@ISM_KAPATILDI", true);
+				prms.Add("@ISM_PUAN", entity.ISM_PUAN);
+				prms.Add("@ISM_SONUC", entity.ISM_SONUC);
+				prms.Add("@ISM_KAPAT_MAKINE_DURUM_KOD_ID", entity.ISM_KAPAT_MAKINE_DURUM_KOD_ID);
+				prms.Add("@ISM_SONUC_KOD_ID", entity.ISM_SONUC_KOD_ID);
+				prms.Add("@ISM_DEGISTIREN_ID", UserInfo.USER_ID);
+				prms.Add("@ISM_DEGISTIRME_TARIH", DateTime.Now);
+				prms.Add("@ISM_BITIS_TARIH", entity.ISM_BITIS_TARIH);
+				prms.Add("@ISM_BITIS_SAAT", entity.ISM_BITIS_SAAT);
+				klas.cmd(qu1, prms.PARAMS);
+				string query = @"INSERT INTO orjin.TB_ISEMRI_LOG
+                                           (ISL_ISEMRI_ID
+                                           ,ISL_KULLANICI_ID
+                                           ,ISL_TARIH
+                                           ,ISL_SAAT
+                                           ,ISL_ISLEM
+                                           ,ISL_DURUM_ESKI_KOD_ID
+                                           ,ISL_DURUM_YENI_KOD_ID
+                                           ,ISL_OLUSTURAN_ID
+                                           ,ISL_OLUSTURMA_TARIH)
+                                     VALUES
+                                            (@ISL_ISEMRI_ID
+                                            ,@ISL_KULLANICI_ID
+                                            ,@ISL_TARIH
+                                            ,@ISL_SAAT
+                                            ,@ISL_ISLEM
+                                            ,@ISL_DURUM_ESKI_KOD_ID
+                                            ,@ISL_DURUM_YENI_KOD_ID
+                                            ,@ISL_OLUSTURAN_ID
+                                            ,@ISL_OLUSTURMA_TARIH)";
+				prms.Clear();
+				prms.Add("ISL_ISEMRI_ID", entity.TB_ISEMRI_ID);
+				prms.Add("ISL_KULLANICI_ID", UserInfo.USER_ID);
+				prms.Add("ISL_TARIH", entity.ISM_BILDIRIM_TARIH ?? DateTime.Now);
+				prms.Add("ISL_SAAT", entity.ISM_BILDIRIM_SAAT ?? DateTime.Now.ToString(C.DB_TIME_FORMAT));
+				prms.Add("ISL_ISLEM", "İş emri kapatıldı");
+				prms.Add("ISL_DURUM_ESKI_KOD_ID", -1);
+				prms.Add("ISL_DURUM_YENI_KOD_ID", -1);
+				prms.Add("ISL_OLUSTURAN_ID", UserInfo.USER_ID);
+				prms.Add("ISL_OLUSTURMA_TARIH", DateTime.Now);
+				klas.cmd(query, prms.PARAMS);
+
+				prms.Clear();
+				prms.Add("ISM_ID", entity.TB_ISEMRI_ID);
+				// iş talep durumu değiştirilip log yazılıyor
+				DataRow drTalep = klas.GetDataRow("select * from orjin.TB_IS_TALEBI where IST_ISEMRI_ID=@ISM_ID",
+					prms.PARAMS);
+				if (drTalep != null)
+				{
+					klas.cmd("UPDATE orjin.TB_IS_TALEBI SET IST_DURUM_ID=4 WHERE IST_ISEMRI_ID = @ISM_ID", prms.PARAMS);
+					prms.Clear();
+					prms.Add("ISM_SONUC_KOD_ID", entity.ISM_SONUC_KOD_ID);
+					string aciklama =
+						klas.GetDataCell("select KOD_TANIM from orjin.TB_KOD where TB_KOD_ID=@ISM_SONUC_KOD_ID",
+							prms.PARAMS);
+					if (aciklama == null) aciklama = "";
+					IsTalepController.IsTalepTarihceYaz(Convert.ToInt32(drTalep["TB_IS_TALEP_ID"]),
+						UserInfo.USER_ID, "Kapandı", aciklama, "KAPANDI");
+				}
+
+				// kapatma esnasında malzeme hareketleri.
+				//List<IsEmriMalzeme> mlzListem = IsEmriMalzemeList(entity.TB_ISEMRI_ID)
+				//	.Where(a => a.IDM_STOK_KULLANIM_SEKLI == 2).ToList();
+
+				//for (int i = 0; i < mlzListem.Count; i++)
+				//{
+				//	StokHareketIslemi(mlzListem[i]);
+				//}
+
+				bildirimEntity.Aciklama = "İş emri başarılı bir şekilde kapatıldı.";
+				bildirimEntity.MsgId = Bildirim.MSG_ISM_KAPAT_OK;
+				bildirimEntity.Durum = true;
+			}
+			catch (Exception ex)
+			{
+				klas.kapat();
+				bildirimEntity.Aciklama = String.Format(Localization.errorFormatted, ex.Message);
+				bildirimEntity.MsgId = Bildirim.MSG_ISLEM_HATA;
+				bildirimEntity.HasExtra = true;
+				bildirimEntity.Durum = false;
+			}
+
+			return bildirimEntity;
+		}
+
+		[Route("api/IsEmriKapat")]
+		[HttpPost]
+		public object CloseWorkOrder([FromUri] List<WebVersionIsEmriModel> isEmri)
+		{
+			try
+			{
+				foreach(var item in isEmri)
+				{
+					var result = CloseWorkOrderProcess(item);
+
+					if (!result.Durum)
+						return Json(new { has_error = true, status_code = 500, status = result.Aciklama });
+				}
+				return Json(new { has_error = true, status_code = 200, status = " Process completed successfully !" });
+			}
+			catch(Exception ex)
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
 			}
 		}
 	}

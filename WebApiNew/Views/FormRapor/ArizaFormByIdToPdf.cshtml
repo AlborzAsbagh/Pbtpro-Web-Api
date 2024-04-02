@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+      }
+
+      .flex-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .content {
+        flex: 1;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 4px;
+      }
+
+      th {
+        width: 120px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="content">
+        <div>
+          <h1 style="text-align: right; font-size: 14px; margin-bottom: 30px">
+            ARIZA Formu / ARIZA Kodu: @Model.IST_KOD
+          </h1>
+          <div style="margin-bottom: 10px">
+            <h2 style="font-size: 14px; border-bottom: 2px solid black">
+              Genel Bilgileri
+            </h2>
+            <div
+              style="width: calc(50% - 16px); float: left; margin-right: 16px"
+            >
+              <table style="border-collapse: collapse; width: 100%">
+                <tr>
+                  <th style="text-align: left; padding: 4px">ARIZA Tanımı</th>
+                  <td style="padding: 4px">: @Model.IST_TANIM</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">Tipi</th>
+                  <td style="padding: 4px">: @Model.IST_TIP</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">ARIZA Grubu</th>
+                  <td style="padding: 4px">: @Model.IST_GRUP</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">ARIZA Nedeni</th>
+                  <td style="padding: 4px">: @Model.IST_NEDEN</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">Öncelik</th>
+                  <td style="padding: 4px">: @Model.IST_ONCELIK</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">Talimat</th>
+                  <td style="padding: 4px">: @Model.IST_TALIMAT</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">Atölye</th>
+                  <td style="padding: 4px">: @Model.IST_ATOLYE</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">Firma</th>
+                  <td style="padding: 4px">: @Model.IST_FIRMA</td>
+                </tr>
+              </table>
+            </div>
+            <div style="width: 50%; float: right">
+              <table style="border-collapse: collapse; width: 100%">
+                <tr>
+                  <th style="text-align: left; padding: 4px">İş Süresi(dk)</th>
+                  <td style="padding: 4px">: @Model.IST_CALISMA_SURE</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">
+                    Duruş Süresi(dk)
+                  </th>
+                  <td style="padding: 4px">: @Model.IST_DURUS_SURE</td>
+                </tr>
+                <tr>
+                  <th style="text-align: left; padding: 4px">
+                    Personel (kişi)
+                  </th>
+                  <td style="padding: 4px">: @Model.IST_PERSONEL</td>
+                </tr>
+              </table>
+            </div>
+            <div style="content: ''; display: block; clear: both"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

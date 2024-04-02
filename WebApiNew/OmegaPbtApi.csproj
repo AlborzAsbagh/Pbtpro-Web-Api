@@ -475,7 +475,7 @@
     <Compile Include="Models\PersonelSertifika.cs" />
     <Compile Include="Models\Takvim.cs" />
     <Compile Include="Models\Talimat.cs" />
-    <Compile Include="Models\WebVersionIsEmriForm.cs" />
+    <Compile Include="Models\WebVersionForms.cs" />
     <Compile Include="Models\WebVersionDashboard.cs" />
     <Compile Include="Models\WebVersionIsEmriModel.cs" />
     <Compile Include="Models\MainModel.cs" />
@@ -553,6 +553,8 @@
     <Compile Include="Queries.cs" />
     <Compile Include="Utility\Abstract\ILogger.cs" />
     <Compile Include="Utility\SimpleLogger.cs" />
+    <None Include="Views\FormRapor\ArizaFormByIdToPdf.cshtml" />
+    <None Include="Views\FormRapor\BakimFormByIdToPdf.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -1104,6 +1106,7 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\FormRapor\IsEmriFormByIdToPdf.cshtml" />
+    <Content Include="Views\FormRapor\IsTalepFormByIdToPdf.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

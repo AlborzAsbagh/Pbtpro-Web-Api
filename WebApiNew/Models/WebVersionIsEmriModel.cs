@@ -376,6 +376,27 @@ namespace WebApiNew.Models
 		[DataMember]
 		public string ISM_ACIKLAMA { get; set; }
 
+		[DataMember]
+		public string ISM_SONUC { get; set; }
+
+		[DataMember]
+		public int ISM_PUAN { get; set; }
+
+		[DataMember]
+		public int ISM_SONUC_KOD_ID { get; set; }
+
+		[DataMember]
+		public DateTime? ISM_BILDIRIM_TARIH { get; set; }
+
+		[DataMember]
+		public string ISM_BILDIRIM_SAAT { get; set; }
+
+		[DataMember]
+		public int ISM_KAPAT_MAKINE_DURUM_KOD_ID { get; set; }
+
+		[DataMember]
+		public string ISM_KAPAT_MAKINE_DURUM { get; set; }
+
 	}
 }
 

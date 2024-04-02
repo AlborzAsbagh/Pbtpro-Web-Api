@@ -1,0 +1,408 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+      }
+
+      .flex-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+
+      .content {
+        flex: 1;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 4px;
+      }
+
+      th {
+        width: 140px;
+        background-color: rgba(200, 200, 200, 0.807);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="content">
+        <div>
+          <h1 style="text-align: right; font-size: 18px; margin-bottom: 30px">
+            İŞ TALEP FORMU
+          </h1>
+          <p style="text-align: right; font-size: 14px; margin-bottom: 20px">
+            29:03:2024 10:48:13
+          </p>
+          <h2 style="text-align: center; font-size: 16px">Talep Kodu: @Model.IST_KOD</h2>
+          <p style="text-align: center; font-size: 14px">
+            Lütfen iş talebinile ilgili sorularınızda talep kodunu bildiriniz:
+          </p>
+
+          <div style="margin-bottom: 10px">
+            <div style="width: 50%; float: left">
+              <table border="1" style="border-collapse: collapse; width: 100%">
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Bildirim Zamanı
+                  </th>
+                  <td style="padding: 4px">@Model.IST_BASLAMA_TARIHI</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Talep Eden
+                  </th>
+                  <td style="padding: 4px">@Model.IST_TALEP_EDEN</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    İş Takipçisi
+                  </th>
+                  <td style="padding: 4px">@Model.IST_IS_TAKIPCISI</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    İş Emri No
+                  </th>
+                  <td style="padding: 4px">@Model.IST_ISEMRI_NO</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Öncelik
+                  </th>
+                  <td style="padding: 4px">@Model.IST_ONCELIK</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Durum
+                  </th>
+                  <td style="padding: 4px"></td>
+                </tr>
+              </table>
+            </div>
+            <div style="width: 50%; float: right">
+              <table border="1" style="border-collapse: collapse; width: 100%">
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Bildirilen Bina
+                  </th>
+                  <td style="padding: 4px">@Model.IST_BILDIRILEN_BINA</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Bildirilen Kat
+                  </th>
+                  <td style="padding: 4px">@Model.IST_BILDIRILEN_KAT</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Bildirim Tipi
+                  </th>
+                  <td style="padding: 4px"></td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    İş Kategorisi
+                  </th>
+                  <td style="padding: 4px">@Model.IST_KATEGORI</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Servis Nedeni
+                  </th>
+                  <td style="padding: 4px">@Model.IST_SERVIS</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    &nbsp;
+                  </th>
+                  <td style="padding: 4px"></td>
+                </tr>
+              </table>
+            </div>
+            <div style="content: ''; display: block; clear: both"></div>
+          </div>
+          <div style="margin: 10px 0">
+            <div style="width: 50%; float: left">
+              <table border="1" style="border-collapse: collapse; width: 100%">
+                <tr>
+                  <th
+                    colspan="2"
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    İletişim Bilgileri
+                  </th>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+		      color: #000;
+                    "
+                  >
+                    İletişim Şekli
+                  </th>
+                  <td style="padding: 4px">@Model.IST_IRTIBAT</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  >
+                    İrtibat Telefonu
+                  </th>
+                  <td style="padding: 4px">@Model.IST_IRTIBAT_TELEFON</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  >
+                    E-Mail
+                  </th>
+                  <td style="padding: 4px">@Model.IST_MAIL_ADRES</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  ></th>
+                  <td style="padding: 4px">&nbsp;</td>
+                </tr>
+              </table>
+            </div>
+            <div style="width: 50%; float: left">
+              <table border="1" style="border-collapse: collapse; width: 100%">
+                <tr>
+                  <th
+                    colspan="2"
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: lightgray;
+                      color: #000;
+                    "
+                  >
+                    Makine/Ekipman Bilgileri
+                  </th>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  >
+                    Makine Kodu
+                  </th>
+                  <td style="padding: 4px">@Model.IST_MAKINE_KOD</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  >
+                    Makine Tanımı
+                  </th>
+                  <td style="padding: 4px">@Model.IST_MAKINE_TANIM</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  >
+                    Ekipman Kodu
+                  </th>
+                  <td style="padding: 4px">@Model.IST_EKIPMAN_KOD</td>
+                </tr>
+                <tr>
+                  <th
+                    style="
+                      text-align: left;
+                      padding: 4px;
+                      background-color: #fff;
+                    "
+                  >
+                    Ekipman Tanımı
+                  </th>
+                  <td style="padding: 4px">@Model.IST_EKIPMAN_TANIM</td>
+                </tr>
+              </table>
+            </div>
+            <div style="content: ''; display: block; clear: both"></div>
+          </div>
+
+          <div style="margin: 10px 0">
+            <table border="1" style="border-collapse: collapse; width: 100%">
+              <tr>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 4px;
+                    background-color: lightgray;
+                    color: #000;
+                  "
+                >
+                  Konu
+                </th>
+              </tr>
+              <tr>
+                <th
+                  style="text-align: left; padding: 4px; background-color: #fff"
+                >@Model.IST_KONU</th>
+              </tr>
+            </table>
+          </div>
+          <div style="margin: 10px 0">
+            <table border="1" style="border-collapse: collapse; width: 100%">
+              <tr>
+                <th
+                  style="
+                    text-align: left;
+                    padding: 4px;
+                    background-color: lightgray;
+                    color: #000;
+                  "
+                >
+                  Açıklama
+                </th>
+              </tr>
+              <tr>
+                <th
+                  style="text-align: left; padding: 4px; background-color: #fff"
+                >@Model.IST_ACIKLAMA</th>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
