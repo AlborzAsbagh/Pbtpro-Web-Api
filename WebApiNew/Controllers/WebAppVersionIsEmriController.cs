@@ -1707,15 +1707,13 @@ namespace WebApiNew.Controllers
 			}
 		}
 
-		public Bildirim CloseWorkOrderProcess([FromBody] WebVersionIsEmriModel entity)
+		public Bildirim CloseWorkOrderProcess(WorkOrderCloseBody entity)
 		{
 			Bildirim bildirimEntity = new Bildirim();
 			try
 			{
 				string qu1 = @"UPDATE orjin.TB_ISEMRI SET
-                                     ISM_BILDIRIM_TARIH = @ISM_BILDIRIM_TARIH
-                                      ,ISM_BILDIRIM_SAAT= @ISM_BILDIRIM_SAAT 
-                                      ,ISM_KAPATILDI = @ISM_KAPATILDI                                      
+                                       ISM_KAPATILDI = @ISM_KAPATILDI                                      
                                       ,ISM_PUAN = @ISM_PUAN
                                       ,ISM_SONUC = @ISM_SONUC
                                       ,ISM_DURUM_KOD_ID = 3
@@ -1725,18 +1723,26 @@ namespace WebApiNew.Controllers
                                       ,ISM_DEGISTIREN_ID=@ISM_DEGISTIREN_ID
                                       ,ISM_DEGISTIRME_TARIH=@ISM_DEGISTIRME_TARIH                                   
                                       ,ISM_BITIS_TARIH=@ISM_BITIS_TARIH                                   
+                                      ,ISM_BASLAMA_TARIH=@ISM_BASLAMA_TARIH                                   
                                       ,ISM_BITIS_SAAT=@ISM_BITIS_SAAT                                   
+                                      ,ISM_BASLAMA_SAAT=@ISM_BASLAMA_SAAT                                   
+                                      ,ISM_SURE_CALISMA=@ISM_SURE_CALISMA                                   
+                                      ,ISM_KAPANMA_YDK_TARIH=@ISM_KAPANMA_YDK_TARIH                                   
+                                      ,ISM_KAPANMA_YDK_SAAT=@ISM_KAPANMA_YDK_SAAT                                   
                                        WHERE TB_ISEMRI_ID = @TB_ISEMRI_ID";
 				prms.Clear();
 				prms.Add("@TB_ISEMRI_ID", entity.TB_ISEMRI_ID);
-				if (entity.ISM_BILDIRIM_TARIH != null)
-					prms.Add("@ISM_BILDIRIM_TARIH", entity.ISM_BILDIRIM_TARIH);
+
+				if (entity.ISM_BASLAMA_TARIH != null)
+					prms.Add("@ISM_BASLAMA_TARIH", entity.ISM_BASLAMA_TARIH);
 				else
-					prms.Add("@ISM_BILDIRIM_TARIH", null);
-				if (entity.ISM_BILDIRIM_SAAT != null)
-					prms.Add("@ISM_BILDIRIM_SAAT", entity.ISM_BILDIRIM_SAAT);
+					prms.Add("@ISM_BASLAMA_TARIH", null);
+
+				if (entity.ISM_BASLAMA_SAAT != null)
+					prms.Add("@ISM_BASLAMA_SAAT", entity.ISM_BASLAMA_SAAT);
 				else
-					prms.Add("@ISM_BILDIRIM_SAAT", null);
+					prms.Add("@ISM_BASLAMA_SAAT", null);
+
 				prms.Add("@ISM_KAPATILDI", true);
 				prms.Add("@ISM_PUAN", entity.ISM_PUAN);
 				prms.Add("@ISM_SONUC", entity.ISM_SONUC);
@@ -1746,6 +1752,9 @@ namespace WebApiNew.Controllers
 				prms.Add("@ISM_DEGISTIRME_TARIH", DateTime.Now);
 				prms.Add("@ISM_BITIS_TARIH", entity.ISM_BITIS_TARIH);
 				prms.Add("@ISM_BITIS_SAAT", entity.ISM_BITIS_SAAT);
+				prms.Add("@ISM_SURE_CALISMA", entity.ISM_SURE_CALISMA);
+				prms.Add("@ISM_KAPANMA_YDK_TARIH", entity.ISM_KAPANMA_YDK_TARIH);
+				prms.Add("@ISM_KAPANMA_YDK_SAAT", entity.ISM_KAPANMA_YDK_SAAT);
 				klas.cmd(qu1, prms.PARAMS);
 				string query = @"INSERT INTO orjin.TB_ISEMRI_LOG
                                            (ISL_ISEMRI_ID
@@ -1770,8 +1779,8 @@ namespace WebApiNew.Controllers
 				prms.Clear();
 				prms.Add("ISL_ISEMRI_ID", entity.TB_ISEMRI_ID);
 				prms.Add("ISL_KULLANICI_ID", UserInfo.USER_ID);
-				prms.Add("ISL_TARIH", entity.ISM_BILDIRIM_TARIH ?? DateTime.Now);
-				prms.Add("ISL_SAAT", entity.ISM_BILDIRIM_SAAT ?? DateTime.Now.ToString(C.DB_TIME_FORMAT));
+				prms.Add("ISL_TARIH", entity.ISM_BASLAMA_TARIH ?? DateTime.Now);
+				prms.Add("ISL_SAAT", entity.ISM_BASLAMA_SAAT ?? DateTime.Now.ToString(C.DB_TIME_FORMAT));
 				prms.Add("ISL_ISLEM", "İş emri kapatıldı");
 				prms.Add("ISL_DURUM_ESKI_KOD_ID", -1);
 				prms.Add("ISL_DURUM_YENI_KOD_ID", -1);
@@ -1824,7 +1833,7 @@ namespace WebApiNew.Controllers
 
 		[Route("api/IsEmriKapat")]
 		[HttpPost]
-		public object CloseWorkOrder([FromUri] List<WebVersionIsEmriModel> isEmri)
+		public object CloseWorkOrder([FromBody] List<WorkOrderCloseBody> isEmri)
 		{
 			try
 			{
@@ -1840,6 +1849,343 @@ namespace WebApiNew.Controllers
 			catch(Exception ex)
 			{
 				return Json(new { has_error = true, status_code = 500, status = ex.Message });
+			}
+		}
+
+		public Bildirim IsmZrnOzelAlanlarKapanma(int isEmriId)
+		{
+			List<long> requiredOzelAlanNumbers = new List<long>();
+			List<long> requiredOzelAlanNumbersToRemoved = new List<long>();
+			List<string> requiredOzelAlanText = new List<string>();
+
+			Bildirim bldr = new Bildirim();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					int isTipiId = cnn.QueryFirstOrDefault<int>(@"select ISM_TIP_ID from orjin.TB_ISEMRI where TB_ISEMRI_ID = @isEmriId", new { @isEmriId = isEmriId });
+
+					if (isTipiId <= -1)
+					{
+						bldr.Error = false;
+						bldr.Durum = true;
+						return bldr;
+					}
+					else
+					{
+						for (int i = 1; i <= 20; i++)
+						{
+							var temp = cnn.QueryFirstOrDefault<Boolean>($@"SELECT COALESCE(IMT_OZEL_ALAN_{i}, 0) as IMT_OZEL_ALAN_{i}
+																			FROM orjin.TB_ISEMRI_TIP
+																			WHERE IMT_AKTIF = 1 AND TB_ISEMRI_TIP_ID = @isTipiId ;
+																			 ", new { @isTipiId = isTipiId });
+
+							if (temp) requiredOzelAlanNumbers.Add(i);
+						}
+
+
+						if (requiredOzelAlanNumbers.Count == 0)
+						{
+							bldr.Error = false;
+							bldr.Durum = true;
+							return bldr;
+						}
+
+						else
+						{
+							Boolean temp1 = false;
+							Boolean temp2 = false;
+							Boolean temp3 = false;
+
+
+							for (int i = 0; i < requiredOzelAlanNumbers.Count; i++)
+							{
+								if (requiredOzelAlanNumbers[i] >= 1 && requiredOzelAlanNumbers[i] <= 10)
+								{
+									temp1 = cnn.QueryFirstOrDefault<Boolean>($@" SELECT CASE WHEN ISM_OZEL_ALAN_{requiredOzelAlanNumbers[i]} IS NULL OR ISM_OZEL_ALAN_{requiredOzelAlanNumbers[i]} = '' THEN 0 ELSE 1 END AS IsNotEmpty
+																			FROM orjin.TB_ISEMRI
+																			 WHERE TB_ISEMRI_ID = @isEmriId
+																			 ", new { @isEmriId = @isEmriId });
+
+									if (temp1)
+									{
+										requiredOzelAlanNumbersToRemoved.Add(requiredOzelAlanNumbers[i]);
+									}
+
+								}
+								else if (requiredOzelAlanNumbers[i] >= 11 && requiredOzelAlanNumbers[i] <= 15)
+								{
+									temp2 = cnn.QueryFirstOrDefault<Boolean>($@" SELECT CASE WHEN COALESCE(ISM_OZEL_ALAN_{requiredOzelAlanNumbers[i]}_KOD_ID, 0)
+																			= 0 THEN 0 ELSE 1 END AS IsNotEmpty
+																			FROM orjin.TB_ISEMRI
+																			 WHERE TB_ISEMRI_ID = @isEmriId
+																			 ", new { @isEmriId = @isEmriId });
+
+									if (temp2)
+									{
+										requiredOzelAlanNumbersToRemoved.Add(requiredOzelAlanNumbers[i]);
+									}
+								}
+								else
+								{
+									temp3 = cnn.QueryFirstOrDefault<Boolean>($@" SELECT CASE WHEN COALESCE(ISM_OZEL_ALAN_{requiredOzelAlanNumbers[i]}, 0)
+																			= 0 THEN 0 ELSE 1 END AS IsNotEmpty
+																			FROM orjin.TB_ISEMRI
+																			 WHERE TB_ISEMRI_ID = @isEmriId
+																			 ", new { @isEmriId = @isEmriId });
+
+									if (temp3)
+									{
+										requiredOzelAlanNumbersToRemoved.Add(requiredOzelAlanNumbers[i]);
+									}
+								}
+							}
+							if (!(temp1 && temp2 && temp3))
+							{
+								for (int index = 0; index < requiredOzelAlanNumbersToRemoved.Count; index++)
+								{
+									requiredOzelAlanNumbers.Remove(requiredOzelAlanNumbersToRemoved[index]);
+								}
+
+								for (int index = 0; index < requiredOzelAlanNumbers.Count; index++)
+								{
+									string tempString = cnn.QueryFirstOrDefault<String>($@" SELECT CASE WHEN OZL_OZEL_ALAN_{requiredOzelAlanNumbers[index]} 
+																			IS NULL OR OZL_OZEL_ALAN_{requiredOzelAlanNumbers[index]} 
+																			= '' THEN 'OZL_OZEL_ALAN_{requiredOzelAlanNumbers[index]}' 
+																			ELSE OZL_OZEL_ALAN_{requiredOzelAlanNumbers[index]}  END AS IsNotEmpty
+																			FROM orjin.TB_OZEL_ALAN
+																			 WHERE OZL_FORM = @OZL_FORM
+																			 ", new { @OZL_FORM = "ISEMRI" });
+
+									requiredOzelAlanText.Add(tempString);
+								}
+
+								bldr.Error = false;
+								bldr.Durum = false;
+								bldr.TextArray = requiredOzelAlanText;
+								return bldr;
+							}
+							bldr.Error = false;
+							bldr.Durum = true;
+							return bldr;
+
+
+						}
+					}
+
+
+				}
+			}
+			catch (Exception e)
+			{
+				bldr.Error = true;
+				bldr.Durum = false;
+				bldr.Aciklama = e.Message;
+				return bldr;
+			}
+		}
+
+		public Bildirim IsmZrnAlanlarKapanma(int isEmriId)
+		{
+			Bildirim bldr = new Bildirim();
+			Dictionary<String, Int32> zrnAlanlarIsEmriTip = new Dictionary<String, Int32>
+				{
+					{ "IMT_PROSEDUR_KAPAT", 1 },
+					{ "IMT_MAKINE_KAPAT", 2 },
+					{ "IMT_KONU_KAPAT", 3 },
+					{ "IMT_IS_TIPI_KAPAT", 4 },
+					{ "IMT_PROJE_KAPAT", 5 },
+					{ "IMT_ONCELIK_KAPAT", 6 },
+					{ "IMT_ATOLYE_KAPAT", 7 },
+					{ "IMT_SAYAC_DEGER_KAPAT", 8 },
+					{ "IMT_ACIKLAMA_KAPAT", 9 },
+					{ "IMT_SOZLESME_KAPAT", 10 },
+					{ "IMT_MAKINE_DURUM_KAPAT", 11 },
+					{ "IMT_FIRMA_KAPAT", 12 },
+					{ "IMT_BAKIM_PUAN", 13 },
+					{ "IMT_EKIPMAN_KAPAT", 14 },
+					{ "IMT_IS_NEDENI_KAPAT", 15 },
+					{ "IMT_REFNO_KAPAT", 16 },
+					{ "IMT_MAKINE_DURUM", 17 },
+				};
+			List<Int32> hasToCheckFieldNumbers = new List<Int32>();
+			List<long> isEmptyFields = new List<long>();
+			Dictionary<String, Int32> zrnAlanlarIsEmri = new Dictionary<String, Int32>
+				{
+					{ "ISM_REF_ID", 1 },
+					{ "ISM_MAKINE_ID", 2 },
+					{ "ISM_KONU", 3 },
+					{ "ISM_TIP_KOD_ID", 4 },
+					{ "ISM_PROJE_ID", 5 },
+					{ "ISM_ONCELIK_ID", 6 },
+					{ "ISM_ATOLYE_ID", 7 },
+					{ "ISM_SAYAC_DEGER", 8 },
+					{ "ISM_ACIKLAMA", 9 },
+					{ "ISM_FIRMA_SOZLESME_ID", 10 },
+					{ "ISM_KAPAT_MAKINE_DURUM_KOD_ID", 11 },
+					{ "ISM_FIRMA_ID", 12 },
+					{ "ISM_PUAN", 13 },
+					{ "ISM_EKIPMAN_ID", 14 },
+					{ "ISM_NEDEN_KOD_ID", 15 },
+					{ "ISM_REFERANS_NO", 16 },
+					{ "ISM_MAKINE_DURUM_KOD_ID", 17 },
+				};
+
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					int isTipiId = cnn.QueryFirstOrDefault<int>(@"select ISM_TIP_ID from orjin.TB_ISEMRI where TB_ISEMRI_ID = @isEmriId", new { @isEmriId = isEmriId });
+
+					if (isTipiId <= -1)
+					{
+						bldr.Error = false;
+						bldr.Durum = true;
+						return bldr;
+					}
+
+					foreach (var item in zrnAlanlarIsEmriTip)
+					{
+
+						Boolean temp = cnn.QueryFirstOrDefault<Boolean>($@"SELECT COALESCE({item.Key}, 0) as {item.Key}
+																			FROM orjin.TB_ISEMRI_TIP
+																			WHERE IMT_AKTIF = 1 AND TB_ISEMRI_TIP_ID = @id",
+							new { @id = isTipiId });
+
+						if (temp) hasToCheckFieldNumbers.Add(item.Value);
+					}
+
+					if (hasToCheckFieldNumbers.Count == 0)
+					{
+						bldr.Error = false;
+						bldr.Durum = true;
+						return bldr;
+					}
+
+					else
+					{
+						for (int i = 0; i < hasToCheckFieldNumbers.Count; i++)
+						{
+							var myKey = zrnAlanlarIsEmri.FirstOrDefault(x => x.Value == hasToCheckFieldNumbers[i]).Key;
+							if (myKey.Equals("ISM_ACIKLAMA") || myKey.Equals("ISM_KONU") || myKey.Equals("ISM_REFERANS_NO"))
+							{
+								Boolean temp1 = cnn.QueryFirstOrDefault<Boolean>($@" SELECT CASE 
+																						 WHEN TRIM({myKey}) IS NULL OR TRIM({myKey}) = '' THEN 0 
+																						 ELSE 1 
+																					   END AS IsNotEmpty
+																				FROM orjin.TB_ISEMRI
+																				WHERE TB_ISEMRI_ID = @isEmriId
+																			 ", new { @isEmriId = @isEmriId });
+								if (!temp1) isEmptyFields.Add(hasToCheckFieldNumbers[i]);
+							}
+							else
+							{
+								Boolean temp2 = cnn.QueryFirstOrDefault<Boolean>($@" SELECT CASE 
+																						 WHEN {myKey} > 0 THEN 1
+																						 ELSE 0
+																					   END AS IsNotEmpty
+																				FROM orjin.TB_ISEMRI
+																				WHERE TB_ISEMRI_ID = @isEmriId
+																			 ", new { @isEmriId = @isEmriId });
+								if (!temp2) isEmptyFields.Add(hasToCheckFieldNumbers[i]);
+							}
+						}
+					}
+					if (isEmptyFields.Count > 0)
+					{
+						bldr.Error = false;
+						bldr.Durum = false;
+						bldr.Idlist = isEmptyFields;
+						return bldr;
+					}
+					bldr.Error = false;
+					bldr.Durum = true;
+					return bldr;
+				}
+			}
+			catch (Exception ex)
+			{
+				bldr.Error = true;
+				bldr.Durum = false;
+				bldr.Aciklama = ex.Message;
+				return bldr;
+			}
+		}
+
+		public Bildirim IsmZrnPrsSureKapanma(int isEmriId)
+		{
+			Bildirim bldr = new Bildirim();
+			try
+			{
+				using (var cnn = klas.baglan())
+				{
+					query = @"SELECT
+							CASE
+								WHEN COUNT(*) = COUNT(CASE WHEN [IDK_SURE] > 0 THEN 1 END) THEN 1
+								ELSE 0
+							END AS AllRecordsValid
+						FROM 
+							[PBTPRO_1].[orjin].[TB_ISEMRI_KAYNAK]
+						WHERE 
+							IDK_ISEMRI_ID = @isEmriId";
+
+					var isAllRecordsValid = cnn.QueryFirstOrDefault<Boolean>(query, new { isEmriId });
+
+					if (isAllRecordsValid)
+					{
+						bldr.Error = false;
+						bldr.Durum = true;
+					}
+					else
+					{
+						bldr.Error = false;
+						bldr.Durum = false;
+						bldr.IsmIsNotPersonelTimeSet = true;
+					}
+					return bldr;
+				}
+			}
+			catch (Exception ex)
+			{
+				bldr.Error = true;
+				bldr.Durum = false;
+				bldr.Aciklama = ex.Message;
+				return bldr;
+			}
+		}
+
+		[Route("api/CheckIsmFieldsForClose")]
+		[HttpGet]
+		public Bildirim CheckIsmFieldsForClose([FromUri] int isEmriId)
+		{
+			Bildirim checkOzelAlan = IsmZrnOzelAlanlarKapanma(isEmriId);
+			Bildirim checkOtherAlan = IsmZrnAlanlarKapanma(isEmriId);
+			Bildirim checkPersonelSure = IsmZrnPrsSureKapanma(isEmriId);
+
+			Bildirim finalResult = new Bildirim();
+
+			if (checkOzelAlan.Durum && checkOtherAlan.Durum && checkPersonelSure.Durum)
+			{
+				finalResult.Durum = true;
+				finalResult.Error = false;
+				return finalResult;
+			}
+			else
+			{
+				if (checkOzelAlan.Error || checkOtherAlan.Error || checkPersonelSure.Error)
+				{
+					finalResult.Durum = false;
+					finalResult.Error = true;
+					finalResult.Aciklama = (checkOzelAlan.Aciklama != null ? checkOzelAlan.Aciklama : "") + (checkOtherAlan.Aciklama != null ? checkOtherAlan.Aciklama : "") +
+						(checkPersonelSure.Aciklama != null ? checkPersonelSure.Aciklama : "");
+					return finalResult;
+				}
+				finalResult.Durum = false;
+				finalResult.Error = false;
+				finalResult.TextArray = (checkOzelAlan.TextArray != null ? checkOzelAlan.TextArray : new List<string>());
+				finalResult.IsmIsNotPersonelTimeSet = checkPersonelSure.IsmIsNotPersonelTimeSet;
+				finalResult.Idlist = (checkOtherAlan.Idlist != null ? checkOtherAlan.Idlist : new List<long>());
+				return finalResult;
 			}
 		}
 	}
