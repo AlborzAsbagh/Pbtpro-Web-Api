@@ -861,21 +861,14 @@ namespace WebApiNew.Controllers
                     }
 
 
-                    bildirimEntity.Id = await cnn.QueryFirstAsync<int>("SELECT MAX(TB_ISEMRI_ID) FROM orjin.TB_ISEMRI");
-                    bildirimEntity.Aciklama = "İşlem başarılı bir şekilde gerçekleşti.";
-                    bildirimEntity.MsgId = Bildirim.MSG_ISLEM_BASARILI;
-                    bildirimEntity.Durum = true;
-                }
-                catch (Exception e)
+					return Json(new { has_error = false, status_code = 201, status = " Added Successfully ! " });
+				}
+                catch (Exception ex)
                 {
-                    bildirimEntity.Aciklama = string.Format(Localization.errorFormatted, e.Message);
-                    bildirimEntity.MsgId = Bildirim.MSG_IS_EMRI_KAYIT_HATA;
-                    bildirimEntity.HasExtra = true;
-                    bildirimEntity.Durum = false;
-                    _logger.Error(e);
+					_logger.Error(ex);
+					return Json(new { has_error = true, status_code = 500, status = ex.Message });
                 }
 
-                return bildirimEntity;
             }
         }
 

@@ -148,11 +148,11 @@ namespace WebApiNew.Controllers
 					cmd.ExecuteNonQuery();
 					klas.baglan().Close();
 				}
-                return Json(new { success = "Ekleme Başarılı !" });
+				return Json(new { has_error = false, status_code = 201, status = " Added Successfully ! " });
 			} 
-            catch(Exception e) 
+            catch(Exception ex) 
             {
-				return Json(new { error = e.Message });
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
 			}
         }
 
