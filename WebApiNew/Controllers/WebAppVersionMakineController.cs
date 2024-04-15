@@ -86,7 +86,7 @@ namespace WebApiNew.Controllers
 					query += $" and mkn.MKN_LOKASYON_ID = {lokasyonId} ";
 					toplamMakineSayisiQuery += $" and mkn.MKN_LOKASYON_ID = {lokasyonId} ";
 				}
-				query+= $" ) SELECT * FROM RowNumberedResults WHERE RowIndex BETWEEN {pagingIlkDeger} AND {pagingSonDeger}; ";
+				query+= $" ) SELECT * FROM RowNumberedResults WHERE RowIndex BETWEEN {pagingIlkDeger} AND {pagingSonDeger-1}; ";
 				toplamMakineSayisiQuery += ") as TotalMakineSayisi";
 
 				using (var cnn = klas.baglan())
