@@ -137,13 +137,19 @@ namespace WebApiNew.Models
 		public string FRIMA { get; set; }
 
 		[DataMember]
+		public int ISM_IS_TALEP_ID { get; set; }
+
+		[DataMember]
 		public string IS_TALEP_NO { get; set; }
 
 		[DataMember]
 		public string IS_TALEP_EDEN { get; set; }
 
 		[DataMember]
-		public DateTime? IS_TALEP_TARIH { get; set; }
+		public DateTime? ISM_IS_TARIH { get; set; }
+
+		[DataMember]
+		public string ISM_IS_SAAT { get; set; }
 
 		[DataMember]
 		public double ISM_MALIYET_MLZ { get; set; }

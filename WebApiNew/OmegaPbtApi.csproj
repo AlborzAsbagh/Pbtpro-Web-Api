@@ -463,6 +463,7 @@
     <Compile Include="Models\IsEmriAracGerec.cs" />
     <Compile Include="Models\IsEmriEkleVarsayilanDegerler.cs" />
     <Compile Include="Models\IsEmriFiltreData.cs" />
+    <Compile Include="Models\IsEmriTabsCount.cs" />
     <Compile Include="Models\IsTalebiTeknisyen.cs" />
     <Compile Include="Models\IsTalepIptalModel.cs" />
     <Compile Include="Models\IsTalepKullanici.cs" />

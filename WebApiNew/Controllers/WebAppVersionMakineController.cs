@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Net.Http;
-using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Dapper;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebApiNew.Filters;
 using WebApiNew.Models;
@@ -39,10 +36,11 @@ namespace WebApiNew.Controllers
 
 		[Route("api/GetMakineFullList")]
 		[HttpPost]
-		public object GetMakineFullList([FromUri] string parametre , [FromBody] JObject filters , [FromUri] int pagingDeger = 1 , [FromUri] int? lokasyonId = 0) 
+		public object GetMakineFullList([FromUri] string parametre , [FromBody] JObject filters , [FromUri] int pagingDeger = 1 ,
+			[FromUri] int? lokasyonId = 0 , [FromUri]  int? pageSize = 10) 
 		{
-			int pagingIlkDeger = pagingDeger == 1 ? 1 : ((pagingDeger * 10) - 10);
-			int pagingSonDeger = pagingIlkDeger == 1 ? 10 : ((pagingDeger * 10));
+			int pagingIlkDeger = (int)(pagingDeger == 1 ? 1 : ((pagingDeger * pageSize) - pageSize));
+			int pagingSonDeger = (int)(pagingIlkDeger == 1 ? pageSize : pagingDeger * pageSize);
 			int toplamMakineSayisi = 0;
 			int counter = 0;
 			string toplamMakineSayisiQuery = ""; 
@@ -50,19 +48,19 @@ namespace WebApiNew.Controllers
 			List<WebVersionMakineModel> listem = new List<WebVersionMakineModel>();
 			try
 			{
-				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_MAKINE_ID DESC) AS subRow FROM orjin.VW_MAKINE where 1=1";
-				toplamMakineSayisiQuery = @"select count(*) from (select * from orjin.VW_MAKINE where 1=1" ;
+				query = Queries.MKN_FETCH_QUERY;
+				toplamMakineSayisiQuery = Queries.MKN_FETCH_COUNT_QUERY;
 
 				if (!string.IsNullOrEmpty(parametre))
 				{
-					query += $" and ( MKN_KOD like '%{parametre}%' or "; toplamMakineSayisiQuery += $" and ( MKN_KOD like '%{parametre}%' or ";
-					query += $" MKN_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_TANIM like '%{parametre}%' or ";
-					query += $" MKN_LOKASYON like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_LOKASYON like '%{parametre}%' or ";
-					query += $" MKN_TIP like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_TIP like '%{parametre}%' or ";
-					query += $" MKN_KATEGORI like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_KATEGORI like '%{parametre}%' or ";
-					query += $" MKN_MARKA like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_MARKA like '%{parametre}%' or ";
-					query += $" MKN_MODEL like '%{parametre}%' or "; toplamMakineSayisiQuery += $" MKN_MODEL like '%{parametre}%' or ";
-					query += $" MKN_SERI_NO like '%{parametre}%' ) "; toplamMakineSayisiQuery += $" MKN_SERI_NO like '%{parametre}%' ) ";
+					query += $" and ( mkn.MKN_KOD like '%{parametre}%' or "; toplamMakineSayisiQuery += $" and ( mkn.MKN_KOD like '%{parametre}%' or ";
+					query += $" mkn.MKN_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" mkn.MKN_TANIM like '%{parametre}%' or ";
+					query += $" lok.LOK_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" lok.LOK_TANIM  like '%{parametre}%' or ";
+					query += $" tip_kod.KOD_TANIM  like '%{parametre}%' or "; toplamMakineSayisiQuery += $" tip_kod.KOD_TANIM like '%{parametre}%' or ";
+					query += $" kategori_kod.KOD_TANIM like '%{parametre}%' or "; toplamMakineSayisiQuery += $" kategori_kod.KOD_TANIM like '%{parametre}%' or ";
+					query += $" mrk.MRK_MARKA  like '%{parametre}%' or "; toplamMakineSayisiQuery += $" mrk.MRK_MARKA like '%{parametre}%' or ";
+					query += $" mdl.MDL_MODEL like '%{parametre}%' or "; toplamMakineSayisiQuery += $" mdl.MDL_MODEL like '%{parametre}%' or ";
+					query += $" mkn.MKN_SERI_NO  like '%{parametre}%' ) "; toplamMakineSayisiQuery += $" mkn.MKN_SERI_NO like '%{parametre}%' ) ";
 				}
 				if((filters["customfilters"] as JObject) != null && (filters["customfilters"] as JObject).Count > 0)
 				{
@@ -85,10 +83,10 @@ namespace WebApiNew.Controllers
 				}
 				if (lokasyonId > 0 && lokasyonId != null)
 				{
-					query += $" and MKN_LOKASYON_ID = {lokasyonId} ";
-					toplamMakineSayisiQuery += $" and MKN_LOKASYON_ID = {lokasyonId} ";
+					query += $" and mkn.MKN_LOKASYON_ID = {lokasyonId} ";
+					toplamMakineSayisiQuery += $" and mkn.MKN_LOKASYON_ID = {lokasyonId} ";
 				}
-				query+= $" ) RowIndex WHERE RowIndex.subRow >= {pagingIlkDeger} AND RowIndex.subRow < {pagingSonDeger}";
+				query+= $" ) SELECT * FROM RowNumberedResults WHERE RowIndex BETWEEN {pagingIlkDeger} AND {pagingSonDeger}; ";
 				toplamMakineSayisiQuery += ") as TotalMakineSayisi";
 
 				using (var cnn = klas.baglan())
@@ -98,7 +96,7 @@ namespace WebApiNew.Controllers
 					toplamMakineSayisi = (int) cmd.ExecuteScalar();
 				}
 				klas.kapat();
-				return Json(new {page = (int)Math.Ceiling((decimal)toplamMakineSayisi/10) ,makine_listesi = listem});
+				return Json(new {page = (int)Math.Ceiling((decimal)((decimal)toplamMakineSayisi/ pageSize)) ,makine_listesi = listem , kayit_sayisi = toplamMakineSayisi });
 
 			} catch(Exception e)
 			{

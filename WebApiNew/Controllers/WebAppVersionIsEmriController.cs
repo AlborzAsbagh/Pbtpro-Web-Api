@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Results;
 using Dapper;
 using Newtonsoft.Json.Linq;
 using WebApiNew.App_GlobalResources;
@@ -46,13 +45,13 @@ namespace WebApiNew.Controllers
 
 		[Route("api/GetIsEmriFullList")]
 		[HttpPost]
-		public Object GetIsEmriFullList([FromUri] string parametre, [FromBody] JObject filtreler, [FromUri] int pagingDeger = 1)
+		public Object GetIsEmriFullList([FromUri] string parametre, [FromBody] JObject filtreler, [FromUri] int pagingDeger = 1 , [FromUri] int? pageSize = 10)
 		{
 
 			List<WebVersionIsEmriModel> listem = new List<WebVersionIsEmriModel>();
 
-			int pagingIlkDeger = pagingDeger == 1 ? 1 : ((pagingDeger * 50) - 50);
-			int pagingSonDeger = pagingIlkDeger == 1 ? 50 : ((pagingDeger * 50));
+			int pagingIlkDeger = (int)(pagingDeger == 1 ? 1 : ((pagingDeger * pageSize) - pageSize));
+			int pagingSonDeger = (int)(pagingIlkDeger == 1 ? pageSize : pagingDeger * pageSize );
 			int toplamIsEmriSayisi = 0;
 			string MAIN_QUERY = "";
 			string TOTAL_IS_EMRI_QUERY = "";
@@ -158,6 +157,7 @@ namespace WebApiNew.Controllers
 									  $" IS_TIPI  LIKE '%" + parametre + "%' or " +
 									  $" IS_NEDENI  LIKE '%" + parametre + "%' or " +
 									  $" ATOLYE  LIKE '%" + parametre + "%' or " +
+									  $" ISM_ACIKLAMA  LIKE '%" + parametre + "%' or " +
 									  $" PERSONEL_ADI LIKE '%" + parametre + "%' ) ";
 
 						isParametreForTotalIsEmri = $" AND ( KAPALI  LIKE '%" + parametre + "%' or " +
@@ -171,6 +171,7 @@ namespace WebApiNew.Controllers
 									  $" IS_TIPI  LIKE '%" + parametre + "%' or " +
 									  $" IS_NEDENI  LIKE '%" + parametre + "%' or " +
 									  $" ATOLYE  LIKE '%" + parametre + "%' or " +
+									  $" ISM_ACIKLAMA  LIKE '%" + parametre + "%' or " +
 									  $" PERSONEL_ADI LIKE '%" + parametre + "%' ) ";
 					}
 
@@ -208,7 +209,7 @@ namespace WebApiNew.Controllers
 				}
 
 				klas.kapat();
-				return Json(new { page = (int)Math.Ceiling((decimal)toplamIsEmriSayisi / 50), list = listem });
+				return Json(new { page = (int)Math.Ceiling((decimal)((decimal)toplamIsEmriSayisi / pageSize)), list = listem , kayit_sayisi = toplamIsEmriSayisi });
 			}
 			catch (Exception e)
 			{
@@ -261,6 +262,10 @@ namespace WebApiNew.Controllers
 		[HttpPost]
 		public Object AddIsEmriDurumDegisikligi([FromBody] IsEmriLog entity)
 		{
+			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
+
+				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+
 			try
 			{
 				query = " insert into orjin.TB_ISEMRI_LOG";
@@ -487,7 +492,11 @@ namespace WebApiNew.Controllers
 		{
 			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
-				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+				return Json(new { has_error = false, status_code = 401, status = "Unauthorized to update !" });
+
+			if (IsIsEmriClose(isEmriId != 0 ? isEmriId : entity.DKN_ISEMRI_ID))
+
+				return Json(new { has_error = false, status_code = 200, Closed = true});
 
 			string plainText, rtfText;
 			string durum = "";
@@ -612,7 +621,11 @@ namespace WebApiNew.Controllers
 		{
 			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
-				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+				return Json(new { has_error = false, status_code = 401, status = "Unauthorized to update !" });
+
+			if (IsIsEmriClose(isEmriId != 0 ? isEmriId : entity.IDM_ISEMRI_ID))
+
+				return Json(new { has_error = false, status_code = 200, Closed = true });
 			string durum = "";
 			try
 			{
@@ -797,7 +810,10 @@ namespace WebApiNew.Controllers
 		{
 			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
-				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+				return Json(new { has_error = false, status_code = 401, status = "Unauthorized to update !" });
+			if (IsIsEmriClose(isEmriId != 0 ? isEmriId : entity.MKD_ISEMRI_ID))
+
+				return Json(new { has_error = false, status_code = 200, Closed = true });
 			string durum = "";
 			try
 			{
@@ -923,7 +939,11 @@ namespace WebApiNew.Controllers
 		{
 			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
-				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+				return Json(new { has_error = false, status_code = 401, status = "Unauthorized to update !" });
+
+			if (IsIsEmriClose(isEmriId != 0 ? isEmriId : entity.IDK_ISEMRI_ID))
+
+				return Json(new { has_error = false, status_code = 200, Closed = true });
 			string durum = "";
 			parametreler.Clear();
 			parametreler.Add(new Prm("IDK_ISEMRI_ID", isEmriId));
@@ -1050,7 +1070,10 @@ namespace WebApiNew.Controllers
 		{
 			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
-				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+				return Json(new { has_error = false, status_code = 401, status = "Unauthorized to update !" });
+			if (IsIsEmriClose(isEmriId))
+
+				return Json(new { has_error = false, status_code = 200, Closed = true });
 			try
 			{
 				foreach(var  item in lsitem) 
@@ -1096,7 +1119,12 @@ namespace WebApiNew.Controllers
 		{
 			if (!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.ISEMIRLERI_TANIMLARI))
 
-				return Json(new { has_error = true, status_code = 401, status = "Unauthorized to update !" });
+				return Json(new { has_error = false, status_code = 401, status = "Unauthorized to update !" });
+
+			if (IsIsEmriClose(isEmriId))
+
+				return Json(new { has_error = false, status_code = 200, Closed = true });
+
 			string durum = "";
 			string query = "";
 			try
@@ -2186,6 +2214,41 @@ namespace WebApiNew.Controllers
 				finalResult.IsmIsNotPersonelTimeSet = checkPersonelSure.IsmIsNotPersonelTimeSet;
 				finalResult.Idlist = (checkOtherAlan.Idlist != null ? checkOtherAlan.Idlist : new List<long>());
 				return finalResult;
+			}
+		}
+
+		public bool IsIsEmriClose(long ismId)
+		{
+			using (var cnn = klas.baglan())
+			{
+				bool isClose = cnn.QueryFirstOrDefault<Boolean>(" select ISM_KAPATILDI from orjin.TB_ISEMRI where TB_ISEMRI_ID = @ismId", new { @ismId = ismId});
+				return isClose;
+			}
+		}
+
+		[Route("api/GetIsEmriTabsCountById")]
+		[HttpGet]
+		public object GetIsEmriTabsCountById([FromUri] int isEmriId)
+		{
+			IsEmriTabsCount entity = new IsEmriTabsCount();
+			query = @"				
+			select  ( select count(TB_ISEMRI_KONTROLLIST_ID) from orjin.TB_ISEMRI_KONTROLLIST where DKN_ISEMRI_ID = @isEmriId ) as IsEmriKontrolListSayisi  ,
+					( select count(TB_ISEMRI_KAYNAK_ID) from orjin.TB_ISEMRI_KAYNAK where IDK_ISEMRI_ID = @isEmriId ) as IsEmriPersonelListSayisi  ,
+					( select count(TB_ISEMRI_ARAC_GEREC_ID) from orjin.TB_ISEMRI_ARAC_GEREC where IAG_ISEMRI_ID = @isEmriId ) as IsEmriAracGerevListSayisi  ,
+					( select count(TB_MAKINE_DURUS_ID) from orjin.TB_MAKINE_DURUS where MKD_ISEMRI_ID = @isEmriId ) as IsEmriDurusListSayisi  ,
+					( select count(TB_ISEMRI_OLCUM_ID) from orjin.TB_ISEMRI_OLCUM where IDO_ISEMRI_ID = @isEmriId ) as IsEmriOlcumListSayisi  ,
+					( select count(TB_ISEMRI_MLZ_ID) from orjin.TB_ISEMRI_MLZ where IDM_ISEMRI_ID = @isEmriId ) as IsEmriMalzemeListSayisi    ";
+			try
+			{
+				using(var conn = klas.baglan())
+				{
+					entity = conn.QueryFirstOrDefault<IsEmriTabsCount>(query, new { @isEmriId = isEmriId });
+					return entity;
+				}
+			}
+			catch(Exception ex) 
+			{
+				return Json(new { has_error = true, status_code = 500, status = ex.Message });
 			}
 		}
 	}
