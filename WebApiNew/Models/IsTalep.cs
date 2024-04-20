@@ -179,6 +179,8 @@ namespace WebApiNew.Models
         [DataMember]
         public string IST_TIP_TANIM { get; set; }
         [DataMember]
+        public string IST_ATOLYE_TANIM { get; set; }
+		[DataMember]
         public string IST_KATEGORI_TANIMI { get; set; }
         [DataMember]
         public string IST_SERVIS_NEDENI { get; set; }

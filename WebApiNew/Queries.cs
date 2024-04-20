@@ -224,5 +224,105 @@ namespace WebApiNew
 	                                            left join orjin.TB_LOKASYON lok on mkn.MKN_LOKASYON_ID = lok.TB_LOKASYON_ID
 
                                              where 1=1  ";
-    }
+
+		public static readonly string IST_FETCH_QUERY = @"WITH RowNumberedResults AS (
+                                    select	tlp.TB_IS_TALEP_ID as TB_IS_TALEP_ID ,
+                                            tlp.IST_KOD as IST_KOD ,
+		                                    tlp.IST_TANIMI as IST_TANIMI , 
+											tlp.IST_KONU as IST_KONU,
+											tlp.IST_ACILIS_TARIHI as IST_ACILIS_TARIHI,
+											tlp.IST_ACILIS_SAATI as IST_ACILIS_SAATI,
+		                                    isk.ISK_ISIM as IST_TALEP_EDEN_ADI ,
+											tlp.IST_DURUM_ID as IST_DURUM_ID ,
+											mkn.MKN_TANIM as IST_MAKINE_TANIM ,
+											mkn.MKN_KOD as IST_MAKINE_KOD ,
+											orjin.UDF_KOD_TANIM(IST_KOTEGORI_KODI_ID) as IST_KATEGORI_TANIMI , 
+											orjin.UDF_KOD_TANIM(IST_SERVIS_NEDENI_KOD_ID) as IST_SERVIS_NEDENI , 
+											soc.SOC_TANIM as IST_ONCELIK ,
+											lok.LOK_TANIM as IST_BILDIREN_LOKASYON ,
+											lok.LOK_TUM_YOL as IST_BILDIREN_LOKASYON_TUM ,
+											tlp.IST_DEGERLENDIRME_ACIKLAMA as IST_DEGERLENDIRME_ACIKLAMA,
+											tlp.IST_DEGERLENDIRME_PUAN as IST_DEGERLENDIRME_PUAN ,
+											tlp.IST_PLANLANAN_BASLAMA_TARIHI as IST_PLANLANAN_BASLAMA_TARIHI,
+											tlp.IST_PLANLANAN_BASLAMA_SAATI as IST_PLANLANAN_BASLAMA_SAATI,
+											tlp.IST_PLANLANAN_BITIS_TARIHI as IST_PLANLANAN_BITIS_TARIHI,
+											tlp.IST_PLANLANAN_BITIS_SAATI as IST_PLANLANAN_BITIS_SAATI,
+											ism.ISM_ISEMRI_NO as IST_ISEMRI_NO ,
+											tlp.IST_ISEMRI_ID as IST_ISEMRI_ID ,
+											(SELECT        TOP (1) PRS.PRS_ISIM
+                                                          FROM            orjin.TB_IS_TALEBI_TEKNISYEN AS ITK LEFT OUTER JOIN
+                                                                                    orjin.TB_PERSONEL AS PRS ON ITK.ITK_TEKNISYEN_ID = PRS.TB_PERSONEL_ID
+                                                          WHERE        (tlp.TB_IS_TALEP_ID = ITK.ITK_IS_TALEBI_ID)) AS IST_TEKNISYEN_TANIM,
+											atl.ATL_TANIM as IST_ATOLYE_TANIM ,
+											orjin.UDF_KOD_TANIM(tlp.IST_BILDIRILEN_KAT) AS IST_BILDIRILEN_KAT, 
+											orjin.UDF_KOD_TANIM(tlp.IST_BILDIRILEN_BINA) AS IST_BILDIRILEN_BINA,
+											kod_tip.KOD_TANIM AS IST_TIP_TANIM ,
+											kod_departman.KOD_TANIM AS IST_DEPARTMAN ,
+											kl.ISK_ISIM as IST_TAKIP_EDEN_ADI ,
+											
+
+	                                    ROW_NUMBER() OVER (ORDER BY mkn.MKN_KOD) AS RowIndex
+	                                    FROM orjin.TB_IS_TALEBI tlp 
+	                                    left join orjin.TB_IS_TALEBI_KULLANICI isk on tlp.IST_TALEP_EDEN_ID = isk.TB_IS_TALEBI_KULLANICI_ID
+										left join orjin.TB_MAKINE mkn on tlp.IST_MAKINE_ID = mkn.TB_MAKINE_ID
+										left join orjin.TB_SERVIS_ONCELIK soc on tlp.IST_ONCELIK_ID = soc.TB_SERVIS_ONCELIK_ID
+										left join orjin.TB_LOKASYON lok on tlp.IST_BILDIREN_LOKASYON_ID = lok.TB_LOKASYON_ID
+										left join orjin.TB_ISEMRI ism on tlp.IST_ISEMRI_ID = ism.TB_ISEMRI_ID
+										left join orjin.TB_ATOLYE atl on tlp.IST_ILGILI_ATOLYE_ID = atl.TB_ATOLYE_ID
+										left join orjin.TB_IS_TALEBI_KULLANICI kl on tlp.IST_IS_TAKIPCISI_ID = kl.TB_IS_TALEBI_KULLANICI_ID
+										left join orjin.TB_KOD kod_tip on tlp.IST_TIP_KOD_ID = kod_tip.TB_KOD_ID
+										left join orjin.TB_KOD kod_departman on tlp.IST_DEPARTMAN_ID = kod_departman.TB_KOD_ID
+
+                                    WHERE 1=1 ";
+
+		public static readonly string IST_FETCH_COUNT_QUERY = @"select count(*) from  (
+                                            select	tlp.TB_IS_TALEP_ID as TB_IS_TALEP_ID ,
+                                            tlp.IST_KOD as IST_KOD ,
+		                                    tlp.IST_TANIMI as IST_TANIMI , 
+											tlp.IST_KONU as IST_KONU,
+											tlp.IST_ACILIS_TARIHI as IST_ACILIS_TARIHI,
+											tlp.IST_ACILIS_SAATI as IST_ACILIS_SAATI,
+		                                    isk.ISK_ISIM as IST_TALEP_EDEN_ADI ,
+											tlp.IST_DURUM_ID as IST_DURUM_ID ,
+											mkn.MKN_TANIM as IST_MAKINE_TANIM ,
+											mkn.MKN_KOD as IST_MAKINE_KOD ,
+											orjin.UDF_KOD_TANIM(IST_KOTEGORI_KODI_ID) as IST_KATEGORI_TANIMI , 
+											orjin.UDF_KOD_TANIM(IST_SERVIS_NEDENI_KOD_ID) as IST_SERVIS_NEDENI , 
+											soc.SOC_TANIM as IST_ONCELIK ,
+											lok.LOK_TANIM as IST_BILDIREN_LOKASYON ,
+											lok.LOK_TUM_YOL as IST_BILDIREN_LOKASYON_TUM ,
+											tlp.IST_DEGERLENDIRME_ACIKLAMA as IST_DEGERLENDIRME_ACIKLAMA,
+											tlp.IST_DEGERLENDIRME_PUAN as IST_DEGERLENDIRME_PUAN ,
+											tlp.IST_PLANLANAN_BASLAMA_TARIHI as IST_PLANLANAN_BASLAMA_TARIHI,
+											tlp.IST_PLANLANAN_BASLAMA_SAATI as IST_PLANLANAN_BASLAMA_SAATI,
+											tlp.IST_PLANLANAN_BITIS_TARIHI as IST_PLANLANAN_BITIS_TARIHI,
+											tlp.IST_PLANLANAN_BITIS_SAATI as IST_PLANLANAN_BITIS_SAATI,
+											ism.ISM_ISEMRI_NO as IST_ISEMRI_NO ,
+											tlp.IST_ISEMRI_ID as IST_ISEMRI_ID ,
+											(SELECT        TOP (1) PRS.PRS_ISIM
+                                                          FROM            orjin.TB_IS_TALEBI_TEKNISYEN AS ITK LEFT OUTER JOIN
+                                                                                    orjin.TB_PERSONEL AS PRS ON ITK.ITK_TEKNISYEN_ID = PRS.TB_PERSONEL_ID
+                                                          WHERE        (tlp.TB_IS_TALEP_ID = ITK.ITK_IS_TALEBI_ID)) AS IST_TEKNISYEN_TANIM,
+											atl.ATL_TANIM as IST_ATOLYE_TANIM ,
+											orjin.UDF_KOD_TANIM(tlp.IST_BILDIRILEN_KAT) AS IST_BILDIRILEN_KAT, 
+											orjin.UDF_KOD_TANIM(tlp.IST_BILDIRILEN_BINA) AS IST_BILDIRILEN_BINA,
+											kod_tip.KOD_TANIM AS IST_TIP_TANIM ,
+											kod_departman.KOD_TANIM AS IST_DEPARTMAN ,
+											kl.ISK_ISIM as IST_TAKIP_EDEN_ADI ,
+											
+
+	                                    ROW_NUMBER() OVER (ORDER BY mkn.MKN_KOD) AS RowIndex
+	                                    FROM orjin.TB_IS_TALEBI tlp 
+	                                    left join orjin.TB_IS_TALEBI_KULLANICI isk on tlp.IST_TALEP_EDEN_ID = isk.TB_IS_TALEBI_KULLANICI_ID
+										left join orjin.TB_MAKINE mkn on tlp.IST_MAKINE_ID = mkn.TB_MAKINE_ID
+										left join orjin.TB_SERVIS_ONCELIK soc on tlp.IST_ONCELIK_ID = soc.TB_SERVIS_ONCELIK_ID
+										left join orjin.TB_LOKASYON lok on tlp.IST_BILDIREN_LOKASYON_ID = lok.TB_LOKASYON_ID
+										left join orjin.TB_ISEMRI ism on tlp.IST_ISEMRI_ID = ism.TB_ISEMRI_ID
+										left join orjin.TB_ATOLYE atl on tlp.IST_ILGILI_ATOLYE_ID = atl.TB_ATOLYE_ID
+										left join orjin.TB_IS_TALEBI_KULLANICI kl on tlp.IST_IS_TAKIPCISI_ID = kl.TB_IS_TALEBI_KULLANICI_ID
+										left join orjin.TB_KOD kod_tip on tlp.IST_TIP_KOD_ID = kod_tip.TB_KOD_ID
+										left join orjin.TB_KOD kod_departman on tlp.IST_DEPARTMAN_ID = kod_departman.TB_KOD_ID
+
+                                    WHERE 1=1  ";
+	}
 }

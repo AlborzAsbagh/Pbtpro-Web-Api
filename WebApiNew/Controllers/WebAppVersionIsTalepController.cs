@@ -58,17 +58,17 @@ namespace WebApiNew.Controllers
 			List<IsTalep> listem = new List<IsTalep>();
 			try
 			{
-				query = @" SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY TB_IS_TALEP_ID DESC) AS subRow FROM orjin.VW_IS_TALEP where 1=1 ";
-				toplamIsTalepSayisiQuery = @" select count(*) from (select * from orjin.VW_IS_TALEP where 1=1 ";
+				query = Queries.IST_FETCH_QUERY;
+				toplamIsTalepSayisiQuery = Queries.IST_FETCH_COUNT_QUERY;
 
 				if (!string.IsNullOrEmpty(parametre))
 				{
-					query += $" and ( IST_KOD like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" and ( IST_KOD like '%{parametre}%' or ";
-					query += $" IST_TANIMI like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_TANIMI like '%{parametre}%' or ";
-					query += $" IST_BILDIREN_LOKASYON like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_BILDIREN_LOKASYON like '%{parametre}%' or ";
-					query += $" IST_MAKINE_KOD like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_MAKINE_KOD like '%{parametre}%' or ";
-					query += $" IST_ACIKLAMA like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" IST_ACIKLAMA like '%{parametre}%' or ";
-					query += $" IST_TALEP_EDEN_ADI like '%{parametre}%' ) "; toplamIsTalepSayisiQuery += $" IST_TALEP_EDEN_ADI like '%{parametre}%' ) ";
+					query += $" and ( tlp.IST_KOD like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" and ( tlp.IST_KOD like '%{parametre}%' or ";
+					query += $" tlp.IST_TANIMI like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" tlp.IST_TANIMI like '%{parametre}%' or ";
+					query += $" lok.LOK_TANIM like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" lok.LOK_TANIM like '%{parametre}%' or ";
+					query += $" mkn.MKN_KOD like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" mkn.MKN_KOD like '%{parametre}%' or ";
+					query += $" tlp.IST_ACIKLAMA like '%{parametre}%' or "; toplamIsTalepSayisiQuery += $" tlp.IST_ACIKLAMA like '%{parametre}%' or ";
+					query += $" isk.ISK_ISIM like '%{parametre}%' ) "; toplamIsTalepSayisiQuery += $" isk.ISK_ISIM like '%{parametre}%' ) ";
 				}
 
 				if ((filters["customfilters"] as JObject) != null && (filters["customfilters"] as JObject).Count > 0)
@@ -80,13 +80,13 @@ namespace WebApiNew.Controllers
 					{
 						if (property.Key == "startDate")
 						{
-							query += $" IST_ACILIS_TARIHI >= '{property.Value}' ";
-							toplamIsTalepSayisiQuery += $" IST_ACILIS_TARIHI >= '{property.Value}' ";
+							query += $" tlp.IST_ACILIS_TARIHI >= '{property.Value}' ";
+							toplamIsTalepSayisiQuery += $" tlp.IST_ACILIS_TARIHI >= '{property.Value}' ";
 						}
 						else if (property.Key == "endDate")
 						{
-							query += $" IST_ACILIS_TARIHI <= '{property.Value}' ";
-							toplamIsTalepSayisiQuery += $" IST_ACILIS_TARIHI <= '{property.Value}' ";
+							query += $" tlp.IST_ACILIS_TARIHI <= '{property.Value}' ";
+							toplamIsTalepSayisiQuery += $" tlp.IST_ACILIS_TARIHI <= '{property.Value}' ";
 						}
 						else
 						{
@@ -107,8 +107,8 @@ namespace WebApiNew.Controllers
 
 				if (lokasyonId > 0 && lokasyonId != null)
 				{
-					query += $" and IST_BILDIREN_LOKASYON_ID = {lokasyonId} ";
-					toplamIsTalepSayisiQuery += $" and IST_BILDIREN_LOKASYON_ID = {lokasyonId} ";
+					query += $" and tlp.IST_BILDIREN_LOKASYON_ID = {lokasyonId} ";
+					toplamIsTalepSayisiQuery += $" and tlp.IST_BILDIREN_LOKASYON_ID = {lokasyonId} ";
 				}
 
 				if( (filters["durumlar"] as JObject) != null && (filters["durumlar"] as JObject).Count > 0)
@@ -118,8 +118,8 @@ namespace WebApiNew.Controllers
 					counter = 0;
 					foreach (var property in filters["durumlar"] as JObject)
 					{
-						query += $" IST_DURUM_ID LIKE '%{property.Value}%' ";
-						toplamIsTalepSayisiQuery += $" IST_DURUM_ID LIKE '%{property.Value}%' ";
+						query += $" tlp.IST_DURUM_ID LIKE '%{property.Value}%' ";
+						toplamIsTalepSayisiQuery += $" tlp.IST_DURUM_ID LIKE '%{property.Value}%' ";
 
 						if (counter < (filters["durumlar"] as JObject).Count - 1)
 						{
@@ -132,7 +132,7 @@ namespace WebApiNew.Controllers
 					toplamIsTalepSayisiQuery += " ) ";
 				}
 
-				query += $" ) RowIndex WHERE RowIndex.subRow >= {pagingIlkDeger} AND RowIndex.subRow < {pagingSonDeger}";
+				query += $" ) SELECT * FROM RowNumberedResults WHERE RowIndex BETWEEN {pagingIlkDeger} AND {pagingSonDeger - 1};";
 				toplamIsTalepSayisiQuery += ") as TotalIsTalepSayisi";
 
 				using (var cnn = klas.baglan())
