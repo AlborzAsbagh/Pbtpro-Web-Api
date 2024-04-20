@@ -39,9 +39,9 @@ namespace WebApiNew.Models
         [DataMember]
         public int IST_IRTIBAT_KOD_KOD_ID { get; set; }
         [DataMember]
-        public int IST_BILDIRILEN_BINA { get; set; }
+        public string IST_BILDIRILEN_BINA { get; set; }
         [DataMember]
-        public int IST_BILDIRILEN_KAT { get; set; }
+        public string IST_BILDIRILEN_KAT { get; set; }
         [DataMember]
         public string IST_TANIMI { get; set; }
         [DataMember]
