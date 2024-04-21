@@ -91,9 +91,8 @@ namespace WebApiNew.Controllers
 
 				using (var cnn = klas.baglan())
 				{
-					listem = cnn.Query<WebVersionMakineModel>(query).ToList();
-					cmd = new SqlCommand(toplamMakineSayisiQuery, cnn);
-					toplamMakineSayisi = (int) cmd.ExecuteScalar();
+					listem = cnn.Query<WebVersionMakineModel>(query , new { @KUL_ID = UserInfo.USER_ID}).ToList();
+					toplamMakineSayisi = cnn.QueryFirstOrDefault<Int32>(toplamMakineSayisiQuery, new { @KUL_ID = UserInfo.USER_ID });
 				}
 				klas.kapat();
 				return Json(new {page = (int)Math.Ceiling((decimal)((decimal)toplamMakineSayisi/ pageSize)) ,makine_listesi = listem , kayit_sayisi = toplamMakineSayisi });

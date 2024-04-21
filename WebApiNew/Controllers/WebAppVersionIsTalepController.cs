@@ -137,9 +137,8 @@ namespace WebApiNew.Controllers
 
 				using (var cnn = klas.baglan())
 				{
-					listem = cnn.Query<IsTalep>(query).ToList();
-					cmd = new SqlCommand(toplamIsTalepSayisiQuery, cnn);
-					toplamIsTalepSayisi = (int)cmd.ExecuteScalar();
+					listem = cnn.Query<IsTalep>(query , new { @KUL_ID = UserInfo.USER_ID}).ToList();
+					toplamIsTalepSayisi = cnn.QueryFirstOrDefault<Int32>(toplamIsTalepSayisiQuery, new { @KUL_ID = UserInfo.USER_ID});
 				}
 				klas.kapat();
 				return Json(new { page = (int)Math.Ceiling((decimal)((decimal)toplamIsTalepSayisi / pageSize)), is_talep_listesi = listem, kayit_sayisi = toplamIsTalepSayisi });

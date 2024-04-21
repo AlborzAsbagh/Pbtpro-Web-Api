@@ -120,7 +120,8 @@ namespace WebApiNew
 
 	                                    left join orjin.TB_LOKASYON lok on mkn.MKN_LOKASYON_ID = lok.TB_LOKASYON_ID
 
-                                    WHERE 1=1";
+                                    WHERE mkn.MKN_AKTIF = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(mkn.MKN_LOKASYON_ID,-1),@KUL_ID) = 1 
+									AND orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(mkn.MKN_ATOLYE_ID,-1), @KUL_ID ) = 1 ";
 
         public static readonly string MKN_FETCH_COUNT_QUERY = @"select count(*) from  (
                                             select	mkn.TB_MAKINE_ID as TB_MAKINE_ID ,
@@ -223,7 +224,8 @@ namespace WebApiNew
 
 	                                            left join orjin.TB_LOKASYON lok on mkn.MKN_LOKASYON_ID = lok.TB_LOKASYON_ID
 
-                                             where 1=1  ";
+                                             WHERE mkn.MKN_AKTIF = 1 AND orjin.UDF_LOKASYON_YETKI_KONTROL(ISNULL(mkn.MKN_LOKASYON_ID,-1),@KUL_ID) = 1 
+												AND orjin.UDF_ATOLYE_YETKI_KONTROL(ISNULL(mkn.MKN_ATOLYE_ID,-1), @KUL_ID ) = 1 ";
 
 		public static readonly string IST_FETCH_QUERY = @"WITH RowNumberedResults AS (
                                     select	tlp.TB_IS_TALEP_ID as TB_IS_TALEP_ID ,
@@ -273,7 +275,8 @@ namespace WebApiNew
 										left join orjin.TB_KOD kod_tip on tlp.IST_TIP_KOD_ID = kod_tip.TB_KOD_ID
 										left join orjin.TB_KOD kod_departman on tlp.IST_DEPARTMAN_ID = kod_departman.TB_KOD_ID
 
-                                    WHERE 1=1 ";
+                                    WHERE orjin.UDF_LOKASYON_YETKI_KONTROL(tlp.IST_BILDIREN_LOKASYON_ID,@KUL_ID) = 1 
+										AND orjin.UDF_ATOLYE_YETKI_KONTROL(tlp.IST_ATOLYE_GRUP_ID,@KUL_ID) = 1 ";
 
 		public static readonly string IST_FETCH_COUNT_QUERY = @"select count(*) from  (
                                             select	tlp.TB_IS_TALEP_ID as TB_IS_TALEP_ID ,
@@ -323,6 +326,7 @@ namespace WebApiNew
 										left join orjin.TB_KOD kod_tip on tlp.IST_TIP_KOD_ID = kod_tip.TB_KOD_ID
 										left join orjin.TB_KOD kod_departman on tlp.IST_DEPARTMAN_ID = kod_departman.TB_KOD_ID
 
-                                    WHERE 1=1  ";
+                                    WHERE orjin.UDF_LOKASYON_YETKI_KONTROL(tlp.IST_BILDIREN_LOKASYON_ID,@KUL_ID) = 1 
+									AND orjin.UDF_ATOLYE_YETKI_KONTROL(tlp.IST_ATOLYE_GRUP_ID,@KUL_ID) = 1 ";
 	}
 }

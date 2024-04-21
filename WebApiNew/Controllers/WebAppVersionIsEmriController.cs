@@ -2237,7 +2237,9 @@ namespace WebApiNew.Controllers
 					( select count(TB_ISEMRI_ARAC_GEREC_ID) from orjin.TB_ISEMRI_ARAC_GEREC where IAG_ISEMRI_ID = @isEmriId ) as IsEmriAracGerevListSayisi  ,
 					( select count(TB_MAKINE_DURUS_ID) from orjin.TB_MAKINE_DURUS where MKD_ISEMRI_ID = @isEmriId ) as IsEmriDurusListSayisi  ,
 					( select count(TB_ISEMRI_OLCUM_ID) from orjin.TB_ISEMRI_OLCUM where IDO_ISEMRI_ID = @isEmriId ) as IsEmriOlcumListSayisi  ,
-					( select count(TB_ISEMRI_MLZ_ID) from orjin.TB_ISEMRI_MLZ where IDM_ISEMRI_ID = @isEmriId ) as IsEmriMalzemeListSayisi    ";
+					( select count(TB_ISEMRI_MLZ_ID) from orjin.TB_ISEMRI_MLZ where IDM_ISEMRI_ID = @isEmriId ) as IsEmriMalzemeListSayisi ,
+					( select count(TB_RESIM_ID) from orjin.TB_RESIM where RSM_REF_GRUP = 'ISEMRI' and RSM_REF_ID = @isEmriId ) as IsEmriResimSayisi ,
+					COALESCE((SELECT CASE WHEN COALESCE(ISM_NOT, '') = '' THEN 0 ELSE 1 END FROM orjin.TB_ISEMRI WHERE TB_ISEMRI_ID = @isEmriId), 0) AS IsEmriNotVar ";
 			try
 			{
 				using(var conn = klas.baglan())
