@@ -45,176 +45,174 @@ namespace WebApiNew.Controllers
 
 		[Route("api/GetIsEmriFullList")]
 		[HttpPost]
-		public Object GetIsEmriFullList([FromUri] string parametre, [FromBody] JObject filtreler, [FromUri] int pagingDeger = 1 , [FromUri] int? pageSize = 10)
+		public object GetIsEmriFullList([FromUri] string parametre, [FromBody] JObject filtreler, [FromUri] int pagingDeger = 1, [FromUri] int? pageSize = 10)
 		{
+			int pagingIlkDeger = (int)(pagingDeger == 1 ? 1 : ((pagingDeger * pageSize) - pageSize));
+			int pagingSonDeger = (int)(pagingIlkDeger == 1 ? pageSize : pagingDeger * pageSize);
+			int toplamIsEmriSayisi = 0;
+			int counter = 0;
+			string toplamIsEmriSayisiQuery = "";
 
 			List<WebVersionIsEmriModel> listem = new List<WebVersionIsEmriModel>();
-
-			int pagingIlkDeger = (int)(pagingDeger == 1 ? 1 : ((pagingDeger * pageSize) - pageSize));
-			int pagingSonDeger = (int)(pagingIlkDeger == 1 ? pageSize : pagingDeger * pageSize );
-			int toplamIsEmriSayisi = 0;
-			string MAIN_QUERY = "";
-			string TOTAL_IS_EMRI_QUERY = "";
-			string isParametreForTotalIsEmri = "";
-			SqlCommand cmd = null;
-
 			try
 			{
-				MAIN_QUERY = "SELECT * from (select ROW_NUMBER() over (order by TB_ISEMRI_ID DESC) as RowIndex , * FROM VW_WEB_VERSION_ISEMRI WHERE 1 = 1 ";
+				query = Queries.ISM_FETCH_QUERY;
+				toplamIsEmriSayisiQuery = Queries.ISM_FETCH_COUNT_QUERY;
 
-				string lokasyonQuery = "", durumQuery = "", isemritipQuery = "", customfilterQuery = "";
-				int counter = 0;
+				JObject isemritipleri = filtreler?["isemritipleri"] as JObject;
+				JObject durumlar = filtreler?["durumlar"] as JObject;
+				JObject lokasyonlar = filtreler?["lokasyonlar"] as JObject;
+				JObject customfilter = filtreler?["customfilter"] as JObject;
 
-				if (filtreler != null || (!string.IsNullOrEmpty(parametre)))
+				if (isemritipleri != null && isemritipleri.Count != 0)
 				{
-					JObject isemritipleri = filtreler?["isemritipleri"] as JObject;
-					JObject durumlar = filtreler?["durumlar"] as JObject;
-					JObject lokasyonlar = filtreler?["lokasyonlar"] as JObject;
-					JObject customfilter = filtreler?["customfilter"] as JObject;
+					query += " and ( ";
+					toplamIsEmriSayisiQuery += " and ( ";
+					counter = 0;
 
-					if (isemritipleri != null && isemritipleri.Count != 0)
+					foreach (var property in isemritipleri)
 					{
-						isemritipQuery = " ( ";
-						counter = 0;
+						query += " isemri_tip.IMT_TANIM LIKE '" + property.Value + "%' ";
+						toplamIsEmriSayisiQuery += " isemri_tip.IMT_TANIM LIKE '" + property.Value + "%' ";
 
-						foreach (var property in isemritipleri)
+						if (counter < isemritipleri.Count - 1)
 						{
-							isemritipQuery += " ISEMRI_TIP LIKE '" + property.Value + "%' ";
-
-							if (counter < isemritipleri.Count - 1)
-							{
-								isemritipQuery += " or ";
-							}
-
-							counter++;
+							query += " or ";
+							toplamIsEmriSayisiQuery += " or ";
 						}
 
-						isemritipQuery += " ) ";
+						counter++;
 					}
 
-					if (durumlar != null && durumlar.Count != 0)
-					{
-						durumQuery = " ( ";
-						counter = 0;
-
-						foreach (var property in durumlar)
-						{
-							durumQuery += " DURUM LIKE '" + property.Value + "%' ";
-
-							if (counter < durumlar.Count - 1)
-							{
-								durumQuery += " or ";
-							}
-							counter++;
-						}
-						durumQuery += " ) ";
-					}
-
-					if (lokasyonlar != null && lokasyonlar.Count != 0)
-					{
-						lokasyonQuery = " ( ";
-						counter = 0;
-
-						foreach (var property in lokasyonlar)
-						{
-							lokasyonQuery += " LOKASYON LIKE '" + property.Value + "%' ";
-							if (counter < lokasyonlar.Count - 1)
-							{
-								lokasyonQuery += " or ";
-							}
-							counter++;
-						}
-						lokasyonQuery += " ) ";
-					}
-
-					if (customfilter != null && customfilter.Count != 0)
-					{
-						customfilterQuery = " ( ";
-						counter = 0;
-						foreach (var property in customfilter)
-						{
-							customfilterQuery += $" {property.Key} LIKE '" + property.Value + "%'";
-							if (counter < customfilter.Count - 1)
-							{
-								customfilterQuery += " or ";
-							}
-							counter++;
-						}
-						customfilterQuery += " ) ";
-
-					}
-
-					if (!string.IsNullOrEmpty(parametre))
-					{
-						MAIN_QUERY += $" AND ( KAPALI  LIKE '%" + parametre + "%' or " +
-									  $" ISEMRI_NO  LIKE '%" + parametre + "%' or " +
-									  $" KONU  LIKE '%" + parametre + "%' or " +
-									  $" ISEMRI_TIP  LIKE '%" + parametre + "%' or " +
-									  $" DURUM  LIKE '%" + parametre + "%' or " +
-									  $" LOKASYON  LIKE '%" + parametre + "%' or " +
-									  $" MAKINE_KODU  LIKE '%" + parametre + "%' or " +
-									  $" MAKINE_TANIMI  LIKE '%" + parametre + "%' or " +
-									  $" IS_TIPI  LIKE '%" + parametre + "%' or " +
-									  $" IS_NEDENI  LIKE '%" + parametre + "%' or " +
-									  $" ATOLYE  LIKE '%" + parametre + "%' or " +
-									  $" ISM_ACIKLAMA  LIKE '%" + parametre + "%' or " +
-									  $" PERSONEL_ADI LIKE '%" + parametre + "%' ) ";
-
-						isParametreForTotalIsEmri = $" AND ( KAPALI  LIKE '%" + parametre + "%' or " +
-									  $" ISEMRI_NO  LIKE '%" + parametre + "%' or " +
-									  $" KONU  LIKE '%" + parametre + "%' or " +
-									  $" ISEMRI_TIP  LIKE '%" + parametre + "%' or " +
-									  $" DURUM  LIKE '%" + parametre + "%' or " +
-									  $" LOKASYON  LIKE '%" + parametre + "%' or " +
-									  $" MAKINE_KODU  LIKE '%" + parametre + "%' or " +
-									  $" MAKINE_TANIMI  LIKE '%" + parametre + "%' or " +
-									  $" IS_TIPI  LIKE '%" + parametre + "%' or " +
-									  $" IS_NEDENI  LIKE '%" + parametre + "%' or " +
-									  $" ATOLYE  LIKE '%" + parametre + "%' or " +
-									  $" ISM_ACIKLAMA  LIKE '%" + parametre + "%' or " +
-									  $" PERSONEL_ADI LIKE '%" + parametre + "%' ) ";
-					}
-
-					if (isemritipleri != null && isemritipleri.Count != 0) MAIN_QUERY += " AND " + isemritipQuery;
-					if (durumlar != null && durumlar.Count != 0) MAIN_QUERY += " AND " + durumQuery;
-					if (lokasyonlar != null && lokasyonlar.Count != 0) MAIN_QUERY += " AND " + lokasyonQuery;
-					if (customfilter != null && customfilter.Count != 0) MAIN_QUERY += " AND " + customfilterQuery;
-
-					MAIN_QUERY += $" ) as SubRow where SubRow.RowIndex >= {pagingIlkDeger} and SubRow.RowIndex < {pagingSonDeger} ";
-
-					TOTAL_IS_EMRI_QUERY = " select count(*) from (select * from dbo.VW_WEB_VERSION_ISEMRI where 1=1 ";
-					TOTAL_IS_EMRI_QUERY += isParametreForTotalIsEmri;
-
-					if (isemritipleri != null && isemritipleri.Count != 0) TOTAL_IS_EMRI_QUERY += " AND " + isemritipQuery;
-					if (durumlar != null && durumlar.Count != 0) TOTAL_IS_EMRI_QUERY += " AND " + durumQuery;
-					if (lokasyonlar != null && lokasyonlar.Count != 0) TOTAL_IS_EMRI_QUERY += " AND " + lokasyonQuery;
-					if (customfilter != null && customfilter.Count != 0) TOTAL_IS_EMRI_QUERY += " AND " + customfilterQuery;
-
-					TOTAL_IS_EMRI_QUERY += " ) as TotalIsEmriSayisi ";
+					query += " ) ";
+					toplamIsEmriSayisiQuery += " ) ";
 				}
 
-				else
+				if (durumlar != null && durumlar.Count != 0)
 				{
+					query += " and (  ";
+					toplamIsEmriSayisiQuery += " and (  ";
+					counter = 0;
 
-					MAIN_QUERY = $" SELECT * FROM ( SELECT ROW_NUMBER() OVER (ORDER BY TB_ISEMRI_ID DESC) as RowIndex , * FROM VW_WEB_VERSION_ISEMRI ) as SubRow where SubRow.RowIndex >= {pagingIlkDeger} and SubRow.RowIndex < {pagingSonDeger} ";
-					TOTAL_IS_EMRI_QUERY = " select count(*) from (select * from dbo.VW_WEB_VERSION_ISEMRI where 1=1) as TotalIsEmriSayisi ";
+					foreach (var property in durumlar)
+					{
+						query += " kod_isemri_durum.KOD_TANIM LIKE '" + property.Value + "%' ";
+						toplamIsEmriSayisiQuery += " kod_isemri_durum.KOD_TANIM LIKE '" + property.Value + "%' ";
+
+						if (counter < durumlar.Count - 1)
+						{
+							query += " or ";
+							toplamIsEmriSayisiQuery += " or ";
+						}
+						counter++;
+					}
+					query += " ) ";
+					toplamIsEmriSayisiQuery += " ) ";
 				}
 
-
-				using(var cnn = klas.baglan())
+				if (lokasyonlar != null && lokasyonlar.Count != 0)
 				{
-					listem = cnn.Query<WebVersionIsEmriModel>(MAIN_QUERY).ToList();
-					cmd = new SqlCommand(TOTAL_IS_EMRI_QUERY, cnn);
-					toplamIsEmriSayisi = (int)cmd.ExecuteScalar();
+					query += " and (  ";
+					toplamIsEmriSayisiQuery += " and (  ";
+					counter = 0;
+
+					foreach (var property in lokasyonlar)
+					{
+						query += " lok.LOK_TANIM LIKE '" + property.Value + "%' ";
+						toplamIsEmriSayisiQuery += " lok.LOK_TANIM LIKE '" + property.Value + "%' ";
+						if (counter < lokasyonlar.Count - 1)
+						{
+							query += " or ";
+							toplamIsEmriSayisiQuery += " or ";
+						}
+						counter++;
+					}
+					query += " ) ";
+					toplamIsEmriSayisiQuery += " ) ";
 				}
 
+				if (customfilter != null && customfilter.Count != 0)
+				{
+					query += " and ( ";
+					toplamIsEmriSayisiQuery += " and ( ";
+					counter = 0;
+					foreach (var property in customfilter as JObject)
+					{
+						if (property.Key == "startDate")
+						{
+							query += $" ism.ISM_BASLAMA_TARIH >= '{property.Value}' ";
+							toplamIsEmriSayisiQuery += $" ism.ISM_BASLAMA_TARIH >= '{property.Value}' ";
+						}
+						else if (property.Key == "endDate")
+						{
+							query += $" ism.ISM_BASLAMA_TARIH <= '{property.Value}' ";
+							toplamIsEmriSayisiQuery += $" ism.ISM_BASLAMA_TARIH <= '{property.Value}' ";
+						}
+						else
+						{
+							query += $" {property.Key} LIKE '%{property.Value}%' ";
+							toplamIsEmriSayisiQuery += $" {property.Key} LIKE '%{property.Value}%' ";
+						}
+
+						if (counter < (customfilter as JObject).Count - 1)
+						{
+							query += " and ";
+							toplamIsEmriSayisiQuery += " and ";
+						}
+						counter++;
+					}
+					query += " ) ";
+					toplamIsEmriSayisiQuery += " ) ";
+
+				}
+
+				if (!string.IsNullOrEmpty(parametre))
+				{
+					query += $" AND ( ism.ISM_KAPATILDI  LIKE '%" + parametre + "%' or " +
+								  $" ism.ISM_ISEMRI_NO  LIKE '%" + parametre + "%' or " +
+								  $" ism.ISM_KONU  LIKE '%" + parametre + "%' or " +
+								  $" isemri_tip.IMT_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" kod_isemri_durum.KOD_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" lok.LOK_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" mkn.MKN_KOD  LIKE '%" + parametre + "%' or " +
+								  $" mkn.MKN_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" kod_is_tip.KOD_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" kod_is_nedeni.KOD_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" atl.ATL_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" ism.ISM_ACIKLAMA  LIKE '%" + parametre + "%' or " +
+								  $" prs.PRS_ISIM LIKE '%" + parametre + "%' ) ";
+
+					toplamIsEmriSayisiQuery += $" AND ( ism.ISM_KAPATILDI  LIKE '%" + parametre + "%' or " +
+								  $" ism.ISM_ISEMRI_NO  LIKE '%" + parametre + "%' or " +
+								  $" ism.ISM_KONU  LIKE '%" + parametre + "%' or " +
+								  $" isemri_tip.IMT_TANIM   LIKE '%" + parametre + "%' or " +
+								  $" kod_isemri_durum.KOD_TANIM   LIKE '%" + parametre + "%' or " +
+								  $" lok.LOK_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" mkn.MKN_KOD  LIKE '%" + parametre + "%' or " +
+								  $" mkn.MKN_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" kod_is_tip.KOD_TANIM   LIKE '%" + parametre + "%' or " +
+								  $" kod_is_nedeni.KOD_TANIM  LIKE '%" + parametre + "%' or " +
+								  $" atl.ATL_TANIM   LIKE '%" + parametre + "%' or " +
+								  $" ism.ISM_ACIKLAMA   LIKE '%" + parametre + "%' or " +
+								  $" prs.PRS_ISIM LIKE '%" + parametre + "%' ) ";
+				}
+
+				query += $" ) SELECT * FROM RowNumberedResults WHERE RowIndex BETWEEN {pagingIlkDeger} AND {pagingSonDeger - 1}; ";
+				toplamIsEmriSayisiQuery += ") as TotalIsEmriSayisi";
+
+				using (var cnn = klas.baglan())
+				{
+					listem = cnn.Query<WebVersionIsEmriModel>(query).ToList();
+					toplamIsEmriSayisi = cnn.QueryFirstOrDefault<Int32>(toplamIsEmriSayisiQuery);
+				}
 				klas.kapat();
-				return Json(new { page = (int)Math.Ceiling((decimal)((decimal)toplamIsEmriSayisi / pageSize)), list = listem , kayit_sayisi = toplamIsEmriSayisi });
+				return Json(new { page = (int)Math.Ceiling((decimal)((decimal)toplamIsEmriSayisi / pageSize)), list = listem, kayit_sayisi = toplamIsEmriSayisi });
+
 			}
 			catch (Exception e)
 			{
 				klas.kapat();
-				return Json(e.Message);
+				return Json(new { error = e.Message });
 			}
 		}
 

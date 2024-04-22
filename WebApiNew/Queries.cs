@@ -19,7 +19,223 @@ namespace WebApiNew
 
         public static readonly string KLL_SIL_YETKISI = @" select KYT_SIL from PBTPRO_MASTER.orjin.TB_KULLANICI_YETKI where KYT_KULLANICI_ID = @KYT_KULLANICI_ID and KYT_YETKI_KOD = @KYT_YETKI_KOD ";
 
-        public static readonly string MKN_FETCH_QUERY = @"WITH RowNumberedResults AS (
+		public static readonly string ISM_FETCH_QUERY = @"WITH RowNumberedResults AS (
+                                    select	ism.TB_ISEMRI_ID as TB_ISEMRI_ID,
+											ist.TB_IS_TALEP_ID as ISM_IS_TALEP_ID ,
+											ism.ISM_ISEMRI_NO as ISEMRI_NO ,
+											ism.ISM_DUZENLEME_TARIH as DUZENLEME_TARIH ,
+											ism.ISM_DUZENLEME_SAAT as DUZENLEME_SAAT ,
+											isemri_tip.IMT_TANIM as ISEMRI_TIP ,
+											isemri_tip.IMT_RENK_WEB_VERSION as ISM_TIP_RENK ,
+											ism.ISM_KONU as KONU ,
+											kod_isemri_durum.KOD_TANIM as DURUM ,
+											lok.LOK_TANIM as LOKASYON ,
+											lok.LOK_TUM_YOL as TAM_LOKASYON ,
+											mkn.MKN_KOD as MAKINE_KODU ,
+											mkn.MKN_TANIM as MAKINE_TANIMI ,
+											ism.ISM_PLAN_BASLAMA_TARIH as PLAN_BASLAMA_TARIH ,
+											ism.ISM_PLAN_BASLAMA_SAAT as PLAN_BASLAMA_SAAT ,
+											ism.ISM_PLAN_BITIS_TARIH as PLAN_BITIS_TARIH ,
+											ism.ISM_PLAN_BITIS_SAAT as PLAN_BITIS_SAAT ,
+											ism.ISM_BASLAMA_TARIH as BASLAMA_TARIH ,
+											ism.ISM_BASLAMA_SAAT as BASLAMA_SAAT ,
+											ism.ISM_BITIS_TARIH as ISM_BITIS_TARIH ,
+											ism.ISM_BITIS_SAAT as ISM_BITIS_SAAT ,
+											ism.ISM_SURE_CALISMA as IS_SURESI ,
+											ism.ISM_TAMAMLANMA_ORAN as TAMAMLANMA ,
+											ism.ISM_GARANTI_KAPSAMINDA AS GARANTI ,
+											ekp.EKP_TANIM as EKIPMAN ,
+											kod_is_tip.KOD_TANIM as IS_TIPI ,
+											atl.ATL_TANIM as ATOLYE ,
+											kod_is_nedeni.KOD_TANIM as IS_NEDENI ,
+											tlm.TLM_TANIM as TALIMAT ,
+											soc.SOC_TANIM as ONCELIK ,
+											ism.ISM_KAPANMA_YDK_TARIH AS KAPANIS_TARIHI, 
+											ism.ISM_KAPANMA_YDK_SAAT AS KAPANIS_SAAT ,
+											tkv.TKV_TANIM as TAKVIM ,
+											msr.MAM_TANIM as MASRAF_MERKEZI ,
+											car.CAR_TANIM as FIRMA ,
+											ist.IST_KOD as IS_TALEP_NO ,
+											isk.ISK_ISIM as IS_TALEP_EDEN ,
+											ism.ISM_IS_TARIH as ISM_IS_TARIH ,
+											ism.ISM_KAPATILDI as KAPALI ,
+											makine_durum.KOD_TANIM as MAKINE_DURUM ,
+											makine_tip.KOD_TANIM as MAKINE_TIP ,
+											kod_bina.KOD_TANIM AS BILDIRILEN_BINA, 
+											kod_kat.KOD_TANIM AS BILDIRILEN_KAT,
+											ism.ISM_SAYAC_DEGER as GUNCEL_SAYAC_DEGER ,
+											ism.ISM_NOT AS ISM_DIS_NOT ,
+											ism.ISM_MAKINE_GUVENLIK_NOTU AS ISM_IC_NOT,
+											ism.ISM_OZEL_ALAN_1 as OZEL_ALAN_1 ,
+											ism.ISM_OZEL_ALAN_2 as OZEL_ALAN_2 ,
+											ism.ISM_OZEL_ALAN_3 as OZEL_ALAN_3 ,
+											ism.ISM_OZEL_ALAN_4 as OZEL_ALAN_4 ,
+											ism.ISM_OZEL_ALAN_5 as OZEL_ALAN_5 ,
+											ism.ISM_OZEL_ALAN_6 as OZEL_ALAN_6 ,
+											ism.ISM_OZEL_ALAN_7 as OZEL_ALAN_7 ,
+											ism.ISM_OZEL_ALAN_8 as OZEL_ALAN_8 ,
+											ism.ISM_OZEL_ALAN_9 as OZEL_ALAN_9,
+											ism.ISM_OZEL_ALAN_10 as OZEL_ALAN_10,
+											kod_ozel_11.KOD_TANIM AS OZEL_ALAN_11,
+											kod_ozel_12.KOD_TANIM AS OZEL_ALAN_12,
+											kod_ozel_13.KOD_TANIM AS OZEL_ALAN_13,
+											kod_ozel_14.KOD_TANIM  AS OZEL_ALAN_14,
+											kod_ozel_15.KOD_TANIM  AS OZEL_ALAN_15 ,
+											ism.ISM_OZEL_ALAN_16 as OZEL_ALAN_16 ,
+											ism.ISM_OZEL_ALAN_17 as OZEL_ALAN_17 ,
+											ism.ISM_OZEL_ALAN_18 as OZEL_ALAN_18 ,
+											ism.ISM_OZEL_ALAN_19 as OZEL_ALAN_19 ,
+											ism.ISM_OZEL_ALAN_20 as OZEL_ALAN_20 ,
+											prs.PRS_ISIM AS PERSONEL_ADI,
+	                                    ROW_NUMBER() OVER (ORDER BY ism.TB_ISEMRI_ID DESC ) AS RowIndex ,
+										MaxIdk.IDK_MAX_ID AS MAX_IDK_ID
+	                                    FROM orjin.TB_ISEMRI ism
+
+										left join orjin.TB_ISEMRI_TIP isemri_tip on ism.ISM_TIP_ID = isemri_tip.TB_ISEMRI_TIP_ID
+										left join orjin.TB_KOD kod_isemri_durum on ism.ISM_DURUM_KOD_ID = kod_isemri_durum.TB_KOD_ID
+										left join orjin.TB_LOKASYON lok on ism.ISM_LOKASYON_ID = lok.TB_LOKASYON_ID
+										left join orjin.TB_MAKINE mkn on ism.ISM_MAKINE_ID = mkn.TB_MAKINE_ID
+										left join orjin.TB_EKIPMAN ekp on ism.ISM_EKIPMAN_ID = ekp.TB_EKIPMAN_ID
+										left join orjin.TB_KOD kod_is_tip on ism.ISM_TIP_KOD_ID = kod_is_tip.TB_KOD_ID
+										left join orjin.TB_ATOLYE atl on ism.ISM_ATOLYE_ID = atl.TB_ATOLYE_ID
+										left join orjin.TB_KOD kod_is_nedeni on ism.ISM_NEDEN_KOD_ID = kod_is_nedeni.TB_KOD_ID
+										left join orjin.TB_TALIMAT tlm on ism.ISM_TALIMAT_ID = tlm.TB_TALIMAT_ID
+										left join orjin.TB_SERVIS_ONCELIK soc on ism.ISM_ONCELIK_ID = soc.TB_SERVIS_ONCELIK_ID
+										left join orjin.TB_TAKVIM tkv on ism.ISM_TAKVIM_ID = tkv.TB_TAKVIM_ID
+										left join orjin.TB_MASRAF_MERKEZ msr on ism.ISM_MASRAF_MERKEZ_ID = msr.TB_MASRAF_MERKEZ_ID
+										left join orjin.TB_CARI car on ism.ISM_FIRMA_ID = car.TB_CARI_ID 
+										left join orjin.TB_IS_TALEBI ist on ism.TB_ISEMRI_ID = ist.IST_ISEMRI_ID 
+										left join orjin.TB_IS_TALEBI_KULLANICI isk on ist.IST_TALEP_EDEN_ID = isk.TB_IS_TALEBI_KULLANICI_ID
+										left join orjin.TB_KOD makine_durum on ism.ISM_MAKINE_DURUM_KOD_ID = makine_durum.TB_KOD_ID
+										left join orjin.TB_KOD makine_tip on mkn.MKN_TIP_KOD_ID = makine_tip.TB_KOD_ID
+
+										left join orjin.TB_KOD kod_ozel_11 on ism.ISM_OZEL_ALAN_11_KOD_ID = kod_ozel_11.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_12 on ism.ISM_OZEL_ALAN_12_KOD_ID = kod_ozel_12.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_13 on ism.ISM_OZEL_ALAN_13_KOD_ID = kod_ozel_13.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_14 on ism.ISM_OZEL_ALAN_14_KOD_ID = kod_ozel_14.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_15 on ism.ISM_OZEL_ALAN_15_KOD_ID = kod_ozel_15.TB_KOD_ID
+
+										left join orjin.TB_KOD kod_kat on ism.ISM_IS_TALEP_KAT = kod_kat.TB_KOD_ID
+										left join orjin.TB_KOD kod_bina on ism.ISM_IS_TALEP_BINA = kod_bina.TB_KOD_ID
+										
+										LEFT JOIN ( 
+									SELECT IDK_ISEMRI_ID, MAX(TB_ISEMRI_KAYNAK_ID) AS IDK_MAX_ID
+									FROM orjin.TB_ISEMRI_KAYNAK
+									GROUP BY IDK_ISEMRI_ID
+								) MaxIdk ON ism.TB_ISEMRI_ID = MaxIdk.IDK_ISEMRI_ID
+								LEFT JOIN orjin.TB_ISEMRI_KAYNAK idk ON MaxIdk.IDK_MAX_ID = idk.TB_ISEMRI_KAYNAK_ID
+								LEFT JOIN orjin.TB_PERSONEL prs ON idk.IDK_REF_ID = prs.TB_PERSONEL_ID
+								WHERE 1=1 ";
+
+		public static readonly string ISM_FETCH_COUNT_QUERY = @"select count(*) from  (
+                                    select	ism.TB_ISEMRI_ID as TB_ISEMRI_ID,
+											ist.TB_IS_TALEP_ID as ISM_IS_TALEP_ID ,
+											ism.ISM_ISEMRI_NO as ISEMRI_NO ,
+											ism.ISM_DUZENLEME_TARIH as DUZENLEME_TARIH ,
+											ism.ISM_DUZENLEME_SAAT as DUZENLEME_SAAT ,
+											isemri_tip.IMT_TANIM as ISEMRI_TIP ,
+											isemri_tip.IMT_RENK_WEB_VERSION as ISM_TIP_RENK ,
+											ism.ISM_KONU as KONU ,
+											kod_isemri_durum.KOD_TANIM as DURUM ,
+											lok.LOK_TANIM as LOKASYON ,
+											lok.LOK_TUM_YOL as TAM_LOKASYON ,
+											mkn.MKN_KOD as MAKINE_KODU ,
+											mkn.MKN_TANIM as MAKINE_TANIMI ,
+											ism.ISM_PLAN_BASLAMA_TARIH as PLAN_BASLAMA_TARIH ,
+											ism.ISM_PLAN_BASLAMA_SAAT as PLAN_BASLAMA_SAAT ,
+											ism.ISM_PLAN_BITIS_TARIH as PLAN_BITIS_TARIH ,
+											ism.ISM_PLAN_BITIS_SAAT as PLAN_BITIS_SAAT ,
+											ism.ISM_BASLAMA_TARIH as BASLAMA_TARIH ,
+											ism.ISM_BASLAMA_SAAT as BASLAMA_SAAT ,
+											ism.ISM_BITIS_TARIH as ISM_BITIS_TARIH ,
+											ism.ISM_BITIS_SAAT as ISM_BITIS_SAAT ,
+											ism.ISM_SURE_CALISMA as IS_SURESI ,
+											ism.ISM_TAMAMLANMA_ORAN as TAMAMLANMA ,
+											ism.ISM_GARANTI_KAPSAMINDA AS GARANTI ,
+											ekp.EKP_TANIM as EKIPMAN ,
+											kod_is_tip.KOD_TANIM as IS_TIPI ,
+											atl.ATL_TANIM as ATOLYE ,
+											kod_is_nedeni.KOD_TANIM as IS_NEDENI ,
+											tlm.TLM_TANIM as TALIMAT ,
+											soc.SOC_TANIM as ONCELIK ,
+											ism.ISM_KAPANMA_YDK_TARIH AS KAPANIS_TARIHI, 
+											ism.ISM_KAPANMA_YDK_SAAT AS KAPANIS_SAAT ,
+											tkv.TKV_TANIM as TAKVIM ,
+											msr.MAM_TANIM as MASRAF_MERKEZI ,
+											car.CAR_TANIM as FIRMA ,
+											ist.IST_KOD as IS_TALEP_NO ,
+											isk.ISK_ISIM as IS_TALEP_EDEN ,
+											ism.ISM_IS_TARIH as ISM_IS_TARIH ,
+											ism.ISM_KAPATILDI as KAPALI ,
+											makine_durum.KOD_TANIM as MAKINE_DURUM ,
+											makine_tip.KOD_TANIM as MAKINE_TIP ,
+											kod_bina.KOD_TANIM AS BILDIRILEN_BINA, 
+											kod_kat.KOD_TANIM AS BILDIRILEN_KAT,
+											ism.ISM_SAYAC_DEGER as GUNCEL_SAYAC_DEGER ,
+											ism.ISM_NOT AS ISM_DIS_NOT ,
+											ism.ISM_MAKINE_GUVENLIK_NOTU AS ISM_IC_NOT,
+											ism.ISM_OZEL_ALAN_1 as OZEL_ALAN_1 ,
+											ism.ISM_OZEL_ALAN_2 as OZEL_ALAN_2 ,
+											ism.ISM_OZEL_ALAN_3 as OZEL_ALAN_3 ,
+											ism.ISM_OZEL_ALAN_4 as OZEL_ALAN_4 ,
+											ism.ISM_OZEL_ALAN_5 as OZEL_ALAN_5 ,
+											ism.ISM_OZEL_ALAN_6 as OZEL_ALAN_6 ,
+											ism.ISM_OZEL_ALAN_7 as OZEL_ALAN_7 ,
+											ism.ISM_OZEL_ALAN_8 as OZEL_ALAN_8 ,
+											ism.ISM_OZEL_ALAN_9 as OZEL_ALAN_9,
+											ism.ISM_OZEL_ALAN_10 as OZEL_ALAN_10,
+											kod_ozel_11.KOD_TANIM AS OZEL_ALAN_11,
+											kod_ozel_12.KOD_TANIM AS OZEL_ALAN_12,
+											kod_ozel_13.KOD_TANIM AS OZEL_ALAN_13,
+											kod_ozel_14.KOD_TANIM  AS OZEL_ALAN_14,
+											kod_ozel_15.KOD_TANIM  AS OZEL_ALAN_15 ,
+											ism.ISM_OZEL_ALAN_16 as OZEL_ALAN_16 ,
+											ism.ISM_OZEL_ALAN_17 as OZEL_ALAN_17 ,
+											ism.ISM_OZEL_ALAN_18 as OZEL_ALAN_18 ,
+											ism.ISM_OZEL_ALAN_19 as OZEL_ALAN_19 ,
+											ism.ISM_OZEL_ALAN_20 as OZEL_ALAN_20 ,
+											prs.PRS_ISIM AS PERSONEL_ADI,
+	                                    ROW_NUMBER() OVER (ORDER BY ism.TB_ISEMRI_ID DESC) AS RowIndex ,
+										MaxIdk.IDK_MAX_ID AS MAX_IDK_ID
+	                                    FROM orjin.TB_ISEMRI ism
+
+										left join orjin.TB_ISEMRI_TIP isemri_tip on ism.ISM_TIP_ID = isemri_tip.TB_ISEMRI_TIP_ID
+										left join orjin.TB_KOD kod_isemri_durum on ism.ISM_DURUM_KOD_ID = kod_isemri_durum.TB_KOD_ID
+										left join orjin.TB_LOKASYON lok on ism.ISM_LOKASYON_ID = lok.TB_LOKASYON_ID
+										left join orjin.TB_MAKINE mkn on ism.ISM_MAKINE_ID = mkn.TB_MAKINE_ID
+										left join orjin.TB_EKIPMAN ekp on ism.ISM_EKIPMAN_ID = ekp.TB_EKIPMAN_ID
+										left join orjin.TB_KOD kod_is_tip on ism.ISM_TIP_KOD_ID = kod_is_tip.TB_KOD_ID
+										left join orjin.TB_ATOLYE atl on ism.ISM_ATOLYE_ID = atl.TB_ATOLYE_ID
+										left join orjin.TB_KOD kod_is_nedeni on ism.ISM_NEDEN_KOD_ID = kod_is_nedeni.TB_KOD_ID
+										left join orjin.TB_TALIMAT tlm on ism.ISM_TALIMAT_ID = tlm.TB_TALIMAT_ID
+										left join orjin.TB_SERVIS_ONCELIK soc on ism.ISM_ONCELIK_ID = soc.TB_SERVIS_ONCELIK_ID
+										left join orjin.TB_TAKVIM tkv on ism.ISM_TAKVIM_ID = tkv.TB_TAKVIM_ID
+										left join orjin.TB_MASRAF_MERKEZ msr on ism.ISM_MASRAF_MERKEZ_ID = msr.TB_MASRAF_MERKEZ_ID
+										left join orjin.TB_CARI car on ism.ISM_FIRMA_ID = car.TB_CARI_ID 
+										left join orjin.TB_IS_TALEBI ist on ism.TB_ISEMRI_ID = ist.IST_ISEMRI_ID 
+										left join orjin.TB_IS_TALEBI_KULLANICI isk on ist.IST_TALEP_EDEN_ID = isk.TB_IS_TALEBI_KULLANICI_ID
+										left join orjin.TB_KOD makine_durum on ism.ISM_MAKINE_DURUM_KOD_ID = makine_durum.TB_KOD_ID
+										left join orjin.TB_KOD makine_tip on mkn.MKN_TIP_KOD_ID = makine_tip.TB_KOD_ID
+
+										left join orjin.TB_KOD kod_ozel_11 on ism.ISM_OZEL_ALAN_11_KOD_ID = kod_ozel_11.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_12 on ism.ISM_OZEL_ALAN_12_KOD_ID = kod_ozel_12.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_13 on ism.ISM_OZEL_ALAN_13_KOD_ID = kod_ozel_13.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_14 on ism.ISM_OZEL_ALAN_14_KOD_ID = kod_ozel_14.TB_KOD_ID
+										left join orjin.TB_KOD kod_ozel_15 on ism.ISM_OZEL_ALAN_15_KOD_ID = kod_ozel_15.TB_KOD_ID
+
+										left join orjin.TB_KOD kod_kat on ism.ISM_IS_TALEP_KAT = kod_kat.TB_KOD_ID
+										left join orjin.TB_KOD kod_bina on ism.ISM_IS_TALEP_BINA = kod_bina.TB_KOD_ID
+										
+										LEFT JOIN ( 
+									SELECT IDK_ISEMRI_ID, MAX(TB_ISEMRI_KAYNAK_ID) AS IDK_MAX_ID
+									FROM orjin.TB_ISEMRI_KAYNAK
+									GROUP BY IDK_ISEMRI_ID
+								) MaxIdk ON ism.TB_ISEMRI_ID = MaxIdk.IDK_ISEMRI_ID
+								LEFT JOIN orjin.TB_ISEMRI_KAYNAK idk ON MaxIdk.IDK_MAX_ID = idk.TB_ISEMRI_KAYNAK_ID
+								LEFT JOIN orjin.TB_PERSONEL prs ON idk.IDK_REF_ID = prs.TB_PERSONEL_ID
+								WHERE 1=1 ";
+
+		public static readonly string MKN_FETCH_QUERY = @"WITH RowNumberedResults AS (
                                     select	mkn.TB_MAKINE_ID as TB_MAKINE_ID ,
                                             mkn.MKN_KOD as MKN_KOD ,
 		                                    mkn.MKN_TANIM as MKN_TANIM , 
@@ -104,7 +320,7 @@ namespace WebApiNew
 	                                    mkn.MKN_OZEL_ALAN_19 as MKN_OZEL_ALAN_19 ,
 	                                    mkn.MKN_OZEL_ALAN_20 as MKN_OZEL_ALAN_20 ,
 
-	                                     ROW_NUMBER() OVER (ORDER BY mkn.MKN_KOD) AS RowIndex
+	                                     ROW_NUMBER() OVER (ORDER BY mkn.TB_MAKINE_ID DESC) AS RowIndex
 	                                    FROM orjin.TB_MAKINE mkn 
 	                                    left join orjin.TB_MAKINE master_mkn on mkn.MKN_MASTER_ID = master_mkn.TB_MAKINE_ID
 
@@ -208,7 +424,7 @@ namespace WebApiNew
 	                                            mkn.MKN_OZEL_ALAN_19 as MKN_OZEL_ALAN_19 ,
 	                                            mkn.MKN_OZEL_ALAN_20 as MKN_OZEL_ALAN_20 ,
 
-	                                             ROW_NUMBER() OVER (ORDER BY mkn.MKN_KOD) AS RowIndex
+	                                             ROW_NUMBER() OVER (ORDER BY mkn.TB_MAKINE_ID DESC) AS RowIndex
 	                                            FROM orjin.TB_MAKINE mkn 
 	                                            left join orjin.TB_MAKINE master_mkn on mkn.MKN_MASTER_ID = master_mkn.TB_MAKINE_ID
 
@@ -263,7 +479,7 @@ namespace WebApiNew
 											kl.ISK_ISIM as IST_TAKIP_EDEN_ADI ,
 											
 
-	                                    ROW_NUMBER() OVER (ORDER BY mkn.MKN_KOD) AS RowIndex
+	                                    ROW_NUMBER() OVER (ORDER BY tlp.TB_IS_TALEP_ID DESC) AS RowIndex
 	                                    FROM orjin.TB_IS_TALEBI tlp 
 	                                    left join orjin.TB_IS_TALEBI_KULLANICI isk on tlp.IST_TALEP_EDEN_ID = isk.TB_IS_TALEBI_KULLANICI_ID
 										left join orjin.TB_MAKINE mkn on tlp.IST_MAKINE_ID = mkn.TB_MAKINE_ID
@@ -314,7 +530,7 @@ namespace WebApiNew
 											kl.ISK_ISIM as IST_TAKIP_EDEN_ADI ,
 											
 
-	                                    ROW_NUMBER() OVER (ORDER BY mkn.MKN_KOD) AS RowIndex
+	                                    ROW_NUMBER() OVER (ORDER BY tlp.TB_IS_TALEP_ID DESC) AS RowIndex
 	                                    FROM orjin.TB_IS_TALEBI tlp 
 	                                    left join orjin.TB_IS_TALEBI_KULLANICI isk on tlp.IST_TALEP_EDEN_ID = isk.TB_IS_TALEBI_KULLANICI_ID
 										left join orjin.TB_MAKINE mkn on tlp.IST_MAKINE_ID = mkn.TB_MAKINE_ID

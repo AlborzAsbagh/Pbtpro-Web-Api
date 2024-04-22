@@ -25,6 +25,12 @@ namespace WebApiNew.Models
 		[DataMember]
 		public int IsEmriAracGerevListSayisi { get; set; }
 
+		[DataMember]
+		public int IsEmriResimSayisi { get; set; }
+
+		[DataMember]
+		public bool IsEmriNotVar { get; set; }
+
 	}
 
 }
