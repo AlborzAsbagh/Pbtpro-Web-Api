@@ -379,15 +379,16 @@ namespace WebApiNew.Controllers
 
 
 		// Add one by one
-		public async Task<String> IsTalepToIsEmriProcess(IsTalepToIsEmriModel isTalepToIsEmriModel)
+		public async Task<Bildirim> IsTalepToIsEmriProcess(IsTalepToIsEmriModel isTalepToIsEmriModel)
 		{
 			int isEmriTipId = -1;
+			Bildirim bldr = new Bildirim();
 			try
 			{
 					using(var conn = klas.baglan())
 					{
 						isEmriTipId = conn.QueryFirstOrDefault<Int32>(@" select ISP_ISEMRI_TIPI_ID from orjin.TB_IS_TALEBI_PARAMETRE ");
-					}
+					
 
 					parametreler.Clear();
 					parametreler.Add(new Prm("TB_IS_TALEP_ID", isTalepToIsEmriModel.TALEP_ID));
@@ -538,12 +539,19 @@ namespace WebApiNew.Controllers
 						}
 					}
 
-					return "";
+					bldr.Durum = true;
+					bldr.Aciklama = entity.ISM_ISEMRI_NO;
+					bldr.Id = _isemriID;
+					return bldr;
 				}
+			}
 			catch (Exception e)
 			{
 				klas.kapat();
-				return e.Message;
+				bldr.Durum = false;
+				bldr.Aciklama = e.Message;
+				bldr.Id = -1;
+				return bldr;
 			}
 
 		}
@@ -558,17 +566,19 @@ namespace WebApiNew.Controllers
 				!(Boolean)yetki.isAuthorizedToUpdate(PagesAuthCodes.IS_TALEPLERI_TANIMLARI))
 				return Json(new { has_error = true, status_code = 401, status = "Unathorized to add or update !" });
 
-			string hasError = "";
+			List<Bildirim> list = new List<Bildirim>();
 			try
 			{
 				if (entities != null && entities.Count != 0)
 				{
 					foreach (var entity in entities)
 					{
-						hasError += await IsTalepToIsEmriProcess(entity);
+						Bildirim bldr = await IsTalepToIsEmriProcess(entity);
+						if (!bldr.Durum) return Json(new { has_error = true, status_code = 500, status = bldr.Aciklama });
+						list.Add(bldr);
 					}
-					if(hasError != "") return Json(new { has_error = true, status_code = 500, status = hasError });
-					return Json(new { has_error = false, status_code = 200, status = "Process completed successfully." });
+					
+					return Json(new { has_error = false, status_code = 200, isEmriNolari = list });
 				}
 				else return Json(new { has_error = true, status_code = 400, status = "Bad Request ( entity may be null or 0 lentgh)" });
 			}
