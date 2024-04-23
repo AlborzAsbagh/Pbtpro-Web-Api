@@ -2238,7 +2238,7 @@ namespace WebApiNew.Controllers
 					( select count(TB_ISEMRI_MLZ_ID) from orjin.TB_ISEMRI_MLZ where IDM_ISEMRI_ID = @isEmriId ) as IsEmriMalzemeListSayisi ,
 					( select count(TB_RESIM_ID) from orjin.TB_RESIM where RSM_REF_GRUP = 'ISEMRI' and RSM_REF_ID = @isEmriId ) as IsEmriResimSayisi ,
 					( select count(TB_DOSYA_ID) from dbo.TB_DOSYA where DSY_REF_GRUP = 'ISEMRI' and DSY_REF_ID = @isEmriId ) as IsEmriDosyaSayisi ,
-					COALESCE((SELECT CASE WHEN COALESCE(ISM_MAKINE_GUVENLIK_NOTU, '') = '' THEN 0 ELSE 1 END FROM orjin.TB_ISEMRI WHERE TB_ISEMRI_ID = @isEmriId), 0) AS IsEmriNotVar 
+					COALESCE((SELECT CASE WHEN COALESCE(ISM_MAKINE_GUVENLIK_NOTU, '') = '' THEN 0 ELSE 1 END FROM orjin.TB_ISEMRI WHERE TB_ISEMRI_ID = @isEmriId), 0) AS IsEmriNotVar ,
 					COALESCE((SELECT CASE WHEN COALESCE(ISM_ACIKLAMA, '') = '' THEN 0 ELSE 1 END FROM orjin.TB_ISEMRI WHERE TB_ISEMRI_ID = @isEmriId), 0) AS IsEmriAciklamaVar ";
 			try
 			{
